@@ -48,6 +48,8 @@ class SLH_Api_Error extends Exception {
 		'packaging_dimensions' => 'ابعاد بسته',
 		'file'                 => 'فایل تصویر',
 		'variants'             => 'تنوع‌ها',
+		'product_attribute'    => 'ویژگی‌های دسته',
+		'attributes'           => 'ویژگی‌های دسته',
 	);
 
 	/**

@@ -24,6 +24,7 @@ class SLH_Installer {
 			as_unschedule_all_actions( '', array(), SLH_Queue::GROUP );
 		}
 		delete_option( 'slh_lock_worker' );
+		delete_option( 'slh_pause_until' );
 	}
 
 	/**
@@ -58,11 +59,13 @@ class SLH_Installer {
 				last_synced_at datetime DEFAULT NULL,
 				last_error text DEFAULT NULL,
 				last_log_id bigint(20) unsigned DEFAULT NULL,
+				batch_id varchar(20) DEFAULT NULL,
 				updated_at datetime NOT NULL,
 				PRIMARY KEY  (id),
 				UNIQUE KEY object_wc (object_type,wc_id),
 				KEY basalam (object_type,basalam_id),
-				KEY sync_status (sync_status)
+				KEY sync_status (sync_status),
+				KEY batch (batch_id,sync_status)
 			) {$charset};"
 		);
 

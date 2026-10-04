@@ -36,11 +36,12 @@ class SLH_Admin {
 
 		add_menu_page( __( 'سلام‌هاب', 'salamhub' ), __( 'سلام‌هاب', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
 		add_submenu_page( 'salamhub', __( 'داشبورد و سلامت', 'salamhub' ), __( 'داشبورد', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ) );
-		add_submenu_page( 'salamhub', __( 'تنظیمات سلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
+		SLH_Admin_Tools::add_pages();
 
 		$errors = SLH_Logger::count_open_errors( 24 * 7 );
 		$badge  = $errors ? ' <span class="awaiting-mod">' . esc_html( slh_fa_digits( $errors ) ) . '</span>' : '';
 		add_submenu_page( 'salamhub', __( 'لاگ همگام‌سازی', 'salamhub' ), __( 'لاگ', 'salamhub' ) . $badge, self::CAP, 'salamhub-logs', array( __CLASS__, 'page_logs' ) );
+		add_submenu_page( 'salamhub', __( 'تنظیمات سلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
 	}
 
 	/**
@@ -78,6 +79,13 @@ class SLH_Admin {
 					'retrying'       => __( 'در حال افزودن به صف…', 'salamhub' ),
 					'queued'         => __( 'در صف قرار گرفت. نتیجه همین‌جا نمایش داده می‌شود.', 'salamhub' ),
 					'networkError'   => __( 'درخواست به سایت خودت نرسید. اینترنت یا ورودت به پیشخوان را بررسی کن و دوباره امتحان کن.', 'salamhub' ),
+					'starting'       => __( 'در حال شروع…', 'salamhub' ),
+					'refreshing'     => __( 'در حال دریافت از باسلام…', 'salamhub' ),
+					'loading'        => __( 'در حال دریافت…', 'salamhub' ),
+					'checkAttrs'     => __( 'بررسی ویژگی‌های اجباری', 'salamhub' ),
+					/* translators: %s: product count */
+					'confirmBulk'    => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'salamhub' ),
+					'confirmCancel'  => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'salamhub' ),
 					'confirmDisconn' => __( 'اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند.', 'salamhub' ),
 				),
 			)

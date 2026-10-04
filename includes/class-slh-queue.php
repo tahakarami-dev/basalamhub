@@ -97,11 +97,12 @@ class SLH_Queue {
 	/**
 	 * Puts a product in the queue once (duplicates are ignored).
 	 *
-	 * @param int  $product_id Product ID.
-	 * @param bool $force      Send even if nothing changed since the last sync.
+	 * @param int         $product_id Product ID.
+	 * @param bool        $force      Send even if nothing changed since the last sync.
+	 * @param string|null $batch_id   Bulk batch this product belongs to.
 	 * @return bool Whether the product is now in the queue.
 	 */
-	public static function enqueue_product( $product_id, $force = false ) {
+	public static function enqueue_product( $product_id, $force = false, $batch_id = null ) {
 		$product_id = (int) $product_id;
 		if ( ! self::available() || $product_id <= 0 ) {
 			return false;
@@ -113,7 +114,11 @@ class SLH_Queue {
 		if ( ! self::has_pending( self::HOOK_PRODUCT, $args ) ) {
 			as_enqueue_async_action( self::HOOK_PRODUCT, $args, self::GROUP );
 		}
-		SLH_Links::set_status( 'product', $product_id, 'queued' );
+		$data = array( 'sync_status' => 'queued' );
+		if ( null !== $batch_id ) {
+			$data['batch_id'] = $batch_id;
+		}
+		SLH_Links::upsert( 'product', $product_id, $data );
 		return true;
 	}
 
@@ -150,6 +155,10 @@ class SLH_Queue {
 			array( 'product_id' => (int) $product_id ),
 			function () use ( $product_id ) {
 				( new SLH_Product_Sync( SLH_Plugin::api() ) )->sync( (int) $product_id );
+				$link = SLH_Links::get( 'product', (int) $product_id );
+				if ( $link && $link->batch_id ) {
+					SLH_Bulk::maybe_finish( $link->batch_id );
+				}
 			}
 		);
 	}
@@ -162,6 +171,12 @@ class SLH_Queue {
 	 * @param callable $job  Work.
 	 */
 	private static function run_exclusive( $hook, array $args, callable $job ) {
+		// Basalam asked us to slow down (429): hold every job until the pause ends.
+		$paused_until = (int) get_option( 'slh_pause_until', 0 );
+		if ( $paused_until > time() ) {
+			as_schedule_single_action( $paused_until + wp_rand( 1, 20 ), $hook, $args, self::GROUP );
+			return;
+		}
 		$owner = SLH_Lock::acquire( 'worker', self::LOCK_TTL );
 		if ( ! $owner ) {
 			as_schedule_single_action( time() + 15, $hook, $args, self::GROUP );
@@ -193,6 +208,18 @@ class SLH_Queue {
 		set_transient( 'slh_attempt_' . $attempt_key, $attempt + 1, DAY_IN_SECONDS );
 		as_schedule_single_action( time() + $delay, $hook, $args, self::GROUP );
 		return $delay;
+	}
+
+	/**
+	 * Pauses all SalamHub jobs (rate limit). Jobs keep their place and resume afterwards.
+	 *
+	 * @param int $seconds Seconds.
+	 */
+	public static function pause( $seconds ) {
+		$until = time() + max( 10, (int) $seconds );
+		if ( $until > (int) get_option( 'slh_pause_until', 0 ) ) {
+			update_option( 'slh_pause_until', $until, false );
+		}
 	}
 
 	/**

@@ -203,6 +203,27 @@ class SLH_Api_Client {
 	}
 
 	/**
+	 * GET /v1/categories — the whole Basalam category tree.
+	 *
+	 * @return array[] Root categories with nested `children`.
+	 */
+	public function categories() {
+		$res = $this->request( 'GET', '/v1/categories' );
+		return isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array();
+	}
+
+	/**
+	 * GET /v1/categories/{id}/attributes — attribute groups of a category (with `required`).
+	 *
+	 * @param int $category_id Basalam category.
+	 * @return array[] Attribute groups.
+	 */
+	public function category_attributes( $category_id ) {
+		$res = $this->request( 'GET', '/v1/categories/' . (int) $category_id . '/attributes', null, array( 'exclude_multi_selects' => true ) );
+		return isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array();
+	}
+
+	/**
 	 * POST /v1/files (multipart) — uploads a product photo, returns the file record with `id`.
 	 *
 	 * @param string $path      Local file path.

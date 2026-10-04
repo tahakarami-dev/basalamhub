@@ -62,13 +62,49 @@ if ( 'POST' === $method && '/v1/files' === $path ) {
 	if ( empty( $_FILES['file'] ) || ( $_POST['file_type'] ?? '' ) !== 'product.photo' ) {
 		out( 422, array( 'detail' => array( array( 'loc' => array( 'body', 'file' ), 'msg' => 'field required' ) ) ), $state, $state_file );
 	}
-	$id                   = $state['next_id']++;
-	$state['files'][ $id ] = array( 'name' => $_FILES['file']['name'], 'size' => $_FILES['file']['size'] );
+	$id   = $state['next_id']++;
+	$info = @getimagesize( $_FILES['file']['tmp_name'] );
+	$state['files'][ $id ] = array( 'name' => $_FILES['file']['name'], 'size' => $_FILES['file']['size'], 'width' => $info ? $info[0] : 0, 'height' => $info ? $info[1] : 0, 'mime' => $info ? $info['mime'] : '' );
 	out( 201, array( 'id' => $id, 'file_name' => $_FILES['file']['name'], 'url' => 'https://statics.basalam.com/' . $id . '.jpg' ), $state, $state_file );
+}
+
+if ( 'GET' === $method && '/v1/categories' === $path ) {
+	out( 200, array( 'data' => array(
+		array( 'id' => 1, 'title' => 'خوراکی', 'children' => array(
+			array( 'id' => 1287, 'title' => 'عسل', 'children' => array() ),
+			array( 'id' => 1300, 'title' => 'ادویه', 'children' => array(
+				array( 'id' => 1301, 'title' => 'زعفران', 'children' => null ),
+			) ),
+		) ),
+		array( 'id' => 2, 'title' => 'پوشاک', 'children' => array(
+			array( 'id' => 2000, 'title' => 'تیشرت', 'children' => array() ),
+		) ),
+	) ), $state, $state_file );
+}
+
+if ( 'GET' === $method && preg_match( '#^/v1/categories/(\d+)/attributes$#', $path, $m ) ) {
+	$groups = array();
+	if ( '2000' === $m[1] ) {
+		$groups[] = array( 'title' => 'مشخصات', 'attributes' => array(
+			array( 'id' => 501, 'title' => 'جنس', 'type' => null, 'required' => true, 'selected_values' => array() ),
+			array( 'id' => 502, 'title' => 'یقه', 'type' => null, 'required' => true, 'selected_values' => array(
+				array( 'id' => 7001, 'title' => 'گرد', 'value' => 'round', 'attribute_id' => 502 ),
+				array( 'id' => 7002, 'title' => 'هفت', 'value' => 'v', 'attribute_id' => 502 ),
+			) ),
+			array( 'id' => 503, 'title' => 'کشور سازنده', 'type' => null, 'required' => false, 'selected_values' => array() ),
+		) );
+	}
+	out( 200, array( 'data' => $groups ), $state, $state_file );
 }
 
 if ( 'POST' === $method && preg_match( '#^/v1/vendors/(\d+)/products$#', $path, $m ) ) {
 	$missing = array();
+	if ( isset( $body['category_id'] ) && 2000 === $body['category_id'] ) {
+		$given = array_column( isset( $body['product_attribute'] ) ? $body['product_attribute'] : array(), 'attribute_id' );
+		if ( array_diff( array( 501, 502 ), $given ) ) {
+			$missing[] = array( 'loc' => array( 'body', 'product_attribute' ), 'msg' => 'required attributes missing', 'type' => 'value_error' );
+		}
+	}
 	foreach ( array( 'name', 'category_id', 'status', 'preparation_days', 'package_weight' ) as $f ) {
 		if ( ! isset( $body[ $f ] ) ) {
 			$missing[] = array( 'loc' => array( 'body', $f ), 'msg' => 'field required', 'type' => 'value_error.missing' );

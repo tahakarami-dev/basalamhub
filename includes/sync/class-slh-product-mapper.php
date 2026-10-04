@@ -21,7 +21,7 @@ class SLH_Product_Mapper {
 		'price'       => array( 'primary_price' ),
 		'stock'       => array( 'stock' ),
 		'shipping'    => array( 'weight', 'package_weight', 'packaging_dimensions', 'preparation_days' ),
-		'category'    => array( 'category_id' ),
+		'category'    => array( 'category_id', 'product_attribute' ),
 	);
 
 	/**
@@ -255,10 +255,20 @@ class SLH_Product_Mapper {
 			$cat = (int) SLH_Settings::get( 'default_category_id', 0 );
 		}
 		if ( $cat <= 0 ) {
+			$names = array();
+			foreach ( $product->get_category_ids() as $term_id ) {
+				$term = get_term( $term_id, 'product_cat' );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$names[] = '«' . $term->name . '»';
+				}
+			}
 			$problems[] = array(
 				'field'      => 'category_id',
-				'message'    => __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'salamhub' ),
-				'suggestion' => __( 'شناسه‌ی دسته‌ی باسلام را در کادر «سلام‌هاب» صفحه‌ی ویرایش محصول، یا دسته‌ی پیش‌فرض را در سلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
+				'message'    => $names
+					/* translators: %s: WooCommerce category names */
+					? sprintf( __( 'دسته‌ی %s به هیچ دسته‌ی باسلام نگاشت نشده.', 'salamhub' ), implode( '، ', $names ) )
+					: __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'salamhub' ),
+				'suggestion' => __( 'در سلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر سلام‌هاب همین محصول بنویس.)', 'salamhub' ),
 			);
 		}
 		return $cat;

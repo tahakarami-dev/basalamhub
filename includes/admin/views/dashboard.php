@@ -56,6 +56,23 @@ $checks[]   = null === $multiplier
 	? array( 'bad', __( 'واحد پول', 'salamhub' ), sprintf( __( 'واحد %s قابل تبدیل به ریال نیست؛ در تنظیمات واحد را دستی انتخاب کن.', 'salamhub' ), get_woocommerce_currency() ) )
 	: array( 'ok', __( 'واحد پول', 'salamhub' ), 1 === $multiplier ? __( 'ریال (بدون تبدیل)', 'salamhub' ) : sprintf( /* translators: %s: multiplier */ __( 'قیمت‌ها ×%s به ریال تبدیل می‌شوند', 'salamhub' ), slh_fa_number( $multiplier ) ) );
 
+$unmapped = SLH_Categories::unmapped_terms();
+if ( $unmapped ) {
+	$checks[] = (int) SLH_Settings::get( 'default_category_id', 0 )
+		/* translators: %s: count */
+		? array( 'warn', __( 'نگاشت دسته‌ها', 'salamhub' ), sprintf( __( '%s دسته نگاشت نشده؛ محصولاتشان با دسته‌ی پیش‌فرض ارسال می‌شوند.', 'salamhub' ), slh_fa_number( count( $unmapped ) ) ) )
+		/* translators: %s: count */
+		: array( 'bad', __( 'نگاشت دسته‌ها', 'salamhub' ), sprintf( __( '%s دسته‌ی دارای محصول نگاشت نشده؛ محصولاتشان ارسال نمی‌شوند.', 'salamhub' ), slh_fa_number( count( $unmapped ) ) ) );
+} else {
+	$checks[] = array( 'ok', __( 'نگاشت دسته‌ها', 'salamhub' ), __( 'همه‌ی دسته‌های دارای محصول نگاشت شده‌اند.', 'salamhub' ) );
+}
+if ( (int) get_option( 'slh_pause_until', 0 ) > time() ) {
+	/* translators: %s: seconds */
+	$checks[] = array( 'warn', __( 'محدودیت درخواست باسلام', 'salamhub' ), sprintf( __( 'صف به درخواست باسلام %s ثانیه مکث کرده و بعد خودکار ادامه می‌دهد.', 'salamhub' ), slh_fa_digits( (int) get_option( 'slh_pause_until' ) - time() ) ) );
+}
+
+$batch = SLH_Bulk::current();
+
 $check_icons = array( 'ok' => 'dashicons-yes-alt', 'warn' => 'dashicons-warning', 'bad' => 'dashicons-dismiss' );
 ?>
 <header class="slh-page-head">
@@ -69,11 +86,20 @@ $check_icons = array( 'ok' => 'dashicons-yes-alt', 'warn' => 'dashicons-warning'
 		<ol class="slh-steps">
 			<li><?php esc_html_e( 'در پنل توسعه‌دهندگان باسلام یک توکن دسترسی شخصی بساز (با دسترسی محصولات غرفه).', 'salamhub' ); ?></li>
 			<li><?php esc_html_e( 'توکن را در تنظیمات سلام‌هاب بچسبان و «ذخیره و تست اتصال» را بزن.', 'salamhub' ); ?></li>
-			<li><?php esc_html_e( 'شناسه‌ی دسته‌ی پیش‌فرض باسلام را وارد کن.', 'salamhub' ); ?></li>
-			<li><?php esc_html_e( 'در صفحه‌ی ویرایش یک محصول، «ارسال به باسلام» را بزن.', 'salamhub' ); ?></li>
+			<li><?php esc_html_e( 'در «نگاشت دسته‌ها» برای هر دسته‌ی ووکامرس، دسته‌ی باسلام را انتخاب کن.', 'salamhub' ); ?></li>
+			<li><?php esc_html_e( 'یک محصول را از صفحه‌ی ویرایشش بفرست؛ اگر درست بود، بقیه را از «ارسال گروهی».', 'salamhub' ); ?></li>
 		</ol>
 		<div class="slh-card__foot">
 			<a class="slh-btn slh-btn--primary" href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub-settings' ) ); ?>"><?php esc_html_e( 'اتصال به باسلام', 'salamhub' ); ?></a>
+		</div>
+	</section>
+<?php endif; ?>
+
+<?php if ( $batch && 'running' === $batch['status'] ) : ?>
+	<section class="slh-card slh-section">
+		<?php SLH_Admin_Tools::progress_html( $batch, SLH_Bulk::progress( $batch ) ); ?>
+		<div class="slh-card__foot">
+			<a class="slh-btn slh-btn--ghost" href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub-bulk' ) ); ?>"><?php esc_html_e( 'جزئیات ارسال گروهی', 'salamhub' ); ?></a>
 		</div>
 	</section>
 <?php endif; ?>

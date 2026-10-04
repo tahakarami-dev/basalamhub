@@ -28,6 +28,9 @@ class SLH_Plugin {
 
 		SLH_Installer::maybe_upgrade();
 		SLH_Queue::init();
+		SLH_Bulk::init();
+		SLH_Categories::init();
+		SLH_Price_Rules::init();
 
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_update_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
@@ -35,6 +38,7 @@ class SLH_Plugin {
 
 		if ( is_admin() ) {
 			SLH_Admin::init();
+			SLH_Admin_Tools::init();
 			SLH_Product_UI::init();
 		}
 	}

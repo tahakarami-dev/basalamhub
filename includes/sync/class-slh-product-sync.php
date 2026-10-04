@@ -102,6 +102,26 @@ class SLH_Product_Sync {
 		}
 
 		$payload = $mapped['payload'];
+		if ( ! empty( $payload['_slh_missing_attributes'] ) ) {
+			$this->fail(
+				$product,
+				array(
+					'message'    => __( 'به باسلام ارسال نشد.', 'salamhub' ),
+					/* translators: %s: attribute names */
+					'reason'     => sprintf( __( 'دسته‌ی باسلام این ویژگی‌های اجباری را می‌خواهد که مقدار ندارند: %s.', 'salamhub' ), implode( '، ', $payload['_slh_missing_attributes'] ) ),
+					'suggestion' => __( 'در سلام‌هاب › نگاشت دسته‌ها مقدار پیش‌فرض این ویژگی‌ها را وارد کن، یا در محصول ویژگی ووکامرسی با همین نام بساز.', 'salamhub' ),
+					'context'    => array( 'category_id' => $payload['category_id'] ),
+				)
+			);
+			return 'failed';
+		}
+		$payload = array_filter(
+			$payload,
+			function ( $key ) {
+				return 0 !== strpos( (string) $key, '_slh_' );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
 		$link    = SLH_Links::get( 'product', $id );
 		$hash    = md5( wp_json_encode( array( $payload, $this->image_signatures( $mapped['image_ids'] ) ) ) );
 
@@ -257,6 +277,31 @@ class SLH_Product_Sync {
 
 		if ( 'auth' === $e->kind ) {
 			SLH_Settings::update_connection( array( 'status' => 'invalid', 'message' => $e->getMessage() ) );
+		}
+
+		if ( 'rate_limit' === $e->kind ) {
+			// Not this product's fault: pause the whole queue and keep its place, without
+			// using up its retry attempts or writing one warning per product.
+			$already_paused = (int) get_option( 'slh_pause_until', 0 ) > time();
+			SLH_Queue::pause( $e->retry_after );
+			as_schedule_single_action( (int) get_option( 'slh_pause_until' ) + wp_rand( 1, 20 ), SLH_Queue::HOOK_PRODUCT, array( 'product_id' => $id ), SLH_Queue::GROUP );
+			SLH_Links::upsert( 'product', $id, array( 'sync_status' => 'queued' ) );
+			if ( ! $already_paused ) {
+				SLH_Logger::log(
+					array(
+						'level'       => 'warning',
+						'event'       => 'rate_limited',
+						'object_type' => 'system',
+						'title'       => __( 'صف پس‌زمینه', 'salamhub' ),
+						/* translators: %s: seconds */
+						'message'     => $e->getMessage() . ' ' . sprintf( __( 'صف %s ثانیه مکث می‌کند و بعد از همان‌جا ادامه می‌دهد.', 'salamhub' ), slh_fa_digits( max( 10, (int) $e->retry_after ) ) ),
+						'reason'      => $e->reason,
+						'suggestion'  => $e->suggestion,
+						'context'     => $e->details,
+					)
+				);
+			}
+			return 'retrying';
 		}
 
 		if ( $e->retryable ) {

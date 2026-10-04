@@ -104,9 +104,9 @@ $slh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_
 		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'ارسال محصول', 'salamhub' ); ?></h2></div>
 		<div class="slh-form-grid">
 			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'default_category_id' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'شناسه‌ی دسته‌ی پیش‌فرض باسلام', 'salamhub' ); ?></span>
+				<span class="slh-field__label"><?php esc_html_e( 'دسته‌ی پیش‌فرض باسلام (شناسه)', 'salamhub' ); ?></span>
 				<input class="slh-field__input slh-field__ltr" type="text" inputmode="numeric" name="default_category_id" value="<?php echo esc_attr( $slh_val( 'default_category_id' ) ); ?>">
-				<?php $slh_hint( 'default_category_id', __( 'برای محصولی که در کادر سلام‌هاب‌اش دسته‌ی جدا ندارد. نگاشت دسته‌های ووکامرس به باسلام در نسخه‌ی بعدی اضافه می‌شود.', 'salamhub' ) ); ?>
+				<?php $slh_hint( 'default_category_id', __( 'اختیاری. فقط برای محصولی که دسته‌اش در «نگاشت دسته‌ها» نگاشت نشده. خالی بماند، چنین محصولی ارسال نمی‌شود و دلیلش در لاگ می‌آید.', 'salamhub' ) ); ?>
 			</label>
 
 			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'preparation_days' ) ); ?>">

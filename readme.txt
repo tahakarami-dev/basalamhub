@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, sync, marketplace, iran
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,13 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 فقط از API رسمی باسلام استفاده می‌کند.
 
 == Changelog ==
+
+= 0.2.0 =
+* ارسال گروهی در پس‌زمینه با نوار پیشرفت، توقف، و ارسال از لیست محصولات
+* نگاشت دسته‌های ووکامرس به باسلام با جستجو، ارث‌بری از دسته‌ی والد و ویژگی‌های اجباری دسته
+* قوانین قیمت سراسری و دسته‌ای، گردکردن و پیش‌نمایش
+* تغییر ابعاد و فشرده‌سازی تصویر روی یک کپی؛ تبدیل WebP به JPEG
+* مکث سراسری صف هنگام محدودیت درخواست باسلام (429)
 
 = 0.1.0 =
 * اتصال با توکن شخصی (رمزنگاری‌شده) و تست اتصال

@@ -2,9 +2,12 @@
 /**
  * Uploads product images to Basalam once and remembers the Basalam file ID.
  *
- * An image is re-uploaded only when the file itself changes (path, size or mtime).
- * The site's original image is never modified. Resizing to Basalam's limits is added
- * in the images phase through the `slh_image_upload_path` filter.
+ * Before upload an image that is too large (pixels or bytes) or in a format Basalam may
+ * not accept (WebP/AVIF/GIF/BMP) is converted on a temporary COPY: resized, re-compressed
+ * and saved as JPEG/PNG. The site's original file is never modified, and the copy is
+ * deleted right after the upload.
+ *
+ * An image is uploaded again only when the file itself or the processing limits change.
  *
  * @package SalamHub
  */
@@ -27,13 +30,33 @@ class SLH_Image_Sync {
 	}
 
 	/**
+	 * Processing limits. Basalam doesn't publish exact numbers in its API spec; these are
+	 * conservative values that keep photos sharp while uploads stay fast on weak hosts.
+	 *
+	 * @return array{max_side:int, max_bytes:int, quality:int, max_images:int, formats:string[]}
+	 */
+	public static function limits() {
+		return wp_parse_args(
+			(array) apply_filters( 'slh_image_limits', array() ),
+			array(
+				'max_side'   => 2048,
+				'max_bytes'  => 2 * MB_IN_BYTES,
+				'quality'    => 82,
+				'max_images' => 10,
+				'formats'    => array( 'image/jpeg', 'image/png' ),
+			)
+		);
+	}
+
+	/**
 	 * @param int[] $attachment_ids Attachments, first is the main photo.
-	 * @return int[] Basalam file IDs in the same order (failed images are skipped).
+	 * @return int[] Basalam file IDs in the same order (failed gallery images are skipped).
 	 * @throws SLH_Api_Error When the main image cannot be uploaded.
 	 */
 	public function ensure_uploaded( array $attachment_ids ) {
-		$out = array();
-		foreach ( array_values( $attachment_ids ) as $i => $attachment_id ) {
+		$out    = array();
+		$limits = self::limits();
+		foreach ( array_slice( array_values( $attachment_ids ), 0, $limits['max_images'] ) as $i => $attachment_id ) {
 			try {
 				$file_id = $this->ensure_one( (int) $attachment_id );
 				if ( $file_id ) {
@@ -55,24 +78,31 @@ class SLH_Image_Sync {
 	 * @throws SLH_Api_Error On upload failure.
 	 */
 	private function ensure_one( $attachment_id ) {
-		$path = get_attached_file( $attachment_id );
+		$path = self::original_path( $attachment_id );
 		if ( ! $path ) {
 			return 0;
 		}
-		$sig      = $this->signature( $path );
+		$sig      = self::signature( $path );
 		$existing = (int) get_post_meta( $attachment_id, self::META_ID, true );
 		if ( $existing && get_post_meta( $attachment_id, self::META_SIG, true ) === $sig ) {
 			return $existing;
 		}
 
-		/**
-		 * Lets the images phase hand over a resized copy instead of the original.
-		 *
-		 * @param string $path          Original file path.
-		 * @param int    $attachment_id Attachment ID.
-		 */
-		$upload_path = apply_filters( 'slh_image_upload_path', $path, $attachment_id );
-		$file        = $this->api->upload_file( $upload_path, 'product.photo' );
+		$prepared = $this->prepare( $path, $attachment_id );
+		try {
+			/**
+			 * Last chance to replace the file that will be uploaded.
+			 *
+			 * @param string $path          File to upload.
+			 * @param int    $attachment_id Attachment ID.
+			 */
+			$upload_path = apply_filters( 'slh_image_upload_path', $prepared['path'], $attachment_id );
+			$file        = $this->api->upload_file( $upload_path, 'product.photo' );
+		} finally {
+			if ( $prepared['temp'] && file_exists( $prepared['path'] ) ) {
+				wp_delete_file( $prepared['path'] );
+			}
+		}
 
 		if ( empty( $file['id'] ) ) {
 			throw new SLH_Api_Error(
@@ -92,12 +122,107 @@ class SLH_Image_Sync {
 	}
 
 	/**
+	 * The full-size original, even when WordPress made a "-scaled" copy for big uploads.
+	 *
+	 * @param int $attachment_id Attachment.
+	 * @return string|false
+	 */
+	private static function original_path( $attachment_id ) {
+		$path = function_exists( 'wp_get_original_image_path' ) ? wp_get_original_image_path( $attachment_id ) : false;
+		if ( ! $path || ! file_exists( $path ) ) {
+			$path = get_attached_file( $attachment_id );
+		}
+		return $path && file_exists( $path ) ? $path : false;
+	}
+
+	/**
+	 * Returns a file that fits the limits: the original when it already fits, otherwise a
+	 * processed temporary copy.
+	 *
+	 * @param string $path          Original file.
+	 * @param int    $attachment_id Attachment (for naming).
+	 * @return array{path:string, temp:bool}
+	 */
+	public function prepare( $path, $attachment_id = 0 ) {
+		$limits = self::limits();
+		$info   = @getimagesize( $path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- unreadable files are handled below.
+		$mime   = $info && ! empty( $info['mime'] ) ? $info['mime'] : '';
+		$fits   = $info
+			&& in_array( $mime, $limits['formats'], true )
+			&& max( (int) $info[0], (int) $info[1] ) <= $limits['max_side']
+			&& filesize( $path ) <= $limits['max_bytes'];
+		if ( $fits || ! $info ) {
+			return array( 'path' => $path, 'temp' => false );
+		}
+
+		$editor = wp_get_image_editor( $path );
+		if ( is_wp_error( $editor ) ) {
+			// No GD/Imagick: upload the original and let Basalam decide.
+			return array( 'path' => $path, 'temp' => false );
+		}
+
+		$size = $editor->get_size();
+		if ( max( $size['width'], $size['height'] ) > $limits['max_side'] ) {
+			$editor->resize( $limits['max_side'], $limits['max_side'], false );
+		}
+
+		// Keep PNG (it may have transparency); everything else becomes JPEG.
+		$out_mime = 'image/png' === $mime ? 'image/png' : 'image/jpeg';
+		$ext      = 'image/png' === $out_mime ? 'png' : 'jpg';
+		$dir      = self::temp_dir();
+		$target   = trailingslashit( $dir ) . 'slh-' . (int) $attachment_id . '-' . wp_generate_password( 8, false ) . '.' . $ext;
+
+		foreach ( array( $limits['quality'], 72, 62, 50 ) as $quality ) {
+			$editor->set_quality( $quality );
+			$saved = $editor->save( $target, $out_mime );
+			if ( is_wp_error( $saved ) ) {
+				return array( 'path' => $path, 'temp' => false );
+			}
+			$target = $saved['path'];
+			clearstatcache( true, $target );
+			if ( filesize( $target ) <= $limits['max_bytes'] || 'image/png' === $out_mime ) {
+				break;
+			}
+		}
+
+		// A PNG that is still too big after resizing becomes a JPEG.
+		if ( 'image/png' === $out_mime && filesize( $target ) > $limits['max_bytes'] ) {
+			wp_delete_file( $target );
+			$editor->set_quality( 72 );
+			$saved = $editor->save( preg_replace( '/\.png$/', '.jpg', $target ), 'image/jpeg' );
+			if ( is_wp_error( $saved ) ) {
+				return array( 'path' => $path, 'temp' => false );
+			}
+			$target = $saved['path'];
+		}
+		return array( 'path' => $target, 'temp' => true );
+	}
+
+	/**
+	 * Private temp folder inside uploads (shared hosts often block the system temp dir).
+	 *
+	 * @return string
+	 */
+	private static function temp_dir() {
+		$uploads = wp_upload_dir( null, false );
+		$dir     = trailingslashit( $uploads['basedir'] ) . 'salamhub-tmp';
+		if ( ! is_dir( $dir ) ) {
+			wp_mkdir_p( $dir );
+			// Not browsable; files live only for the seconds of an upload.
+			file_put_contents( $dir . '/index.php', "<?php\n// Silence is golden.\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		}
+		return $dir;
+	}
+
+	/**
+	 * Identity of the file plus the limits it was processed with.
+	 *
 	 * @param string $path File path.
 	 * @return string
 	 */
-	private function signature( $path ) {
+	public static function signature( $path ) {
 		$size  = file_exists( $path ) ? filesize( $path ) : 0;
 		$mtime = file_exists( $path ) ? filemtime( $path ) : 0;
-		return md5( $path . '|' . $size . '|' . $mtime );
+		return md5( $path . '|' . $size . '|' . $mtime . '|' . wp_json_encode( self::limits() ) );
 	}
 }
