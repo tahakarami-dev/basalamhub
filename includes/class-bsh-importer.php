@@ -12,16 +12,18 @@
  * One product per background job: a product with ten photos stays far below any host's
  * time limit.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Importer {
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
 
-	const STATE    = 'slh_import_state';
-	const HOOK     = 'slh_import_next';
-	const HOOK_ONE = 'slh_import_one';
+class BSH_Importer {
+
+	const STATE    = 'bsh_import_state';
+	const HOOK     = 'bsh_import_next';
+	const HOOK_ONE = 'bsh_import_one';
 
 	/**
 	 * Hooks.
@@ -75,8 +77,8 @@ class SLH_Importer {
 	 * @return array{ready: bool, new: int, linked: int, review: int, fetched_at: string}
 	 */
 	public static function preview() {
-		$linker = SLH_Linker::state();
-		$counts = SLH_Linker::counts();
+		$linker = BSH_Linker::state();
+		$counts = BSH_Linker::counts();
 		return array(
 			'ready'      => 'ready' === $linker['status'],
 			'new'        => $counts['none'],
@@ -93,20 +95,20 @@ class SLH_Importer {
 	 * @return true|WP_Error
 	 */
 	public static function start( array $options ) {
-		if ( ! SLH_Settings::is_connected() ) {
-			return new WP_Error( 'not_connected', __( 'اول در باسلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) );
+		if ( ! BSH_Settings::is_connected() ) {
+			return new WP_Error( 'not_connected', __( 'اول در باسلام‌هاب › تنظیمات به باسلام وصل شو.', 'basalamhub' ) );
 		}
-		if ( self::is_running() || SLH_Linker::is_running() || SLH_Bulk::is_running() ) {
-			return new WP_Error( 'busy', __( 'یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'salamhub' ) );
+		if ( self::is_running() || BSH_Linker::is_running() || BSH_Bulk::is_running() ) {
+			return new WP_Error( 'busy', __( 'یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'basalamhub' ) );
 		}
 		$preview = self::preview();
 		if ( ! $preview['ready'] ) {
-			return new WP_Error( 'no_snapshot', __( 'اول «دریافت فهرست غرفه» را بزن تا محصولات غرفه خوانده و با سایت مقایسه شوند.', 'salamhub' ) );
+			return new WP_Error( 'no_snapshot', __( 'اول «دریافت فهرست غرفه» را بزن تا محصولات غرفه خوانده و با سایت مقایسه شوند.', 'basalamhub' ) );
 		}
 		$update = ! empty( $options['update_linked'] );
 		$total  = $preview['new'] + ( $update ? $preview['linked'] : 0 );
 		if ( ! $total ) {
-			return new WP_Error( 'nothing', __( 'محصولی برای واردکردن نیست؛ همه‌ی محصولات غرفه یا متصل‌اند یا منتظر بررسی در «اتصال محصولات غرفه».', 'salamhub' ) );
+			return new WP_Error( 'nothing', __( 'محصولی برای واردکردن نیست؛ همه‌ی محصولات غرفه یا متصل‌اند یا منتظر بررسی در «اتصال محصولات غرفه».', 'basalamhub' ) );
 		}
 		$run = 'i' . time() . wp_rand( 100, 999 );
 		update_option(
@@ -122,12 +124,19 @@ class SLH_Importer {
 				'failed'        => 0,
 				'update_linked' => $update ? 1 : 0,
 				'publish'       => isset( $options['publish'] ) && 'draft' === $options['publish'] ? 'draft' : 'publish',
-				'started_at'    => slh_now(),
+				'started_at'    => bsh_now(),
 				'finished_at'   => '',
 			),
 			false
 		);
-		as_enqueue_async_action( self::HOOK, array( 'run_id' => $run, 'offset' => 0 ), SLH_Queue::GROUP );
+		as_enqueue_async_action(
+			self::HOOK,
+			array(
+				'run_id' => $run,
+				'offset' => 0,
+			),
+			BSH_Queue::GROUP
+		);
 		return true;
 	}
 
@@ -136,7 +145,12 @@ class SLH_Importer {
 	 */
 	public static function cancel() {
 		if ( self::is_running() ) {
-			self::set_state( array( 'status' => 'cancelled', 'finished_at' => slh_now() ) );
+			self::set_state(
+				array(
+					'status'      => 'cancelled',
+					'finished_at' => bsh_now(),
+				)
+			);
 		}
 	}
 
@@ -164,14 +178,17 @@ class SLH_Importer {
 		if ( $state['run_id'] !== $run_id || 'running' !== $state['status'] ) {
 			return;
 		}
-		SLH_Queue::run_exclusive(
+		BSH_Queue::run_exclusive(
 			self::HOOK,
-			array( 'run_id' => $run_id, 'offset' => (int) $offset ),
+			array(
+				'run_id' => $run_id,
+				'offset' => (int) $offset,
+			),
 			function () use ( $run_id, $offset ) {
 				global $wpdb;
 				$state    = self::state();
 				$statuses = $state['update_linked'] ? "'none','linked'" : "'none'";
-				$row      = $wpdb->get_row( $wpdb->prepare( 'SELECT basalam_id, match_status FROM ' . SLH_Linker::table() . " WHERE match_status IN ({$statuses}) ORDER BY id ASC LIMIT 1 OFFSET %d", (int) $offset ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$row      = $wpdb->get_row( $wpdb->prepare( 'SELECT basalam_id, match_status FROM ' . BSH_Linker::table() . " WHERE match_status IN ({$statuses}) ORDER BY id ASC LIMIT 1 OFFSET %d", (int) $offset ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				if ( ! $row ) {
 					self::finish();
 					return;
@@ -179,7 +196,15 @@ class SLH_Importer {
 				$result = self::import_one( (int) $row->basalam_id, $state );
 				if ( 'retry' === $result ) {
 					// Temporary Basalam/network problem: try the same product again later.
-					if ( false !== SLH_Queue::retry_later( self::HOOK, array( 'run_id' => $run_id, 'offset' => (int) $offset ), 'import_' . $row->basalam_id, 60 ) ) {
+					if ( false !== BSH_Queue::retry_later(
+						self::HOOK,
+						array(
+							'run_id' => $run_id,
+							'offset' => (int) $offset,
+						),
+						'import_' . $row->basalam_id,
+						60
+					) ) {
 						return;
 					}
 					$result = 'failed';
@@ -188,8 +213,20 @@ class SLH_Importer {
 				if ( 'running' !== $state['status'] ) {
 					return; // Cancelled meanwhile.
 				}
-				self::set_state( array( $result => $state[ $result ] + 1, 'offset' => (int) $offset + 1 ) );
-				as_enqueue_async_action( self::HOOK, array( 'run_id' => $run_id, 'offset' => (int) $offset + 1 ), SLH_Queue::GROUP );
+				self::set_state(
+					array(
+						$result  => $state[ $result ] + 1,
+						'offset' => (int) $offset + 1,
+					)
+				);
+				as_enqueue_async_action(
+					self::HOOK,
+					array(
+						'run_id' => $run_id,
+						'offset' => (int) $offset + 1,
+					),
+					BSH_Queue::GROUP
+				);
 			}
 		);
 	}
@@ -198,17 +235,22 @@ class SLH_Importer {
 	 * Run finished: summary log entry.
 	 */
 	private static function finish() {
-		self::set_state( array( 'status' => 'done', 'finished_at' => slh_now() ) );
+		self::set_state(
+			array(
+				'status'      => 'done',
+				'finished_at' => bsh_now(),
+			)
+		);
 		$s = self::state();
-		SLH_Logger::log(
+		BSH_Logger::log(
 			array(
 				'level'       => $s['failed'] ? 'warning' : 'success',
 				'event'       => 'import_finished',
 				'object_type' => 'system',
-				'title'       => __( 'ایمپورت غرفه', 'salamhub' ),
+				'title'       => __( 'ایمپورت غرفه', 'basalamhub' ),
 				/* translators: 1: created, 2: updated, 3: skipped, 4: failed */
-				'message'     => sprintf( __( 'تمام شد: %1$s محصول ساخته شد، %2$s به‌روز شد، %3$s رد شد، %4$s خطا.', 'salamhub' ), slh_fa_number( $s['created'] ), slh_fa_number( $s['updated'] ), slh_fa_number( $s['skipped'] ), slh_fa_number( $s['failed'] ) ),
-				'suggestion'  => $s['failed'] ? __( 'خطاها با دلیل در همین لاگ آمده‌اند و هرکدام «تلاش مجدد» دارد.', 'salamhub' ) : null,
+				'message'     => sprintf( __( 'تمام شد: %1$s محصول ساخته شد، %2$s به‌روز شد، %3$s رد شد، %4$s خطا.', 'basalamhub' ), bsh_fa_number( $s['created'] ), bsh_fa_number( $s['updated'] ), bsh_fa_number( $s['skipped'] ), bsh_fa_number( $s['failed'] ) ),
+				'suggestion'  => $s['failed'] ? __( 'خطاها با دلیل در همین لاگ آمده‌اند و هرکدام «تلاش مجدد» دارد.', 'basalamhub' ) : null,
 			)
 		);
 	}
@@ -219,20 +261,27 @@ class SLH_Importer {
 	 * @param int $basalam_id Basalam product.
 	 */
 	public static function handle_one( $basalam_id ) {
-		SLH_Queue::run_exclusive(
+		BSH_Queue::run_exclusive(
 			self::HOOK_ONE,
 			array( 'basalam_id' => (int) $basalam_id ),
 			function () use ( $basalam_id ) {
 				$state = self::state();
-				$res   = self::import_one( (int) $basalam_id, array( 'update_linked' => 1, 'publish' => $state['publish'] ) );
+				$res   = self::import_one(
+					(int) $basalam_id,
+					array(
+						'update_linked' => 1,
+						'publish'       => $state['publish'],
+					)
+				);
 				if ( 'retry' === $res ) {
-					SLH_Queue::retry_later( self::HOOK_ONE, array( 'basalam_id' => (int) $basalam_id ), 'import_' . $basalam_id, 60 );
+					BSH_Queue::retry_later( self::HOOK_ONE, array( 'basalam_id' => (int) $basalam_id ), 'import_' . $basalam_id, 60 );
 				}
 			}
 		);
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * One product
 	 * ------------------------------------------------------------------ */
 
@@ -242,51 +291,58 @@ class SLH_Importer {
 	 * @return string created|updated|skipped|failed|retry
 	 */
 	public static function import_one( $basalam_id, array $options ) {
-		$owner = SLH_Lock::acquire( 'import_' . $basalam_id, 300 );
+		$owner = BSH_Lock::acquire( 'import_' . $basalam_id, 300 );
 		if ( ! $owner ) {
 			return 'skipped';
 		}
 		try {
-			$link    = SLH_Links::get_by_basalam( 'product', $basalam_id );
+			$link    = BSH_Links::get_by_basalam( 'product', $basalam_id );
 			$product = $link ? wc_get_product( (int) $link->wc_id ) : null;
 			if ( $product && empty( $options['update_linked'] ) ) {
 				return 'skipped';
 			}
-			$remote = SLH_Plugin::api()->get_product( $basalam_id );
+			$remote = BSH_Plugin::api()->get_product( $basalam_id );
 			if ( $product ) {
 				self::update_from_remote( $product, $remote );
-				SLH_Queue::reset_attempts( 'import_' . $basalam_id );
+				BSH_Queue::reset_attempts( 'import_' . $basalam_id );
 				return 'updated';
 			}
 
 			// Last guard against duplicates: a site product with the same SKU.
 			$sku = self::taken_sku( $remote );
 			if ( $sku ) {
-				SLH_Logger::log(
+				BSH_Logger::log(
 					array(
 						'level'       => 'warning',
 						'event'       => 'import_sku_exists',
 						'object_type' => 'import',
 						'object_id'   => $basalam_id,
 						'title'       => isset( $remote['title'] ) ? (string) $remote['title'] : '#' . $basalam_id,
-						'message'     => __( 'وارد نشد تا تکراری ساخته نشود.', 'salamhub' ),
+						'message'     => __( 'وارد نشد تا تکراری ساخته نشود.', 'basalamhub' ),
 						/* translators: %s: SKU */
-						'reason'      => sprintf( __( 'محصولی با SKU «%s» در سایت هست.', 'salamhub' ), $sku ),
-						'suggestion'  => __( 'این دو را در «اتصال محصولات غرفه» به هم وصل کن.', 'salamhub' ),
+						'reason'      => sprintf( __( 'محصولی با SKU «%s» در سایت هست.', 'basalamhub' ), $sku ),
+						'suggestion'  => __( 'این دو را در «اتصال محصولات غرفه» به هم وصل کن.', 'basalamhub' ),
 					)
 				);
 				return 'skipped';
 			}
 
 			$wc_id = self::create_from_remote( $remote, $options );
-			SLH_Queue::reset_attempts( 'import_' . $basalam_id );
-			SLH_Logger::resolve_for( 'import', $basalam_id );
+			BSH_Queue::reset_attempts( 'import_' . $basalam_id );
+			BSH_Logger::resolve_for( 'import', $basalam_id );
 			global $wpdb;
-			$wpdb->update( SLH_Linker::table(), array( 'match_status' => 'linked', 'match_wc_id' => $wc_id ), array( 'basalam_id' => $basalam_id ) );
+			$wpdb->update(
+				BSH_Linker::table(),
+				array(
+					'match_status' => 'linked',
+					'match_wc_id'  => $wc_id,
+				),
+				array( 'basalam_id' => $basalam_id )
+			);
 			return 'created';
-		} catch ( SLH_Api_Error $e ) {
+		} catch ( BSH_Api_Error $e ) {
 			if ( 'rate_limit' === $e->kind ) {
-				SLH_Queue::pause( $e->retry_after );
+				BSH_Queue::pause( $e->retry_after );
 			}
 			if ( $e->retryable ) {
 				return 'retry';
@@ -297,16 +353,19 @@ class SLH_Importer {
 			self::log_failure(
 				$basalam_id,
 				array(
-					'reason'     => __( 'ساخت محصول در ووکامرس با خطای داخلی متوقف شد.', 'salamhub' ),
-					'suggestion' => __( '«تلاش مجدد» را بزن. اگر تکرار شد، جزئیات فنی را برای پشتیبانی بفرست.', 'salamhub' ),
-					'context'    => array( 'error' => $e->getMessage(), 'at' => basename( $e->getFile() ) . ':' . $e->getLine() ),
+					'reason'     => __( 'ساخت محصول در ووکامرس با خطای داخلی متوقف شد.', 'basalamhub' ),
+					'suggestion' => __( '«تلاش مجدد» را بزن. اگر تکرار شد، جزئیات فنی را برای پشتیبانی بفرست.', 'basalamhub' ),
+					'context'    => array(
+						'error' => $e->getMessage(),
+						'at'    => basename( $e->getFile() ) . ':' . $e->getLine(),
+					),
 				),
-				__( 'خطای داخلی.', 'salamhub' )
+				__( 'خطای داخلی.', 'basalamhub' )
 			);
 			return 'failed';
 		} finally {
-			SLH_Plugin::$suspend_hooks = false;
-			SLH_Lock::release( 'import_' . $basalam_id, $owner );
+			BSH_Plugin::$suspend_hooks = false;
+			BSH_Lock::release( 'import_' . $basalam_id, $owner );
 		}
 	}
 
@@ -316,7 +375,7 @@ class SLH_Importer {
 	 * @param string $message    Short message.
 	 */
 	private static function log_failure( $basalam_id, array $log, $message ) {
-		SLH_Logger::log(
+		BSH_Logger::log(
 			array_merge(
 				array(
 					'level'       => 'error',
@@ -324,12 +383,12 @@ class SLH_Importer {
 					'object_type' => 'import',
 					'object_id'   => $basalam_id,
 					/* translators: %s: Basalam product id */
-					'title'       => sprintf( __( 'محصول باسلام #%s', 'salamhub' ), $basalam_id ),
+					'title'       => sprintf( __( 'محصول باسلام #%s', 'basalamhub' ), $basalam_id ),
 					'retry_hook'  => self::HOOK_ONE,
 					'retry_args'  => array( 'basalam_id' => (int) $basalam_id ),
 				),
 				$log,
-				array( 'message' => __( 'در ووکامرس ساخته نشد.', 'salamhub' ) . ' ' . $message )
+				array( 'message' => __( 'در ووکامرس ساخته نشد.', 'basalamhub' ) . ' ' . $message )
 			)
 		);
 	}
@@ -363,17 +422,17 @@ class SLH_Importer {
 	 *
 	 * @param int|null $rial Price.
 	 * @return string
-	 * @throws SLH_Api_Error When the store currency is unknown.
+	 * @throws BSH_Api_Error When the store currency is unknown.
 	 */
 	private static function to_store( $rial ) {
-		$multiplier = SLH_Product_Mapper::rial_multiplier();
+		$multiplier = BSH_Product_Mapper::rial_multiplier();
 		if ( null === $multiplier ) {
-			throw new SLH_Api_Error(
-				__( 'واحد پول فروشگاه قابل تبدیل از ریال نیست.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'واحد پول فروشگاه قابل تبدیل از ریال نیست.', 'basalamhub' ),
 				'validation',
 				array(
-					'reason'     => __( 'قیمت‌های باسلام به ریال است و باسلام‌هاب نمی‌داند به چه واحدی تبدیلش کند.', 'salamhub' ),
-					'suggestion' => __( 'در باسلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن.', 'salamhub' ),
+					'reason'     => __( 'قیمت‌های باسلام به ریال است و باسلام‌هاب نمی‌داند به چه واحدی تبدیلش کند.', 'basalamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن.', 'basalamhub' ),
 				)
 			);
 		}
@@ -402,7 +461,7 @@ class SLH_Importer {
 	 */
 	private static function local_stock( $remote ) {
 		$remote = max( 0, (int) $remote );
-		return $remote > 0 ? $remote + max( 0, (int) SLH_Settings::get( 'safety_stock', 0 ) ) : 0;
+		return $remote > 0 ? $remote + max( 0, (int) BSH_Settings::get( 'safety_stock', 0 ) ) : 0;
 	}
 
 	/**
@@ -411,11 +470,11 @@ class SLH_Importer {
 	 * @param array $r       ReadProductResponse.
 	 * @param array $options publish.
 	 * @return int Product ID.
-	 * @throws SLH_Api_Error When prices can't be converted.
+	 * @throws BSH_Api_Error When prices can't be converted.
 	 */
 	public static function create_from_remote( array $r, array $options ) {
-		$basalam_id = (int) $r['id'];
-		$variants   = array_values(
+		$basalam_id                = (int) $r['id'];
+		$variants                  = array_values(
 			array_filter(
 				isset( $r['variants'] ) && is_array( $r['variants'] ) ? $r['variants'] : array(),
 				function ( $v ) {
@@ -423,7 +482,7 @@ class SLH_Importer {
 				}
 			)
 		);
-		SLH_Plugin::$suspend_hooks = true;
+		BSH_Plugin::$suspend_hooks = true;
 
 		$product = $variants ? new WC_Product_Variable() : new WC_Product_Simple();
 		$product->set_name( isset( $r['title'] ) ? (string) $r['title'] : ( isset( $r['name'] ) ? (string) $r['name'] : '#' . $basalam_id ) );
@@ -453,8 +512,8 @@ class SLH_Importer {
 		if ( $term ) {
 			$product->set_category_ids( array( $term ) );
 		}
-		if ( isset( $r['preparation_day'] ) && (int) $r['preparation_day'] !== (int) SLH_Settings::get( 'preparation_days' ) ) {
-			$product->update_meta_data( '_slh_preparation_days', (int) $r['preparation_day'] );
+		if ( isset( $r['preparation_day'] ) && (int) $r['preparation_day'] !== (int) BSH_Settings::get( 'preparation_days' ) ) {
+			$product->update_meta_data( '_bsh_preparation_days', (int) $r['preparation_day'] );
 		}
 
 		if ( ! $variants ) {
@@ -474,11 +533,20 @@ class SLH_Importer {
 			$product->set_image_id( array_shift( $images ) );
 			$product->set_gallery_image_ids( $images );
 		}
-		$product->update_meta_data( '_slh_imported_from', $basalam_id );
+		$product->update_meta_data( '_bsh_imported_from', $basalam_id );
 		$wc_id = $product->save();
 
 		// Link right away: from here on, nothing can import this product a second time.
-		SLH_Links::upsert( 'product', $wc_id, array( 'basalam_id' => $basalam_id, 'sync_status' => 'synced', 'last_synced_at' => slh_now(), 'last_error' => null ) );
+		BSH_Links::upsert(
+			'product',
+			$wc_id,
+			array(
+				'basalam_id'     => $basalam_id,
+				'sync_status'    => 'synced',
+				'last_synced_at' => bsh_now(),
+				'last_error'     => null,
+			)
+		);
 
 		if ( $variants ) {
 			self::create_variations( $wc_id, $variants );
@@ -488,11 +556,11 @@ class SLH_Importer {
 		if ( $variants ) {
 			self::store_variant_map( $product, $variants );
 		}
-		$sync = new SLH_Product_Sync( SLH_Plugin::api() );
-		SLH_Links::upsert( 'product', $wc_id, array( 'payload_hash' => $sync->fingerprint( wc_get_product( $wc_id ) ) ) );
-		SLH_Plugin::$suspend_hooks = false;
+		$sync = new BSH_Product_Sync( BSH_Plugin::api() );
+		BSH_Links::upsert( 'product', $wc_id, array( 'payload_hash' => $sync->fingerprint( wc_get_product( $wc_id ) ) ) );
+		BSH_Plugin::$suspend_hooks = false;
 
-		SLH_Logger::log(
+		BSH_Logger::log(
 			array(
 				'level'       => $image_errors ? 'warning' : 'success',
 				'event'       => 'product_imported',
@@ -500,9 +568,9 @@ class SLH_Importer {
 				'object_id'   => $wc_id,
 				'title'       => $product->get_name(),
 				/* translators: %s: Basalam product id */
-				'message'     => sprintf( __( 'از باسلام وارد شد (#%s).', 'salamhub' ), $basalam_id ),
+				'message'     => sprintf( __( 'از باسلام وارد شد (#%s).', 'basalamhub' ), $basalam_id ),
 				'reason'      => $image_errors ? implode( ' ', array_unique( $image_errors ) ) : null,
-				'suggestion'  => $image_errors ? __( 'تصویرهای جاافتاده را دستی به محصول اضافه کن؛ بقیه‌ی اطلاعات کامل وارد شده.', 'salamhub' ) : null,
+				'suggestion'  => $image_errors ? __( 'تصویرهای جاافتاده را دستی به محصول اضافه کن؛ بقیه‌ی اطلاعات کامل وارد شده.', 'basalamhub' ) : null,
 			)
 		);
 		return $wc_id;
@@ -578,7 +646,7 @@ class SLH_Importer {
 				$attrs[ sanitize_title( self::prop_name( $p ) ) ] = self::prop_value( $p );
 			}
 			list( $regular, $sale ) = self::prices( $v );
-			$var = new WC_Product_Variation();
+			$var                    = new WC_Product_Variation();
 			$var->set_parent_id( $parent_id );
 			$var->set_attributes( $attrs );
 			$var->set_regular_price( $regular );
@@ -612,17 +680,23 @@ class SLH_Importer {
 		}
 		$problems = array();
 		$map      = array();
-		foreach ( ( new SLH_Product_Mapper() )->variations( $product, $problems ) as $vid => $mv ) {
+		foreach ( ( new BSH_Product_Mapper() )->variations( $product, $problems ) as $vid => $mv ) {
 			$pairs = array();
 			foreach ( $mv['properties'] as $p ) {
 				$pairs[ $p['property'] ] = $p['value'];
 			}
 			$key = self::prop_key( $pairs );
 			if ( isset( $remote[ $key ] ) ) {
-				$map[ $vid ] = array( 'id' => $remote[ $key ], 'sig' => $mv['sig'], 'price' => $mv['primary_price'], 'stock' => $mv['stock'], 'sku' => $mv['sku'] );
+				$map[ $vid ] = array(
+					'id'    => $remote[ $key ],
+					'sig'   => $mv['sig'],
+					'price' => $mv['primary_price'],
+					'stock' => $mv['stock'],
+					'sku'   => $mv['sku'],
+				);
 			}
 		}
-		update_post_meta( $product->get_id(), '_slh_variants', $map );
+		update_post_meta( $product->get_id(), '_bsh_variants', $map );
 	}
 
 	/**
@@ -637,7 +711,7 @@ class SLH_Importer {
 			return 0;
 		}
 		$cat_id = (int) $category['id'];
-		foreach ( SLH_Categories::map() as $term_id => $m ) {
+		foreach ( BSH_Categories::map() as $term_id => $m ) {
 			if ( (int) $m['category_id'] === $cat_id && term_exists( (int) $term_id, 'product_cat' ) ) {
 				return (int) $term_id;
 			}
@@ -656,10 +730,13 @@ class SLH_Importer {
 		} else {
 			$term_id = (int) $term->term_id;
 		}
-		$map = SLH_Categories::map();
+		$map = BSH_Categories::map();
 		if ( ! isset( $map[ $term_id ] ) ) {
-			$map[ $term_id ] = array( 'category_id' => $cat_id, 'attrs' => array() );
-			update_option( SLH_Categories::MAP_OPTION, $map, false );
+			$map[ $term_id ] = array(
+				'category_id' => $cat_id,
+				'attrs'       => array(),
+			);
+			update_option( BSH_Categories::MAP_OPTION, $map, false );
 		}
 		return $term_id;
 	}
@@ -705,7 +782,7 @@ class SLH_Importer {
 					'post_status' => 'inherit',
 					'numberposts' => 1,
 					'fields'      => 'ids',
-					'meta_key'    => SLH_Image_Sync::META_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_key'    => BSH_Image_Sync::META_ID, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 					'meta_value'  => (string) $file_id, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				)
 			);
@@ -729,27 +806,33 @@ class SLH_Importer {
 
 		$tmp = download_url( $url, 30 );
 		if ( is_wp_error( $tmp ) ) {
-			$errors[] = __( 'دانلود بعضی تصویرها از باسلام انجام نشد.', 'salamhub' );
+			$errors[] = __( 'دانلود بعضی تصویرها از باسلام انجام نشد.', 'basalamhub' );
 			return 0;
 		}
 		$name = sanitize_file_name( basename( (string) wp_parse_url( $url, PHP_URL_PATH ) ) );
 		if ( ! preg_match( '/\.(jpe?g|png|webp|gif)$/i', $name ) ) {
 			$name = 'basalam-' . ( $file_id ? $file_id : wp_generate_password( 6, false ) ) . '.jpg';
 		}
-		$id = media_handle_sideload( array( 'name' => $name, 'tmp_name' => $tmp ), 0 );
+		$id = media_handle_sideload(
+			array(
+				'name'     => $name,
+				'tmp_name' => $tmp,
+			),
+			0
+		);
 		if ( is_wp_error( $id ) ) {
 			if ( file_exists( $tmp ) ) {
 				wp_delete_file( $tmp );
 			}
-			$errors[] = __( 'بعضی تصویرها در کتابخانه‌ی رسانه ذخیره نشدند.', 'salamhub' );
+			$errors[] = __( 'بعضی تصویرها در کتابخانه‌ی رسانه ذخیره نشدند.', 'basalamhub' );
 			return 0;
 		}
 		if ( $file_id ) {
 			// Sending this product back later reuses Basalam's file instead of uploading it again.
 			$path = function_exists( 'wp_get_original_image_path' ) ? wp_get_original_image_path( $id ) : '';
 			$path = $path && file_exists( $path ) ? $path : get_attached_file( $id );
-			update_post_meta( $id, SLH_Image_Sync::META_ID, $file_id );
-			update_post_meta( $id, SLH_Image_Sync::META_SIG, SLH_Image_Sync::signature( $path ) );
+			update_post_meta( $id, BSH_Image_Sync::META_ID, $file_id );
+			update_post_meta( $id, BSH_Image_Sync::META_SIG, BSH_Image_Sync::signature( $path ) );
 		}
 		return (int) $id;
 	}
@@ -760,11 +843,11 @@ class SLH_Importer {
 	 *
 	 * @param WC_Product $product Product.
 	 * @param array      $r       ReadProductResponse.
-	 * @throws SLH_Api_Error When prices can't be converted.
+	 * @throws BSH_Api_Error When prices can't be converted.
 	 */
 	public static function update_from_remote( WC_Product $product, array $r ) {
-		$prices = ! SLH_Price_Rules::is_active();
-		SLH_Plugin::$suspend_hooks = true;
+		$prices                    = ! BSH_Price_Rules::is_active();
+		BSH_Plugin::$suspend_hooks = true;
 		if ( $product->is_type( 'variable' ) ) {
 			$remote = array();
 			foreach ( isset( $r['variants'] ) && is_array( $r['variants'] ) ? $r['variants'] : array() as $v ) {
@@ -772,7 +855,7 @@ class SLH_Importer {
 					$remote[ (int) $v['id'] ] = $v;
 				}
 			}
-			foreach ( SLH_Product_Sync::variant_map( $product ) as $vid => $row ) {
+			foreach ( BSH_Product_Sync::variant_map( $product ) as $vid => $row ) {
 				$variation = wc_get_product( (int) $vid );
 				if ( ! $variation || ! isset( $remote[ (int) $row['id'] ] ) ) {
 					continue;
@@ -784,7 +867,7 @@ class SLH_Importer {
 					$variation->set_sale_price( $sale );
 					$variation->save();
 				}
-				SLH_Inventory::set_local_stock( wc_get_product( (int) $vid ), isset( $v['stock'] ) ? (int) $v['stock'] : 0 );
+				BSH_Inventory::set_local_stock( wc_get_product( (int) $vid ), isset( $v['stock'] ) ? (int) $v['stock'] : 0 );
 			}
 			WC_Product_Variable::sync( $product->get_id() );
 		} else {
@@ -794,10 +877,18 @@ class SLH_Importer {
 				$product->set_sale_price( $sale );
 				$product->save();
 			}
-			SLH_Inventory::set_local_stock( wc_get_product( $product->get_id() ), isset( $r['inventory'] ) ? (int) $r['inventory'] : ( isset( $r['stock'] ) ? (int) $r['stock'] : 0 ) );
+			BSH_Inventory::set_local_stock( wc_get_product( $product->get_id() ), isset( $r['inventory'] ) ? (int) $r['inventory'] : ( isset( $r['stock'] ) ? (int) $r['stock'] : 0 ) );
 		}
-		$sync = new SLH_Product_Sync( SLH_Plugin::api() );
-		SLH_Links::upsert( 'product', $product->get_id(), array( 'payload_hash' => $sync->fingerprint( wc_get_product( $product->get_id() ) ), 'sync_status' => 'synced', 'last_synced_at' => slh_now() ) );
-		SLH_Plugin::$suspend_hooks = false;
+		$sync = new BSH_Product_Sync( BSH_Plugin::api() );
+		BSH_Links::upsert(
+			'product',
+			$product->get_id(),
+			array(
+				'payload_hash'   => $sync->fingerprint( wc_get_product( $product->get_id() ) ),
+				'sync_status'    => 'synced',
+				'last_synced_at' => bsh_now(),
+			)
+		);
+		BSH_Plugin::$suspend_hooks = false;
 	}
 }

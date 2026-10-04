@@ -1,15 +1,15 @@
-/* SalamHub admin: vanilla JS, no dependencies.
+/* BasalamHub admin: vanilla JS, no dependencies.
  *
  * Two parts:
  * - Delegated handlers on `document` (bound once) for buttons that may appear on any page.
  * - initPage(root): per-page setup (pollers, counters), re-run after every page swap.
- * Inside the app shell, links to other SalamHub pages load without a full reload; any
+ * Inside the app shell, links to other BasalamHub pages load without a full reload; any
  * failure falls back to normal navigation, so the plugin never depends on this script.
  */
 ( function () {
 	'use strict';
 
-	var cfg = window.SalamHub || {};
+	var cfg = window.BasalamHub || {};
 	var t = cfg.i18n || {};
 	var timers = [];
 
@@ -79,7 +79,7 @@
 	 * App shell: theme, mobile menu, page router
 	 * ---------------------------------------------------------------- */
 
-	var app = document.querySelector( '[data-slh-app]' );
+	var app = document.querySelector( '[data-bsh-app]' );
 	var reloadContent = function () {
 		window.location.reload();
 	};
@@ -93,11 +93,11 @@
 	if ( app ) {
 		// Move the app to <body> so wp-admin wrappers can't clip or restyle it.
 		document.body.appendChild( app );
-		document.documentElement.classList.add( 'slh-app-open' );
+		document.documentElement.classList.add( 'bsh-app-open' );
 
 		var themes = [ 'auto', 'light', 'dark' ];
 		var themeLabels = { auto: t.themeAuto, light: t.themeLight, dark: t.themeDark };
-		var themeBtn = app.querySelector( '[data-slh-theme]' );
+		var themeBtn = app.querySelector( '[data-bsh-theme]' );
 		var showTheme = function () {
 			var cur = app.getAttribute( 'data-theme' ) || 'auto';
 			if ( themeBtn && themeLabels[ cur ] ) {
@@ -111,17 +111,17 @@
 				var cur = app.getAttribute( 'data-theme' ) || 'auto';
 				var next = themes[ ( themes.indexOf( cur ) + 1 ) % themes.length ];
 				app.setAttribute( 'data-theme', next );
-				store( 'slh-theme', next );
+				store( 'bsh-theme', next );
 				showTheme();
 			} );
 		}
 
-		var scrim = app.querySelector( '[data-slh-scrim]' );
+		var scrim = app.querySelector( '[data-bsh-scrim]' );
 		var setMenu = function ( open ) {
 			app.classList.toggle( 'is-menu-open', open );
 			scrim.hidden = ! open;
 		};
-		app.querySelector( '[data-slh-menu]' ).addEventListener( 'click', function () {
+		app.querySelector( '[data-bsh-menu]' ).addEventListener( 'click', function () {
 			setMenu( ! app.classList.contains( 'is-menu-open' ) );
 		} );
 		scrim.addEventListener( 'click', function () {
@@ -133,25 +133,25 @@
 			}
 		} );
 
-		var main = app.querySelector( '[data-slh-main]' );
-		var loading = app.querySelector( '[data-slh-loading]' );
+		var main = app.querySelector( '[data-bsh-main]' );
+		var loading = app.querySelector( '[data-bsh-loading]' );
 
 		var isAppUrl = function ( href ) {
 			try {
 				var u = new URL( href, window.location.href );
-				return u.origin === window.location.origin && /\/wp-admin\/admin\.php$/.test( u.pathname ) && /^salamhub/.test( u.searchParams.get( 'page' ) || '' );
+				return u.origin === window.location.origin && /\/wp-admin\/admin\.php$/.test( u.pathname ) && /^basalamhub/.test( u.searchParams.get( 'page' ) || '' );
 			} catch ( e ) {
 				return false;
 			}
 		};
 
 		var navigate = function ( url, push ) {
-			var content = app.querySelector( '[data-slh-content]' );
+			var content = app.querySelector( '[data-bsh-content]' );
 			clearTimers();
 			setMenu( false );
 			loading.hidden = false;
 			content.classList.add( 'is-loading' );
-			return fetch( url, { credentials: 'same-origin', headers: { 'X-SalamHub-Nav': '1' } } )
+			return fetch( url, { credentials: 'same-origin', headers: { 'X-BasalamHub-Nav': '1' } } )
 				.then( function ( r ) {
 					if ( ! r.ok || r.redirected && ! isAppUrl( r.url ) ) {
 						throw new Error( 'nav' );
@@ -160,19 +160,19 @@
 				} )
 				.then( function ( html ) {
 					var doc = new DOMParser().parseFromString( html, 'text/html' );
-					var fresh = doc.querySelector( '[data-slh-content]' );
-					var nav = doc.querySelector( '[data-slh-sidebar-nav]' );
+					var fresh = doc.querySelector( '[data-bsh-content]' );
+					var nav = doc.querySelector( '[data-bsh-sidebar-nav]' );
 					if ( ! fresh ) {
 						throw new Error( 'nav' );
 					}
 					content.replaceWith( fresh );
 					if ( nav ) {
-						app.querySelector( '[data-slh-sidebar-nav]' ).replaceWith( nav );
+						app.querySelector( '[data-bsh-sidebar-nav]' ).replaceWith( nav );
 					}
-					app.querySelector( '[data-slh-crumb]' ).textContent = fresh.getAttribute( 'data-title' );
+					app.querySelector( '[data-bsh-crumb]' ).textContent = fresh.getAttribute( 'data-title' );
 					document.title = doc.title;
 					if ( push ) {
-						window.history.pushState( { slh: 1 }, '', url );
+						window.history.pushState( { bsh: 1 }, '', url );
 					}
 					main.scrollTop = 0;
 					main.focus( { preventScroll: true } );
@@ -201,7 +201,7 @@
 		// GET forms (search, log filters) also stay inside the app.
 		document.addEventListener( 'submit', function ( e ) {
 			var form = e.target;
-			if ( ! app.contains( form ) || ( form.method || 'get' ).toLowerCase() !== 'get' || form.hasAttribute( 'data-slh-bulk-form' ) ) {
+			if ( ! app.contains( form ) || ( form.method || 'get' ).toLowerCase() !== 'get' || form.hasAttribute( 'data-bsh-bulk-form' ) ) {
 				return;
 			}
 			var url = new URL( form.getAttribute( 'action' ) || window.location.href, window.location.href );
@@ -232,11 +232,11 @@
 		var btn;
 
 		// Settings: test connection.
-		if ( ( btn = closest( e, '[data-slh-test]' ) ) ) {
-			var testOut = document.querySelector( '[data-slh-test-result]' );
+		if ( ( btn = closest( e, '[data-bsh-test]' ) ) ) {
+			var testOut = document.querySelector( '[data-bsh-test-result]' );
 			busy( btn, t.testing );
 			setMessage( testOut, '' );
-			post( 'slh_test_connection' ).then( function ( res ) {
+			post( 'bsh_test_connection' ).then( function ( res ) {
 				idle( btn );
 				var d = res.data || {};
 				setMessage( testOut, [ d.message, d.suggestion ].filter( Boolean ).join( ' ' ), res.success ? 'ok' : 'error' );
@@ -245,13 +245,13 @@
 		}
 
 		// Log: retry one row.
-		if ( ( btn = closest( e, '[data-slh-retry]' ) ) ) {
-			var msg = document.querySelector( '[data-slh-message]' );
+		if ( ( btn = closest( e, '[data-bsh-retry]' ) ) ) {
+			var msg = document.querySelector( '[data-bsh-message]' );
 			busy( btn, t.retrying );
-			post( 'slh_retry_log', { log_id: btn.getAttribute( 'data-slh-retry' ) } ).then( function ( res ) {
+			post( 'bsh_retry_log', { log_id: btn.getAttribute( 'data-bsh-retry' ) } ).then( function ( res ) {
 				var d = res.data || {};
 				if ( res.success ) {
-					btn.replaceWith( Object.assign( document.createElement( 'span' ), { className: 'slh-badge slh-badge--queued', textContent: d.message } ) );
+					btn.replaceWith( Object.assign( document.createElement( 'span' ), { className: 'bsh-badge bsh-badge--queued', textContent: d.message } ) );
 				} else {
 					idle( btn );
 					setMessage( msg, d.message, 'error' );
@@ -261,15 +261,15 @@
 		}
 
 		// Log: retry all errors.
-		if ( ( btn = closest( e, '[data-slh-retry-all]' ) ) ) {
-			var allMsg = document.querySelector( '[data-slh-message]' );
+		if ( ( btn = closest( e, '[data-bsh-retry-all]' ) ) ) {
+			var allMsg = document.querySelector( '[data-bsh-message]' );
 			busy( btn, t.retrying );
-			post( 'slh_retry_all' ).then( function ( res ) {
+			post( 'bsh_retry_all' ).then( function ( res ) {
 				var d = res.data || {};
 				setMessage( allMsg, d.message, res.success ? 'ok' : 'error' );
 				if ( res.success ) {
 					btn.remove();
-					document.querySelectorAll( '[data-slh-retry]' ).forEach( function ( b ) {
+					document.querySelectorAll( '[data-bsh-retry]' ).forEach( function ( b ) {
 						b.remove();
 					} );
 				} else {
@@ -280,48 +280,48 @@
 		}
 
 		// Import: start / stop.
-		if ( ( btn = closest( e, '[data-slh-import-start]' ) ) ) {
-			var upd = document.querySelector( '[data-slh-import-update]' );
-			var pub = document.querySelector( '[data-slh-import-publish]' );
+		if ( ( btn = closest( e, '[data-bsh-import-start]' ) ) ) {
+			var upd = document.querySelector( '[data-bsh-import-update]' );
+			var pub = document.querySelector( '[data-bsh-import-publish]' );
 			var count = parseInt( btn.getAttribute( 'data-new' ), 10 ) + ( upd && upd.checked ? parseInt( btn.getAttribute( 'data-linked' ), 10 ) : 0 );
 			if ( ! window.confirm( ( t.confirmImport || '' ).replace( '%s', count ) ) ) {
 				return;
 			}
 			busy( btn, t.starting );
-			post( 'slh_import_start', { update_linked: upd && upd.checked ? 1 : '', publish: pub ? pub.value : 'publish' } ).then( function ( res ) {
+			post( 'bsh_import_start', { update_linked: upd && upd.checked ? 1 : '', publish: pub ? pub.value : 'publish' } ).then( function ( res ) {
 				if ( res.success ) {
 					reloadContent();
 				} else {
 					idle( btn );
-					setMessage( document.querySelector( '[data-slh-import-message]' ), ( res.data || {} ).message, 'error' );
+					setMessage( document.querySelector( '[data-bsh-import-message]' ), ( res.data || {} ).message, 'error' );
 				}
 			} );
 			return;
 		}
-		if ( ( btn = closest( e, '[data-slh-import-cancel]' ) ) ) {
+		if ( ( btn = closest( e, '[data-bsh-import-cancel]' ) ) ) {
 			if ( ! window.confirm( t.confirmStopImport ) ) {
 				return;
 			}
 			busy( btn, t.loading );
-			post( 'slh_import_cancel' ).then( function () {
+			post( 'bsh_import_cancel' ).then( function () {
 				reloadContent();
 			} );
 			return;
 		}
 
 		// Notifications: find chat id / send a test message.
-		if ( ( btn = closest( e, '[data-slh-notify-find], [data-slh-notify-test]' ) ) ) {
-			var card = btn.closest( '[data-slh-channel]' );
-			var out = card.querySelector( '[data-slh-channel-message]' );
-			var isTest = btn.hasAttribute( 'data-slh-notify-test' );
+		if ( ( btn = closest( e, '[data-bsh-notify-find], [data-bsh-notify-test]' ) ) ) {
+			var card = btn.closest( '[data-bsh-channel]' );
+			var out = card.querySelector( '[data-bsh-channel-message]' );
+			var isTest = btn.hasAttribute( 'data-bsh-notify-test' );
 			busy( btn, isTest ? t.sendingTest : t.searching );
-			post( isTest ? 'slh_notify_test' : 'slh_notify_find_chat', { channel: card.getAttribute( 'data-slh-channel' ) } ).then( function ( res ) {
+			post( isTest ? 'bsh_notify_test' : 'bsh_notify_find_chat', { channel: card.getAttribute( 'data-bsh-channel' ) } ).then( function ( res ) {
 				idle( btn );
 				var d = res.data || {};
 				setMessage( out, d.message, res.success ? 'ok' : 'error' );
 				if ( res.success && d.id ) {
-					card.querySelector( '[data-slh-chat-id]' ).value = d.id;
-					var test = card.querySelector( '[data-slh-notify-test]' );
+					card.querySelector( '[data-bsh-chat-id]' ).value = d.id;
+					var test = card.querySelector( '[data-bsh-notify-test]' );
 					if ( test ) {
 						test.disabled = false;
 					}
@@ -331,21 +331,21 @@
 		}
 
 		// Orders: nightly reconciliation now.
-		if ( ( btn = closest( e, '[data-slh-reconcile]' ) ) ) {
+		if ( ( btn = closest( e, '[data-bsh-reconcile]' ) ) ) {
 			busy( btn, t.starting );
-			post( 'slh_reconcile_now' ).then( function ( res ) {
+			post( 'bsh_reconcile_now' ).then( function ( res ) {
 				idle( btn );
-				setMessage( document.querySelector( '[data-slh-message]' ), ( res.data || {} ).message, res.success ? 'ok' : 'error' );
+				setMessage( document.querySelector( '[data-bsh-message]' ), ( res.data || {} ).message, res.success ? 'ok' : 'error' );
 			} );
 			return;
 		}
 
 		// Orders: poll now / stock pull now.
-		if ( ( btn = closest( e, '[data-slh-orders-poll], [data-slh-stock-pull]' ) ) ) {
-			var pollMsg = document.querySelector( '[data-slh-message]' );
-			var isPull = btn.hasAttribute( 'data-slh-stock-pull' );
+		if ( ( btn = closest( e, '[data-bsh-orders-poll], [data-bsh-stock-pull]' ) ) ) {
+			var pollMsg = document.querySelector( '[data-bsh-message]' );
+			var isPull = btn.hasAttribute( 'data-bsh-stock-pull' );
 			busy( btn, t.starting );
-			post( isPull ? 'slh_stock_pull' : 'slh_orders_poll' ).then( function ( res ) {
+			post( isPull ? 'bsh_stock_pull' : 'bsh_orders_poll' ).then( function ( res ) {
 				idle( btn );
 				setMessage( pollMsg, ( res.data || {} ).message, res.success ? 'ok' : 'error' );
 			} );
@@ -353,8 +353,8 @@
 		}
 
 		// Orders: copy the webhook URL.
-		if ( ( btn = closest( e, '[data-slh-copy]' ) ) ) {
-			var src = btn.parentNode.querySelector( '[data-slh-copy-src]' );
+		if ( ( btn = closest( e, '[data-bsh-copy]' ) ) ) {
+			var src = btn.parentNode.querySelector( '[data-bsh-copy-src]' );
 			src.select();
 			( navigator.clipboard ? navigator.clipboard.writeText( src.value ) : Promise.reject() ).catch( function () {
 				document.execCommand( 'copy' );
@@ -364,18 +364,18 @@
 		}
 
 		// Order box: confirm / posted on Basalam.
-		if ( ( btn = closest( e, '[data-slh-order-action]' ) ) ) {
-			var box = btn.closest( '[data-slh-order]' );
-			var todo = btn.getAttribute( 'data-slh-order-action' );
-			var boxMsg = box.querySelector( '[data-slh-message]' );
-			var method = box.querySelector( '[name="slh_shipping_method"]' );
-			var code = box.querySelector( '[name="slh_tracking_code"]' );
+		if ( ( btn = closest( e, '[data-bsh-order-action]' ) ) ) {
+			var box = btn.closest( '[data-bsh-order]' );
+			var todo = btn.getAttribute( 'data-bsh-order-action' );
+			var boxMsg = box.querySelector( '[data-bsh-message]' );
+			var method = box.querySelector( '[name="bsh_shipping_method"]' );
+			var code = box.querySelector( '[name="bsh_tracking_code"]' );
 			if ( todo === 'posted' && ! window.confirm( t.confirmPosted ) ) {
 				return;
 			}
 			busy( btn, t.saving );
-			post( 'slh_order_action', {
-				order_id: box.getAttribute( 'data-slh-order' ),
+			post( 'bsh_order_action', {
+				order_id: box.getAttribute( 'data-bsh-order' ),
 				todo: todo,
 				shipping_method: method ? method.value : '',
 				tracking_code: code ? code.value : ''
@@ -392,10 +392,10 @@
 		}
 
 		// Categories: refresh Basalam list.
-		if ( ( btn = closest( e, '[data-slh-cat-refresh]' ) ) ) {
-			var catMsg = document.querySelector( '[data-slh-cat-message]' );
+		if ( ( btn = closest( e, '[data-bsh-cat-refresh]' ) ) ) {
+			var catMsg = document.querySelector( '[data-bsh-cat-message]' );
 			busy( btn, t.refreshing );
-			post( 'slh_categories_refresh' ).then( function ( res ) {
+			post( 'bsh_categories_refresh' ).then( function ( res ) {
 				if ( res.success ) {
 					setMessage( catMsg, res.data.message, 'ok' );
 					window.location.reload();
@@ -408,38 +408,38 @@
 		}
 
 		// Categories: load required attributes for a row.
-		if ( ( btn = closest( e, '[data-slh-load-attrs]' ) ) ) {
+		if ( ( btn = closest( e, '[data-bsh-load-attrs]' ) ) ) {
 			var row = btn.closest( 'tr' );
-			var holder = row.querySelector( '[data-slh-attrs]' );
+			var holder = row.querySelector( '[data-bsh-attrs]' );
 			var input = row.querySelector( 'input[name$="[category_id]"]' );
 			busy( btn, t.loading );
-			post( 'slh_category_attributes', { term_id: row.getAttribute( 'data-term' ), category: input.value } ).then( function ( res ) {
+			post( 'bsh_category_attributes', { term_id: row.getAttribute( 'data-term' ), category: input.value } ).then( function ( res ) {
 				if ( res.success ) {
 					holder.innerHTML = res.data.html;
 				} else {
 					idle( btn );
-					holder.appendChild( Object.assign( document.createElement( 'p' ), { className: 'slh-field__hint is-error', textContent: res.data.message } ) );
+					holder.appendChild( Object.assign( document.createElement( 'p' ), { className: 'bsh-field__hint is-error', textContent: res.data.message } ) );
 				}
 			} );
 			return;
 		}
 
 		// Price rules: add a category row.
-		if ( ( btn = closest( e, '[data-slh-rule-add]' ) ) ) {
-			var termPick = document.querySelector( '[data-slh-rule-term]' );
+		if ( ( btn = closest( e, '[data-bsh-rule-add]' ) ) ) {
+			var termPick = document.querySelector( '[data-bsh-rule-term]' );
 			var opt = termPick.options[ termPick.selectedIndex ];
 			if ( ! termPick.value || opt.disabled ) {
 				termPick.focus();
 				return;
 			}
-			var tpl = document.querySelector( '[data-slh-rule-template]' );
+			var tpl = document.querySelector( '[data-bsh-rule-template]' );
 			var tmp = document.createElement( 'tbody' );
 			var nameEl = document.createElement( 'span' );
 			nameEl.textContent = opt.getAttribute( 'data-name' );
 			tmp.innerHTML = tpl.innerHTML.split( '__TERM__' ).join( termPick.value ).replace( '__NAME__', nameEl.innerHTML );
 			var newRow = tmp.querySelector( 'tr' );
-			document.querySelector( '[data-slh-rules]' ).appendChild( newRow );
-			document.querySelector( '[data-slh-rules-wrap]' ).hidden = false;
+			document.querySelector( '[data-bsh-rules]' ).appendChild( newRow );
+			document.querySelector( '[data-bsh-rules-wrap]' ).hidden = false;
 			opt.disabled = true;
 			termPick.value = '';
 			var first = newRow.querySelector( 'input' );
@@ -450,31 +450,31 @@
 		}
 
 		// Price rules: remove a category row.
-		if ( ( btn = closest( e, '[data-slh-rule-remove]' ) ) ) {
+		if ( ( btn = closest( e, '[data-bsh-rule-remove]' ) ) ) {
 			var ruleRow = btn.closest( 'tr' );
-			var pick = document.querySelector( '[data-slh-rule-term]' );
+			var pick = document.querySelector( '[data-bsh-rule-term]' );
 			var o = pick && pick.querySelector( 'option[value="' + ruleRow.getAttribute( 'data-term' ) + '"]' );
 			if ( o ) {
 				o.disabled = false;
 			}
 			var body = ruleRow.parentNode;
 			ruleRow.remove();
-			document.querySelector( '[data-slh-rules-wrap]' ).hidden = ! body.querySelector( 'tr' );
+			document.querySelector( '[data-bsh-rules-wrap]' ).hidden = ! body.querySelector( 'tr' );
 			return;
 		}
 
 		// Link page: approve selected / all certain.
-		if ( ( btn = closest( e, '[data-slh-link-selected], [data-slh-link-all]' ) ) ) {
-			var all = btn.hasAttribute( 'data-slh-link-all' );
+		if ( ( btn = closest( e, '[data-bsh-link-selected], [data-bsh-link-all]' ) ) ) {
+			var all = btn.hasAttribute( 'data-bsh-link-all' );
 			var pairs = {};
-			document.querySelectorAll( '.slh-link-table tbody tr' ).forEach( function ( tr ) {
-				var c = tr.querySelector( '[data-slh-link-check]' );
-				var target = tr.querySelector( '[data-slh-link-target]' );
+			document.querySelectorAll( '.bsh-link-table tbody tr' ).forEach( function ( tr ) {
+				var c = tr.querySelector( '[data-bsh-link-check]' );
+				var target = tr.querySelector( '[data-bsh-link-target]' );
 				if ( c && c.checked && target && parseInt( target.value, 10 ) > 0 ) {
 					pairs[ tr.getAttribute( 'data-basalam-id' ) ] = target.value;
 				}
 			} );
-			var out = document.querySelector( '[data-slh-link-result]' );
+			var out = document.querySelector( '[data-bsh-link-result]' );
 			if ( ! all && ! Object.keys( pairs ).length ) {
 				setMessage( out, t.nothingSelected, 'error' );
 				return;
@@ -482,9 +482,9 @@
 			if ( all && ! window.confirm( t.confirmLinkAll ) ) {
 				return;
 			}
-			var push = document.querySelector( '[data-slh-link-push]' );
+			var push = document.querySelector( '[data-bsh-link-push]' );
 			busy( btn, t.linking );
-			post( 'slh_link_approve', { pairs: JSON.stringify( all ? {} : pairs ), all_certain: all ? 1 : '', push: push && push.checked ? 1 : '' } ).then( function ( res ) {
+			post( 'bsh_link_approve', { pairs: JSON.stringify( all ? {} : pairs ), all_certain: all ? 1 : '', push: push && push.checked ? 1 : '' } ).then( function ( res ) {
 				idle( btn );
 				setMessage( out, res.data && res.data.message, res.success ? 'ok' : 'error' );
 				if ( res.success ) {
@@ -495,30 +495,30 @@
 		}
 
 		// Link page: start fetch + match.
-		if ( ( btn = closest( e, '[data-slh-link-start]' ) ) ) {
-			var box = document.querySelector( '[data-slh-link-progress]' );
+		if ( ( btn = closest( e, '[data-bsh-link-start]' ) ) ) {
+			var box = document.querySelector( '[data-bsh-link-progress]' );
 			busy( btn, t.starting );
-			post( 'slh_link_start' ).then( function ( res ) {
+			post( 'bsh_link_start' ).then( function ( res ) {
 				box.hidden = false;
 				if ( ! res.success ) {
 					idle( btn );
-					setMessage( box.querySelector( '[data-slh-link-message]' ), res.data.message, 'error' );
+					setMessage( box.querySelector( '[data-bsh-link-message]' ), res.data.message, 'error' );
 					return;
 				}
-				box.querySelector( '[data-slh-link-html]' ).innerHTML = res.data.html;
+				box.querySelector( '[data-bsh-link-html]' ).innerHTML = res.data.html;
 				later( linkPoll, 3000 );
 			} );
 			return;
 		}
 
 		// Products page: send one row.
-		if ( ( btn = closest( e, '[data-slh-row-send]' ) ) ) {
-			var id = btn.getAttribute( 'data-slh-row-send' );
-			var cell = btn.closest( 'tr' ).querySelector( '[data-slh-row-status]' );
+		if ( ( btn = closest( e, '[data-bsh-row-send]' ) ) ) {
+			var id = btn.getAttribute( 'data-bsh-row-send' );
+			var cell = btn.closest( 'tr' ).querySelector( '[data-bsh-row-status]' );
 			busy( btn, t.sending );
-			post( 'slh_send_product', { product_id: id } ).then( function ( res ) {
+			post( 'bsh_send_product', { product_id: id } ).then( function ( res ) {
 				if ( res.success ) {
-					cell.innerHTML = '<span class="slh-badge slh-badge--queued">' + ( t.queuedShort || '' ) + '</span>';
+					cell.innerHTML = '<span class="bsh-badge bsh-badge--queued">' + ( t.queuedShort || '' ) + '</span>';
 					btn.textContent = t.queuedShort || '';
 				} else {
 					idle( btn );
@@ -529,23 +529,23 @@
 		}
 
 		// Products page: send selected.
-		if ( ( btn = closest( e, '[data-slh-send-selected]' ) ) ) {
-			var ids = Array.prototype.map.call( document.querySelectorAll( '[data-slh-check]:checked' ), function ( c ) {
+		if ( ( btn = closest( e, '[data-bsh-send-selected]' ) ) ) {
+			var ids = Array.prototype.map.call( document.querySelectorAll( '[data-bsh-check]:checked' ), function ( c ) {
 				return c.value;
 			} );
-			var barMsg = document.querySelector( '[data-slh-bulkbar] [data-slh-message]' );
+			var barMsg = document.querySelector( '[data-bsh-bulkbar] [data-bsh-message]' );
 			if ( ! ids.length ) {
 				return;
 			}
 			busy( btn, t.sending );
-			post( 'slh_products_send', { ids: ids.join( ',' ) } ).then( function ( res ) {
+			post( 'bsh_products_send', { ids: ids.join( ',' ) } ).then( function ( res ) {
 				idle( btn );
 				setMessage( barMsg, res.data && res.data.message, res.success ? 'ok' : 'error' );
 				if ( res.success ) {
-					document.querySelectorAll( '[data-slh-check]:checked' ).forEach( function ( c ) {
+					document.querySelectorAll( '[data-bsh-check]:checked' ).forEach( function ( c ) {
 						c.checked = false;
-						var st = c.closest( 'tr' ).querySelector( '[data-slh-row-status]' );
-						st.innerHTML = '<span class="slh-badge slh-badge--queued">' + ( t.queuedShort || '' ) + '</span>';
+						var st = c.closest( 'tr' ).querySelector( '[data-bsh-row-status]' );
+						st.innerHTML = '<span class="bsh-badge bsh-badge--queued">' + ( t.queuedShort || '' ) + '</span>';
 					} );
 				}
 			} );
@@ -556,37 +556,37 @@
 		var el = e.target;
 
 		// Products page: selection.
-		if ( el.matches && ( el.matches( '[data-slh-check]' ) || el.matches( '[data-slh-check-all]' ) ) ) {
-			if ( el.matches( '[data-slh-check-all]' ) ) {
-				document.querySelectorAll( '[data-slh-check]' ).forEach( function ( c ) {
+		if ( el.matches && ( el.matches( '[data-bsh-check]' ) || el.matches( '[data-bsh-check-all]' ) ) ) {
+			if ( el.matches( '[data-bsh-check-all]' ) ) {
+				document.querySelectorAll( '[data-bsh-check]' ).forEach( function ( c ) {
 					c.checked = el.checked;
 				} );
 			}
-			var n = document.querySelectorAll( '[data-slh-check]:checked' ).length;
-			var bar = document.querySelector( '[data-slh-bulkbar]' );
+			var n = document.querySelectorAll( '[data-bsh-check]:checked' ).length;
+			var bar = document.querySelector( '[data-bsh-bulkbar]' );
 			if ( bar ) {
 				bar.hidden = ! n;
-				bar.querySelector( '[data-slh-selected-count]' ).textContent = ( t.selected || '%s' ).replace( '%s', n.toLocaleString( 'fa-IR' ) );
+				bar.querySelector( '[data-bsh-selected-count]' ).textContent = ( t.selected || '%s' ).replace( '%s', n.toLocaleString( 'fa-IR' ) );
 			}
 			return;
 		}
 
-		if ( el.matches && el.matches( '[data-slh-link-check-all]' ) ) {
-			document.querySelectorAll( '[data-slh-link-check]' ).forEach( function ( c ) {
+		if ( el.matches && el.matches( '[data-bsh-link-check-all]' ) ) {
+			document.querySelectorAll( '[data-bsh-link-check]' ).forEach( function ( c ) {
 				c.checked = el.checked;
 			} );
 			return;
 		}
 
 		// Categories: offer the attribute check after choosing a category.
-		if ( el.matches && el.matches( '.slh-map-table input[name$="[category_id]"]' ) ) {
-			var holder = el.closest( 'tr' ).querySelector( '[data-slh-attrs]' );
+		if ( el.matches && el.matches( '.bsh-map-table input[name$="[category_id]"]' ) ) {
+			var holder = el.closest( 'tr' ).querySelector( '[data-bsh-attrs]' );
 			holder.innerHTML = '';
 			if ( /\d+\)?\s*$/.test( el.value ) ) {
 				var b = document.createElement( 'button' );
 				b.type = 'button';
-				b.className = 'slh-btn slh-btn--ghost';
-				b.setAttribute( 'data-slh-load-attrs', '' );
+				b.className = 'bsh-btn bsh-btn--ghost';
+				b.setAttribute( 'data-bsh-load-attrs', '' );
 				b.textContent = t.checkAttrs;
 				holder.appendChild( b );
 			}
@@ -594,7 +594,7 @@
 	} );
 
 	document.addEventListener( 'submit', function ( e ) {
-		if ( e.target.matches && e.target.matches( '[data-slh-confirm="disconnect"]' ) && ! window.confirm( t.confirmDisconn ) ) {
+		if ( e.target.matches && e.target.matches( '[data-bsh-confirm="disconnect"]' ) && ! window.confirm( t.confirmDisconn ) ) {
 			e.preventDefault();
 		}
 	} );
@@ -604,11 +604,11 @@
 	 * ---------------------------------------------------------------- */
 
 	function initChart( root ) {
-		var chart = root.querySelector( '[data-slh-chart]' );
+		var chart = root.querySelector( '[data-bsh-chart]' );
 		if ( ! chart ) {
 			return;
 		}
-		var tip = chart.querySelector( '[data-slh-tip]' );
+		var tip = chart.querySelector( '[data-bsh-tip]' );
 		var show = function ( col ) {
 			tip.innerHTML = '';
 			var title = document.createElement( 'strong' );
@@ -629,7 +629,7 @@
 			tip.style.left = Math.max( 0, Math.min( left, c.width - tip.offsetWidth ) ) + 'px';
 			tip.style.top = '-8px';
 		};
-		chart.querySelectorAll( '.slh-chart__col' ).forEach( function ( col ) {
+		chart.querySelectorAll( '.bsh-chart__col' ).forEach( function ( col ) {
 			col.addEventListener( 'mouseenter', function () {
 				show( col );
 			} );
@@ -646,15 +646,15 @@
 	}
 
 	function initBulk( root ) {
-		var bulkBox = root.querySelector( '[data-slh-bulk-progress]' );
+		var bulkBox = root.querySelector( '[data-bsh-bulk-progress]' );
 		if ( ! bulkBox ) {
 			return;
 		}
-		var bulkForm = root.querySelector( '[data-slh-bulk-form]' );
-		var bulkHtml = bulkBox.querySelector( '[data-slh-bulk-html]' );
-		var bulkActions = bulkBox.querySelector( '[data-slh-bulk-running-actions]' );
-		var bulkMsg = bulkBox.querySelector( '[data-slh-bulk-message]' );
-		var startBtn = bulkForm ? bulkForm.querySelector( '[data-slh-bulk-start]' ) : null;
+		var bulkForm = root.querySelector( '[data-bsh-bulk-form]' );
+		var bulkHtml = bulkBox.querySelector( '[data-bsh-bulk-html]' );
+		var bulkActions = bulkBox.querySelector( '[data-bsh-bulk-running-actions]' );
+		var bulkMsg = bulkBox.querySelector( '[data-bsh-bulk-message]' );
+		var startBtn = bulkForm ? bulkForm.querySelector( '[data-bsh-bulk-start]' ) : null;
 
 		var render = function ( data ) {
 			bulkBox.hidden = false;
@@ -665,7 +665,7 @@
 			}
 		};
 		var poll = function () {
-			post( 'slh_bulk_status' ).then( function ( res ) {
+			post( 'bsh_bulk_status' ).then( function ( res ) {
 				if ( ! res.success || ! document.body.contains( bulkBox ) ) {
 					return;
 				}
@@ -679,7 +679,7 @@
 			later( poll, 3000 );
 		}
 
-		var cancelBtn = bulkBox.querySelector( '[data-slh-bulk-cancel]' );
+		var cancelBtn = bulkBox.querySelector( '[data-bsh-bulk-cancel]' );
 		if ( cancelBtn ) {
 			cancelBtn.addEventListener( 'click', function () {
 				if ( ! window.confirm( t.confirmCancel ) ) {
@@ -687,7 +687,7 @@
 				}
 				clearTimers();
 				busy( cancelBtn, t.loading );
-				post( 'slh_bulk_cancel' ).then( function ( res ) {
+				post( 'bsh_bulk_cancel' ).then( function ( res ) {
 					idle( cancelBtn );
 					if ( res.success ) {
 						render( res.data );
@@ -698,24 +698,24 @@
 		}
 
 		if ( bulkForm ) {
-			var termSel = bulkForm.querySelector( '[data-slh-bulk-term]' );
+			var termSel = bulkForm.querySelector( '[data-bsh-bulk-term]' );
 			termSel.addEventListener( 'change', function () {
-				post( 'slh_bulk_count', { term_id: termSel.value } ).then( function ( res ) {
+				post( 'bsh_bulk_count', { term_id: termSel.value } ).then( function ( res ) {
 					if ( res.success ) {
-						bulkForm.querySelector( '[data-slh-count="all"]' ).textContent = res.data.all_fa;
-						bulkForm.querySelector( '[data-slh-count="unsent"]' ).textContent = res.data.unsent_fa;
+						bulkForm.querySelector( '[data-bsh-count="all"]' ).textContent = res.data.all_fa;
+						bulkForm.querySelector( '[data-bsh-count="unsent"]' ).textContent = res.data.unsent_fa;
 					}
 				} );
 			} );
 			bulkForm.addEventListener( 'submit', function ( e ) {
 				e.preventDefault();
 				var scope = bulkForm.querySelector( 'input[name="scope"]:checked' ).value;
-				var count = bulkForm.querySelector( '[data-slh-count="' + scope + '"]' ).textContent;
+				var count = bulkForm.querySelector( '[data-bsh-count="' + scope + '"]' ).textContent;
 				if ( ! window.confirm( ( t.confirmBulk || '%s' ).replace( '%s', count ) ) ) {
 					return;
 				}
 				busy( startBtn, t.starting );
-				post( 'slh_bulk_start', { scope: scope, term_id: termSel.value } ).then( function ( res ) {
+				post( 'bsh_bulk_start', { scope: scope, term_id: termSel.value } ).then( function ( res ) {
 					idle( startBtn );
 					if ( ! res.success ) {
 						bulkBox.hidden = false;
@@ -733,19 +733,19 @@
 	}
 
 	function initProductBox( root ) {
-		var box = root.querySelector( '.slh-product-box' );
+		var box = root.querySelector( '.bsh-product-box' );
 		if ( ! box ) {
 			return;
 		}
 		var productId = box.getAttribute( 'data-product-id' );
-		var statusEl = box.querySelector( '[data-slh-status]' );
-		var msgEl = box.querySelector( '[data-slh-message]' );
-		var sendBtn = box.querySelector( '[data-slh-send]' );
+		var statusEl = box.querySelector( '[data-bsh-status]' );
+		var msgEl = box.querySelector( '[data-bsh-message]' );
+		var sendBtn = box.querySelector( '[data-bsh-send]' );
 		var polls = 0;
 
 		var poll = function () {
 			polls++;
-			post( 'slh_product_status', { product_id: productId } ).then( function ( res ) {
+			post( 'bsh_product_status', { product_id: productId } ).then( function ( res ) {
 				if ( ! res.success ) {
 					return;
 				}
@@ -764,7 +764,7 @@
 		if ( sendBtn ) {
 			sendBtn.addEventListener( 'click', function () {
 				busy( sendBtn, t.sending );
-				post( 'slh_send_product', { product_id: productId } ).then( function ( res ) {
+				post( 'bsh_send_product', { product_id: productId } ).then( function ( res ) {
 					var d = res.data || {};
 					if ( ! res.success ) {
 						idle( sendBtn );
@@ -779,22 +779,22 @@
 				} );
 			} );
 		}
-		if ( statusEl && statusEl.querySelector( '.slh-badge--queued' ) ) {
+		if ( statusEl && statusEl.querySelector( '.bsh-badge--queued' ) ) {
 			later( poll, 5000 );
 		}
 	}
 
 	function linkPoll() {
-		var box = document.querySelector( '[data-slh-link-progress]' );
+		var box = document.querySelector( '[data-bsh-link-progress]' );
 		if ( ! box ) {
 			return;
 		}
-		post( 'slh_link_status' ).then( function ( res ) {
+		post( 'bsh_link_status' ).then( function ( res ) {
 			if ( ! res.success || ! document.body.contains( box ) ) {
 				return;
 			}
 			if ( res.data.running ) {
-				box.querySelector( '[data-slh-link-html]' ).innerHTML = res.data.html;
+				box.querySelector( '[data-bsh-link-html]' ).innerHTML = res.data.html;
 				later( linkPoll, 4000 );
 			} else {
 				reloadContent();
@@ -803,15 +803,15 @@
 	}
 
 	function importPoll() {
-		var box = document.querySelector( '[data-slh-import-progress]' );
+		var box = document.querySelector( '[data-bsh-import-progress]' );
 		if ( ! box ) {
 			return;
 		}
-		post( 'slh_import_status' ).then( function ( res ) {
+		post( 'bsh_import_status' ).then( function ( res ) {
 			if ( ! res.success || ! document.body.contains( box ) ) {
 				return;
 			}
-			box.querySelector( '[data-slh-import-html]' ).innerHTML = res.data.html;
+			box.querySelector( '[data-bsh-import-html]' ).innerHTML = res.data.html;
 			if ( res.data.running ) {
 				later( importPoll, 4000 );
 			} else {
@@ -821,11 +821,11 @@
 	}
 
 	function initPage( root ) {
-		var linkBox = root.querySelector( '[data-slh-link-progress]' );
+		var linkBox = root.querySelector( '[data-bsh-link-progress]' );
 		if ( linkBox && linkBox.getAttribute( 'data-running' ) === '1' ) {
 			later( linkPoll, 3000 );
 		}
-		var importBox = root.querySelector( '[data-slh-import-progress]' );
+		var importBox = root.querySelector( '[data-bsh-import-progress]' );
 		if ( importBox && importBox.getAttribute( 'data-running' ) === '1' ) {
 			later( importPoll, 3000 );
 		}

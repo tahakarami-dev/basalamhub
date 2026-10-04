@@ -3,12 +3,12 @@
  * The Persian log center. Every entry answers: what, what happened, why, what to do.
  * Raw API details go into `context` and are only shown in an expandable section.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Logger {
+class BSH_Logger {
 
 	const LEVELS = array( 'info', 'success', 'warning', 'error' );
 
@@ -17,7 +17,7 @@ class SLH_Logger {
 	 */
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'slh_logs';
+		return $wpdb->prefix . 'bsh_logs';
 	}
 
 	/**
@@ -53,7 +53,7 @@ class SLH_Logger {
 		$wpdb->insert(
 			self::table(),
 			array(
-				'created_at'  => slh_now(),
+				'created_at'  => bsh_now(),
 				'level'       => $level,
 				'event'       => isset( $entry['event'] ) ? substr( (string) $entry['event'], 0, 50 ) : 'general',
 				'object_type' => isset( $entry['object_type'] ) ? $entry['object_type'] : null,
@@ -73,7 +73,7 @@ class SLH_Logger {
 		/**
 		 * Fires after a log entry is written. Notifications (Telegram/Bale) hook here in a later phase.
 		 */
-		do_action( 'slh_logged', $id, $level, $entry );
+		do_action( 'bsh_logged', $id, $level, $entry );
 
 		return $id;
 	}
@@ -157,8 +157,8 @@ class SLH_Logger {
 			$params[] = $like;
 		}
 
-		$per_page = isset( $args['per_page'] ) ? max( 1, (int) $args['per_page'] ) : 30;
-		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$per_page  = isset( $args['per_page'] ) ? max( 1, (int) $args['per_page'] ) : 30;
+		$page      = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$sql_where = implode( ' AND ', $where );
 
 		$count_sql = 'SELECT COUNT(*) FROM ' . self::table() . " WHERE {$sql_where}";
@@ -169,7 +169,10 @@ class SLH_Logger {
 		$items = $wpdb->get_results( $wpdb->prepare( $items_sql, array_merge( $params, array( $per_page, ( $page - 1 ) * $per_page ) ) ) );
 		// phpcs:enable
 
-		return array( 'items' => $items ? $items : array(), 'total' => $total );
+		return array(
+			'items' => $items ? $items : array(),
+			'total' => $total,
+		);
 	}
 
 	/**
@@ -200,7 +203,7 @@ class SLH_Logger {
 	 */
 	public static function prune() {
 		global $wpdb;
-		$days = (int) SLH_Settings::get( 'log_retention_days', 30 );
+		$days = (int) BSH_Settings::get( 'log_retention_days', 30 );
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . self::table() . ' WHERE created_at < %s', gmdate( 'Y-m-d H:i:s', time() - $days * DAY_IN_SECONDS ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 	}
 }

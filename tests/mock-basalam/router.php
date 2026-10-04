@@ -3,16 +3,16 @@
  * A small fake of Basalam's Open API for local end-to-end tests.
  *
  *   php -S 127.0.0.1:8099 tests/mock-basalam/router.php
- *   define( 'SLH_API_BASE', 'http://127.0.0.1:8099' ); // in wp-config.php
+ *   define( 'BSH_API_BASE', 'http://127.0.0.1:8099' ); // in wp-config.php
  *
  * Valid token: "good-token". "novendor-token" = account without a booth.
  * Fault injection: write {"fail": {"POST /v1/vendors/*\/products": {"status": 504, "times": 1, "create": true}}}
  * into the state file; "create": true makes the product anyway (lost response).
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
-$state_file = getenv( 'SLH_MOCK_STATE' ) ?: sys_get_temp_dir() . '/slh-mock-state.json';
+$state_file = getenv( 'BSH_MOCK_STATE' ) ?: sys_get_temp_dir() . '/bsh-mock-state.json';
 $state      = file_exists( $state_file ) ? json_decode( file_get_contents( $state_file ), true ) : array();
 $state     += array( 'products' => array(), 'files' => array(), 'next_id' => 9000, 'requests' => array(), 'fail' => array() );
 
@@ -23,7 +23,10 @@ $token  = preg_replace( '/^Bearer\s+/i', '', $auth );
 $raw    = file_get_contents( 'php://input' );
 $body   = json_decode( $raw, true );
 
-$state['requests'][] = array( 'method' => $method, 'path' => $path, 'query' => $_SERVER['QUERY_STRING'] ?? '', 'body' => is_array( $body ) ? $body : ( $_POST ?: null ) );
+if ( empty( $state['no_request_log'] ) ) {
+	$state['requests'][] = array( 'method' => $method, 'path' => $path, 'query' => $_SERVER['QUERY_STRING'] ?? '', 'body' => is_array( $body ) ? $body : ( $_POST ?: null ) );
+}
+$state['hits'] = ( $state['hits'] ?? 0 ) + 1;
 
 /** ProductVariants input → VariantResponse-like records with new IDs. */
 function mock_variants( array $in, array &$state ) {
@@ -76,13 +79,35 @@ if ( 'GET' === $method && preg_match( '#^/mock-files/(broken-)?(\d+)\.jpg$#', $p
 	exit;
 }
 
+// Chaos mode for stress tests: {"chaos": {"latency_ms": 30, "p429": 0.1, "p5xx": 0.05, "p_lost_create": 0.03}}.
+if ( ! empty( $state['chaos'] ) && 0 === strpos( $path, '/v1/' ) && '/v1/users/me' !== $path ) {
+	$c = $state['chaos'];
+	if ( ! empty( $c['latency_ms'] ) ) {
+		usleep( (int) $c['latency_ms'] * 1000 );
+	}
+	$roll = mt_rand() / mt_getrandmax();
+	if ( $roll < ( $c['p429'] ?? 0 ) ) {
+		$state['chaos_hits']['429'] = ( $state['chaos_hits']['429'] ?? 0 ) + 1;
+		header( 'Retry-After: 1' );
+		out( 429, array( 'detail' => 'Too many requests (chaos)' ), $state, $state_file );
+	}
+	if ( $roll < ( $c['p429'] ?? 0 ) + ( $c['p5xx'] ?? 0 ) ) {
+		$state['chaos_hits']['5xx'] = ( $state['chaos_hits']['5xx'] ?? 0 ) + 1;
+		out( 503, array( 'detail' => 'Service unavailable (chaos)' ), $state, $state_file );
+	}
+	if ( 'POST' === $method && preg_match( '#^/v1/vendors/\d+/products$#', $path ) && $roll < ( $c['p429'] ?? 0 ) + ( $c['p5xx'] ?? 0 ) + ( $c['p_lost_create'] ?? 0 ) ) {
+		$state['chaos_hits']['lost'] = ( $state['chaos_hits']['lost'] ?? 0 ) + 1;
+		$injected = array( 'status' => 504, 'create' => true ); // Created, but the answer never arrives.
+	}
+}
+
 if ( ! in_array( $token, array( 'good-token', 'novendor-token' ), true ) ) {
 	out( 401, array( 'detail' => 'Invalid token' ), $state, $state_file );
 }
 
 // Fault injection.
 $route_key = $method . ' ' . preg_replace( '#/\d+#', '/*', $path );
-$injected  = null;
+$injected  = isset( $injected ) ? $injected : null;
 if ( isset( $state['fail'][ $route_key ] ) && $state['fail'][ $route_key ]['times'] > 0 ) {
 	$state['fail'][ $route_key ]['times']--;
 	$injected = $state['fail'][ $route_key ];

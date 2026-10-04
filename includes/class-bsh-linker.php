@@ -9,16 +9,16 @@
  *   3. the user reviews the preview and approves; only then are links written.
  * Linking never sends anything to Basalam unless the user asks for it.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Linker {
+class BSH_Linker {
 
-	const STATE      = 'slh_link_state';
-	const HOOK_FETCH = 'slh_link_fetch';
-	const HOOK_MATCH = 'slh_link_match';
+	const STATE      = 'bsh_link_state';
+	const HOOK_FETCH = 'bsh_link_fetch';
+	const HOOK_MATCH = 'bsh_link_match';
 	const PER_PAGE   = 50;
 	const CHUNK      = 300;
 
@@ -38,7 +38,7 @@ class SLH_Linker {
 	 */
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'slh_remote_products';
+		return $wpdb->prefix . 'bsh_remote_products';
 	}
 
 	/**
@@ -83,11 +83,11 @@ class SLH_Linker {
 	 * @return true|WP_Error
 	 */
 	public static function start() {
-		if ( ! SLH_Settings::is_connected() ) {
-			return new WP_Error( 'not_connected', __( 'اول در باسلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) );
+		if ( ! BSH_Settings::is_connected() ) {
+			return new WP_Error( 'not_connected', __( 'اول در باسلام‌هاب › تنظیمات به باسلام وصل شو.', 'basalamhub' ) );
 		}
-		if ( self::is_running() || SLH_Bulk::is_running() || SLH_Importer::is_running() ) {
-			return new WP_Error( 'busy', __( 'یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'salamhub' ) );
+		if ( self::is_running() || BSH_Bulk::is_running() || BSH_Importer::is_running() ) {
+			return new WP_Error( 'busy', __( 'یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'basalamhub' ) );
 		}
 		$run = 'r' . time() . wp_rand( 100, 999 );
 		update_option(
@@ -98,11 +98,18 @@ class SLH_Linker {
 				'page'       => 0,
 				'fetched'    => 0,
 				'matched'    => 0,
-				'started_at' => slh_now(),
+				'started_at' => bsh_now(),
 			),
 			false
 		);
-		as_enqueue_async_action( self::HOOK_FETCH, array( 'run_id' => $run, 'page' => 1 ), SLH_Queue::GROUP );
+		as_enqueue_async_action(
+			self::HOOK_FETCH,
+			array(
+				'run_id' => $run,
+				'page'   => 1,
+			),
+			BSH_Queue::GROUP
+		);
 		return true;
 	}
 
@@ -116,31 +123,47 @@ class SLH_Linker {
 		if ( self::state()['run_id'] !== $run_id || 'fetching' !== self::state()['status'] ) {
 			return;
 		}
-		SLH_Queue::run_exclusive(
+		BSH_Queue::run_exclusive(
 			self::HOOK_FETCH,
-			array( 'run_id' => $run_id, 'page' => $page ),
+			array(
+				'run_id' => $run_id,
+				'page'   => $page,
+			),
 			function () use ( $run_id, $page ) {
 				try {
-					$res = SLH_Plugin::api()->vendor_products( SLH_Settings::vendor_id(), $page, self::PER_PAGE );
-				} catch ( SLH_Api_Error $e ) {
-					if ( $e->retryable && false !== SLH_Queue::retry_later( self::HOOK_FETCH, array( 'run_id' => $run_id, 'page' => $page ), 'link_fetch', $e->retry_after ) ) {
+					$res = BSH_Plugin::api()->vendor_products( BSH_Settings::vendor_id(), $page, self::PER_PAGE );
+				} catch ( BSH_Api_Error $e ) {
+					if ( $e->retryable && false !== BSH_Queue::retry_later(
+						self::HOOK_FETCH,
+						array(
+							'run_id' => $run_id,
+							'page'   => $page,
+						),
+						'link_fetch',
+						$e->retry_after
+					) ) {
 						return;
 					}
-					self::set_state( array( 'status' => 'failed', 'error' => trim( $e->getMessage() . ' ' . $e->reason ) ) );
-					SLH_Logger::log(
+					self::set_state(
+						array(
+							'status' => 'failed',
+							'error'  => trim( $e->getMessage() . ' ' . $e->reason ),
+						)
+					);
+					BSH_Logger::log(
 						array_merge(
 							array(
 								'level'       => 'error',
 								'event'       => 'link_fetch_failed',
 								'object_type' => 'system',
-								'title'       => __( 'اتصال محصولات غرفه', 'salamhub' ),
+								'title'       => __( 'اتصال محصولات غرفه', 'basalamhub' ),
 							),
 							$e->to_log()
 						)
 					);
 					return;
 				}
-				SLH_Queue::reset_attempts( 'link_fetch' );
+				BSH_Queue::reset_attempts( 'link_fetch' );
 				foreach ( $res['data'] as $item ) {
 					self::store_remote( $item, $run_id );
 				}
@@ -154,14 +177,33 @@ class SLH_Linker {
 					)
 				);
 				if ( $more ) {
-					as_enqueue_async_action( self::HOOK_FETCH, array( 'run_id' => $run_id, 'page' => $page + 1 ), SLH_Queue::GROUP );
+					as_enqueue_async_action(
+						self::HOOK_FETCH,
+						array(
+							'run_id' => $run_id,
+							'page'   => $page + 1,
+						),
+						BSH_Queue::GROUP
+					);
 					return;
 				}
 				// Products deleted from the booth since the last run disappear from the preview.
 				global $wpdb;
 				$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . self::table() . ' WHERE run_id <> %s', $run_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				self::set_state( array( 'status' => 'matching', 'total' => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::table() ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				as_enqueue_async_action( self::HOOK_MATCH, array( 'run_id' => $run_id, 'offset' => 0 ), SLH_Queue::GROUP );
+				self::set_state(
+					array(
+						'status' => 'matching',
+						'total'  => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::table() ),
+					)
+				); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				as_enqueue_async_action(
+					self::HOOK_MATCH,
+					array(
+						'run_id' => $run_id,
+						'offset' => 0,
+					),
+					BSH_Queue::GROUP
+				);
 			}
 		);
 	}
@@ -203,8 +245,8 @@ class SLH_Linker {
 				}
 			}
 		}
-		$price = isset( $item['primary_price'] ) ? $item['primary_price'] : ( isset( $item['price'] ) ? $item['price'] : null );
-		$row   = array(
+		$price  = isset( $item['primary_price'] ) ? $item['primary_price'] : ( isset( $item['price'] ) ? $item['price'] : null );
+		$row    = array(
 			'basalam_id' => (int) $item['id'],
 			'title'      => mb_substr( isset( $item['title'] ) ? (string) $item['title'] : ( isset( $item['name'] ) ? (string) $item['name'] : '' ), 0, 250 ),
 			'sku'        => isset( $item['sku'] ) && '' !== (string) $item['sku'] ? mb_substr( (string) $item['sku'], 0, 100 ) : null,
@@ -213,7 +255,7 @@ class SLH_Linker {
 			'photo'      => $photo ? esc_url_raw( $photo ) : null,
 			'variants'   => $variants ? wp_json_encode( $variants ) : null,
 			'run_id'     => $run_id,
-			'fetched_at' => slh_now(),
+			'fetched_at' => bsh_now(),
 		);
 		$exists = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . self::table() . ' WHERE basalam_id = %d', $row['basalam_id'] ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		if ( $exists ) {
@@ -223,7 +265,8 @@ class SLH_Linker {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Matching
 	 * ------------------------------------------------------------------ */
 
@@ -256,20 +299,32 @@ class SLH_Linker {
 		}
 		self::set_state( array( 'matched' => $offset + count( $rows ) ) );
 		if ( count( $rows ) === self::CHUNK ) {
-			as_enqueue_async_action( self::HOOK_MATCH, array( 'run_id' => $run_id, 'offset' => $offset + self::CHUNK ), SLH_Queue::GROUP );
+			as_enqueue_async_action(
+				self::HOOK_MATCH,
+				array(
+					'run_id' => $run_id,
+					'offset' => $offset + self::CHUNK,
+				),
+				BSH_Queue::GROUP
+			);
 			return;
 		}
 		self::resolve_conflicts();
-		self::set_state( array( 'status' => 'ready', 'finished_at' => slh_now() ) );
+		self::set_state(
+			array(
+				'status'      => 'ready',
+				'finished_at' => bsh_now(),
+			)
+		);
 		$c = self::counts();
-		SLH_Logger::log(
+		BSH_Logger::log(
 			array(
 				'level'       => 'info',
 				'event'       => 'link_ready',
 				'object_type' => 'system',
-				'title'       => __( 'اتصال محصولات غرفه', 'salamhub' ),
+				'title'       => __( 'اتصال محصولات غرفه', 'basalamhub' ),
 				/* translators: 1: total, 2: certain, 3: suspect, 4: none */
-				'message'     => sprintf( __( '%1$s محصول غرفه بررسی شد: %2$s قطعی، %3$s مشکوک، %4$s بدون جفت. تا تأیید تو چیزی متصل نمی‌شود.', 'salamhub' ), slh_fa_number( array_sum( $c ) ), slh_fa_number( $c['certain'] ), slh_fa_number( $c['suspect'] ), slh_fa_number( $c['none'] ) ),
+				'message'     => sprintf( __( '%1$s محصول غرفه بررسی شد: %2$s قطعی، %3$s مشکوک، %4$s بدون جفت. تا تأیید تو چیزی متصل نمی‌شود.', 'basalamhub' ), bsh_fa_number( array_sum( $c ) ), bsh_fa_number( $c['certain'] ), bsh_fa_number( $c['suspect'] ), bsh_fa_number( $c['none'] ) ),
 			)
 		);
 	}
@@ -284,7 +339,7 @@ class SLH_Linker {
 		global $wpdb;
 		$posts = $wpdb->get_results( "SELECT ID, post_title, post_parent, post_type FROM {$wpdb->posts} WHERE post_type IN ('product','product_variation') AND post_status NOT IN ('trash','auto-draft')" );
 		$skus  = $wpdb->get_results( "SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = '_sku' AND meta_value <> ''" );
-		$links = $wpdb->get_results( 'SELECT wc_id, basalam_id FROM ' . SLH_Links::table() . " WHERE object_type = 'product' AND basalam_id IS NOT NULL" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$links = $wpdb->get_results( 'SELECT wc_id, basalam_id FROM ' . BSH_Links::table() . " WHERE object_type = 'product' AND basalam_id IS NOT NULL" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		$parent = array();
 		$titles = array();
@@ -328,7 +383,13 @@ class SLH_Linker {
 	public static function match_one( $row, array $index ) {
 		$bid = (int) $row->basalam_id;
 		if ( isset( $index['linked_basalam'][ $bid ] ) ) {
-			return array( 'status' => 'linked', 'wc_id' => $index['linked_basalam'][ $bid ], 'score' => 100, 'reason' => __( 'قبلاً متصل شده.', 'salamhub' ), 'candidates' => array() );
+			return array(
+				'status'     => 'linked',
+				'wc_id'      => $index['linked_basalam'][ $bid ],
+				'score'      => 100,
+				'reason'     => __( 'قبلاً متصل شده.', 'basalamhub' ),
+				'candidates' => array(),
+			);
 		}
 
 		// 1) SKU: the product's own, or any of its variants'.
@@ -346,7 +407,7 @@ class SLH_Linker {
 			$key = mb_strtolower( trim( $sku ) );
 			if ( isset( $index['by_sku'][ $key ] ) ) {
 				$sku_hits[ $index['by_sku'][ $key ] ] = $sku;
-			} elseif ( preg_match( '/^SLH-(\d+)$/i', $sku, $m ) && isset( $index['parent'][ (int) $m[1] ] ) ) {
+			} elseif ( preg_match( '/^(?:BSH|SLH)-(\d+)$/i', $sku, $m ) && isset( $index['parent'][ (int) $m[1] ] ) ) {
 				// Our own synthetic SKU: the WooCommerce ID is inside it.
 				$sku_hits[ $index['parent'][ (int) $m[1] ] ] = $sku;
 			}
@@ -359,21 +420,39 @@ class SLH_Linker {
 					'wc_id'      => $wc_id,
 					'score'      => 90,
 					/* translators: %s: Basalam id */
-					'reason'     => sprintf( __( 'SKU یکی است، ولی این محصول سایت قبلاً به محصول دیگری در باسلام (#%s) متصل است.', 'salamhub' ), $index['linked_wc'][ $wc_id ] ),
+					'reason'     => sprintf( __( 'SKU یکی است، ولی این محصول سایت قبلاً به محصول دیگری در باسلام (#%s) متصل است.', 'basalamhub' ), $index['linked_wc'][ $wc_id ] ),
 					'candidates' => array( $wc_id ),
 				);
 			}
 			/* translators: %s: SKU */
-			return array( 'status' => 'certain', 'wc_id' => $wc_id, 'score' => 100, 'reason' => sprintf( __( 'SKU یکسان: %s', 'salamhub' ), current( $sku_hits ) ), 'candidates' => array( $wc_id ) );
+			return array(
+				'status'     => 'certain',
+				'wc_id'      => $wc_id,
+				'score'      => 100,
+				'reason'     => sprintf( __( 'SKU یکسان: %s', 'basalamhub' ), current( $sku_hits ) ),
+				'candidates' => array( $wc_id ),
+			);
 		}
 		if ( count( $sku_hits ) > 1 ) {
-			return array( 'status' => 'suspect', 'wc_id' => (int) key( $sku_hits ), 'score' => 80, 'reason' => __( 'SKUهای این محصول به چند محصول مختلف سایت می‌خورند.', 'salamhub' ), 'candidates' => array_map( 'intval', array_keys( $sku_hits ) ) );
+			return array(
+				'status'     => 'suspect',
+				'wc_id'      => (int) key( $sku_hits ),
+				'score'      => 80,
+				'reason'     => __( 'SKUهای این محصول به چند محصول مختلف سایت می‌خورند.', 'basalamhub' ),
+				'candidates' => array_map( 'intval', array_keys( $sku_hits ) ),
+			);
 		}
 
 		// 2) Name: exact (normalized), then fuzzy among products that share words.
 		$norm = self::normalize( $row->title );
 		if ( '' === $norm ) {
-			return array( 'status' => 'none', 'wc_id' => 0, 'score' => 0, 'reason' => '', 'candidates' => array() );
+			return array(
+				'status'     => 'none',
+				'wc_id'      => 0,
+				'score'      => 0,
+				'reason'     => '',
+				'candidates' => array(),
+			);
 		}
 		$scores = array();
 		if ( isset( $index['titles'][ $norm ] ) ) {
@@ -412,19 +491,31 @@ class SLH_Linker {
 			}
 		);
 		if ( ! $top ) {
-			return array( 'status' => 'none', 'wc_id' => 0, 'score' => 0, 'reason' => '', 'candidates' => array() );
+			return array(
+				'status'     => 'none',
+				'wc_id'      => 0,
+				'score'      => 0,
+				'reason'     => '',
+				'candidates' => array(),
+			);
 		}
 		$best  = (int) key( $top );
 		$score = (int) current( $top );
 		/* translators: %s: similarity percent */
-		$reason = 100 === $score ? __( 'نام دقیقاً یکی است (SKU ندارد یا فرق دارد).', 'salamhub' ) : sprintf( __( 'نام شبیه است (%s٪).', 'salamhub' ), slh_fa_digits( $score ) );
+		$reason = 100 === $score ? __( 'نام دقیقاً یکی است (SKU ندارد یا فرق دارد).', 'basalamhub' ) : sprintf( __( 'نام شبیه است (%s٪).', 'basalamhub' ), bsh_fa_digits( $score ) );
 		if ( count( $top ) > 1 ) {
-			$reason .= ' ' . __( 'چند گزینه‌ی مشابه هست؛ درستش را انتخاب کن.', 'salamhub' );
+			$reason .= ' ' . __( 'چند گزینه‌ی مشابه هست؛ درستش را انتخاب کن.', 'basalamhub' );
 		}
 		if ( isset( $index['linked_wc'][ $best ] ) ) {
-			$reason .= ' ' . __( 'این محصول سایت قبلاً به محصول دیگری متصل است.', 'salamhub' );
+			$reason .= ' ' . __( 'این محصول سایت قبلاً به محصول دیگری متصل است.', 'basalamhub' );
 		}
-		return array( 'status' => 'suspect', 'wc_id' => $best, 'score' => $score, 'reason' => $reason, 'candidates' => array_map( 'intval', array_slice( array_keys( $top ), 0, 5 ) ) );
+		return array(
+			'status'     => 'suspect',
+			'wc_id'      => $best,
+			'score'      => $score,
+			'reason'     => $reason,
+			'candidates' => array_map( 'intval', array_slice( array_keys( $top ), 0, 5 ) ),
+		);
 	}
 
 	/**
@@ -437,7 +528,7 @@ class SLH_Linker {
 			$wpdb->query(
 				$wpdb->prepare(
 					'UPDATE ' . self::table() . " SET match_status = 'suspect', match_score = 80, match_reason = %s WHERE match_status = 'certain' AND match_wc_id = %d", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-					__( 'چند محصول باسلام با یک SKU به همین محصول سایت می‌خورند؛ فقط یکی را متصل کن.', 'salamhub' ),
+					__( 'چند محصول باسلام با یک SKU به همین محصول سایت می‌خورند؛ فقط یکی را متصل کن.', 'basalamhub' ),
 					$wc_id
 				)
 			);
@@ -450,8 +541,36 @@ class SLH_Linker {
 	 */
 	public static function normalize( $text ) {
 		$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, 'UTF-8' );
-		$text = strtr( $text, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9', '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9', 'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ؤ' => 'و' ) );
-		$text = SLH_Categories::normalize( $text );
+		$text = strtr(
+			$text,
+			array(
+				'۰' => '0',
+				'۱' => '1',
+				'۲' => '2',
+				'۳' => '3',
+				'۴' => '4',
+				'۵' => '5',
+				'۶' => '6',
+				'۷' => '7',
+				'۸' => '8',
+				'۹' => '9',
+				'٠' => '0',
+				'١' => '1',
+				'٢' => '2',
+				'٣' => '3',
+				'٤' => '4',
+				'٥' => '5',
+				'٦' => '6',
+				'٧' => '7',
+				'٨' => '8',
+				'٩' => '9',
+				'أ' => 'ا',
+				'إ' => 'ا',
+				'آ' => 'ا',
+				'ؤ' => 'و',
+			)
+		);
+		$text = BSH_Categories::normalize( $text );
 		$text = preg_replace( '/[^\p{L}\p{N}]+/u', ' ', $text );
 		return trim( preg_replace( '/\s+/u', ' ', $text ) );
 	}
@@ -461,9 +580,16 @@ class SLH_Linker {
 	 * @return string[] Words of 2+ characters.
 	 */
 	private static function tokens( $norm ) {
-		return array_values( array_unique( array_filter( explode( ' ', $norm ), function ( $t ) {
-			return mb_strlen( $t ) >= 2;
-		} ) ) );
+		return array_values(
+			array_unique(
+				array_filter(
+					explode( ' ', $norm ),
+					function ( $t ) {
+						return mb_strlen( $t ) >= 2;
+					}
+				)
+			)
+		);
 	}
 
 	/**
@@ -475,7 +601,8 @@ class SLH_Linker {
 		return implode( '|', $m[0] );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Preview data and approval
 	 * ------------------------------------------------------------------ */
 
@@ -484,7 +611,12 @@ class SLH_Linker {
 	 */
 	public static function counts() {
 		global $wpdb;
-		$out = array( 'certain' => 0, 'suspect' => 0, 'none' => 0, 'linked' => 0 );
+		$out = array(
+			'certain' => 0,
+			'suspect' => 0,
+			'none'    => 0,
+			'linked'  => 0,
+		);
 		foreach ( (array) $wpdb->get_results( 'SELECT match_status, COUNT(*) AS n FROM ' . self::table() . ' GROUP BY match_status' ) as $r ) { // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			if ( isset( $out[ $r->match_status ] ) ) {
 				$out[ $r->match_status ] = (int) $r->n;
@@ -502,11 +634,14 @@ class SLH_Linker {
 	public static function rows( $status, $page = 1, $per_page = 50 ) {
 		global $wpdb;
 		$order = 'suspect' === $status ? 'match_score DESC, id ASC' : 'id ASC';
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order is one of two fixed ORDER BY clauses.
 		$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . self::table() . ' WHERE match_status = %s', $status ) );
 		$items = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . " WHERE match_status = %s ORDER BY {$order} LIMIT %d OFFSET %d", $status, $per_page, ( max( 1, $page ) - 1 ) * $per_page ) );
 		// phpcs:enable
-		return array( 'items' => $items ? $items : array(), 'total' => $total );
+		return array(
+			'items' => $items ? $items : array(),
+			'total' => $total,
+		);
 	}
 
 	/**
@@ -521,7 +656,7 @@ class SLH_Linker {
 		global $wpdb;
 		$linked = 0;
 		$errors = array();
-		$mapper = new SLH_Product_Mapper();
+		$mapper = new BSH_Product_Mapper();
 		foreach ( $pairs as $basalam_id => $wc_id ) {
 			$basalam_id = (int) $basalam_id;
 			$wc_id      = (int) $wc_id;
@@ -529,19 +664,19 @@ class SLH_Linker {
 			$product    = $wc_id ? wc_get_product( $wc_id ) : null;
 			if ( ! $row || ! $product || ! ( $product->is_type( 'simple' ) || $product->is_type( 'variable' ) ) ) {
 				/* translators: %s: Basalam id */
-				$errors[] = sprintf( __( '#%s: محصول سایت پیدا نشد یا نوعش پشتیبانی نمی‌شود.', 'salamhub' ), $basalam_id );
+				$errors[] = sprintf( __( '#%s: محصول سایت پیدا نشد یا نوعش پشتیبانی نمی‌شود.', 'basalamhub' ), $basalam_id );
 				continue;
 			}
-			$other = SLH_Links::get_by_basalam( 'product', $basalam_id );
+			$other = BSH_Links::get_by_basalam( 'product', $basalam_id );
 			if ( $other && (int) $other->wc_id !== $wc_id ) {
 				/* translators: %s: Basalam id */
-				$errors[] = sprintf( __( '#%s: این محصول باسلام قبلاً به محصول دیگری متصل شده.', 'salamhub' ), $basalam_id );
+				$errors[] = sprintf( __( '#%s: این محصول باسلام قبلاً به محصول دیگری متصل شده.', 'basalamhub' ), $basalam_id );
 				continue;
 			}
-			$mine = SLH_Links::get( 'product', $wc_id );
+			$mine = BSH_Links::get( 'product', $wc_id );
 			if ( $mine && $mine->basalam_id && (int) $mine->basalam_id !== $basalam_id ) {
 				/* translators: 1: product, 2: Basalam id */
-				$errors[] = sprintf( __( '«%1$s» قبلاً به محصول باسلام #%2$s متصل است.', 'salamhub' ), $product->get_name(), $mine->basalam_id );
+				$errors[] = sprintf( __( '«%1$s» قبلاً به محصول باسلام #%2$s متصل است.', 'basalamhub' ), $product->get_name(), $mine->basalam_id );
 				continue;
 			}
 
@@ -558,16 +693,22 @@ class SLH_Linker {
 						$same_label = self::normalize( $r['label'] ) === self::normalize( $v['label'] );
 						if ( $same_sku || $same_label ) {
 							// Price/stock unknown (null) so the first sync sends them.
-							$map[ $vid ] = array( 'id' => (int) $r['id'], 'sig' => $v['sig'], 'price' => null, 'stock' => null, 'sku' => $v['sku'] );
+							$map[ $vid ] = array(
+								'id'    => (int) $r['id'],
+								'sig'   => $v['sig'],
+								'price' => null,
+								'stock' => null,
+								'sku'   => $v['sku'],
+							);
 							break;
 						}
 					}
 				}
 				$unmatched = count( $variations ) - count( $map );
-				update_post_meta( $wc_id, '_slh_variants', $unmatched ? array() : $map );
+				update_post_meta( $wc_id, '_bsh_variants', $unmatched ? array() : $map );
 			}
 
-			SLH_Links::upsert(
+			BSH_Links::upsert(
 				'product',
 				$wc_id,
 				array(
@@ -577,8 +718,15 @@ class SLH_Linker {
 					'last_error'   => null,
 				)
 			);
-			$wpdb->update( self::table(), array( 'match_status' => 'linked', 'match_wc_id' => $wc_id ), array( 'basalam_id' => $basalam_id ) );
-			SLH_Logger::log(
+			$wpdb->update(
+				self::table(),
+				array(
+					'match_status' => 'linked',
+					'match_wc_id'  => $wc_id,
+				),
+				array( 'basalam_id' => $basalam_id )
+			);
+			BSH_Logger::log(
 				array(
 					'level'       => 'success',
 					'event'       => 'product_linked',
@@ -586,18 +734,21 @@ class SLH_Linker {
 					'object_id'   => $wc_id,
 					'title'       => $product->get_name(),
 					/* translators: %s: Basalam id */
-					'message'     => sprintf( __( 'به محصول موجود باسلام #%s متصل شد.', 'salamhub' ), $basalam_id ),
+					'message'     => sprintf( __( 'به محصول موجود باسلام #%s متصل شد.', 'basalamhub' ), $basalam_id ),
 					'reason'      => $unmatched
 						/* translators: %s: count */
-						? sprintf( __( '%s تنوع جفت نشد؛ در اولین ارسال، فهرست کامل تنوع‌ها از سایت فرستاده می‌شود.', 'salamhub' ), slh_fa_number( $unmatched ) )
+						? sprintf( __( '%s تنوع جفت نشد؛ در اولین ارسال، فهرست کامل تنوع‌ها از سایت فرستاده می‌شود.', 'basalamhub' ), bsh_fa_number( $unmatched ) )
 						: null,
 				)
 			);
 			if ( $push ) {
-				SLH_Queue::enqueue_product( $wc_id, true );
+				BSH_Queue::enqueue_product( $wc_id, true );
 			}
 			++$linked;
 		}
-		return array( 'linked' => $linked, 'errors' => $errors );
+		return array(
+			'linked' => $linked,
+			'errors' => $errors,
+		);
 	}
 }

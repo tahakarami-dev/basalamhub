@@ -2,42 +2,42 @@
 /**
  * Category mapping page.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$slh_user   = get_current_user_id();
-$slh_failed = get_transient( 'slh_map_errors_' . $slh_user );
-delete_transient( 'slh_map_errors_' . $slh_user );
-$slh_errors = $slh_failed ? $slh_failed['errors'] : array();
-$slh_input  = $slh_failed ? $slh_failed['input'] : array();
+$bsh_user   = get_current_user_id();
+$bsh_failed = get_transient( 'bsh_map_errors_' . $bsh_user );
+delete_transient( 'bsh_map_errors_' . $bsh_user );
+$bsh_errors = $bsh_failed ? $bsh_failed['errors'] : array();
+$bsh_input  = $bsh_failed ? $bsh_failed['input'] : array();
 
-$slh_cache    = SLH_Categories::cache();
-$slh_items    = $slh_cache['items'];
-$slh_map      = SLH_Categories::map();
-$slh_tree     = SLH_Admin_Tools::wc_category_tree();
-$slh_attrs    = get_option( SLH_Categories::ATTR_OPTION, array() );
-$slh_unmapped = count( SLH_Categories::unmapped_terms() );
-$slh_default  = (int) SLH_Settings::get( 'default_category_id', 0 );
+$bsh_cache    = BSH_Categories::cache();
+$bsh_items    = $bsh_cache['items'];
+$bsh_map      = BSH_Categories::map();
+$bsh_tree     = BSH_Admin_Tools::wc_category_tree();
+$bsh_attrs    = get_option( BSH_Categories::ATTR_OPTION, array() );
+$bsh_unmapped = count( BSH_Categories::unmapped_terms() );
+$bsh_default  = (int) BSH_Settings::get( 'default_category_id', 0 );
 
 /** Text shown in a row's input: rejected input, else "Path (id)", else the bare id. */
-$slh_input_value = function ( $term_id ) use ( $slh_input, $slh_errors, $slh_map ) {
-	if ( isset( $slh_errors[ $term_id ], $slh_input[ $term_id ]['category_id'] ) ) {
-		return (string) $slh_input[ $term_id ]['category_id'];
+$bsh_input_value = function ( $term_id ) use ( $bsh_input, $bsh_errors, $bsh_map ) {
+	if ( isset( $bsh_errors[ $term_id ], $bsh_input[ $term_id ]['category_id'] ) ) {
+		return (string) $bsh_input[ $term_id ]['category_id'];
 	}
-	if ( ! isset( $slh_map[ $term_id ] ) ) {
+	if ( ! isset( $bsh_map[ $term_id ] ) ) {
 		return '';
 	}
-	$id  = (int) $slh_map[ $term_id ]['category_id'];
-	$cat = SLH_Categories::find( $id );
+	$id  = (int) $bsh_map[ $term_id ]['category_id'];
+	$cat = BSH_Categories::find( $id );
 	return $cat ? $cat['path'] . ' (' . $id . ')' : (string) $id;
 };
 
 /** Nearest mapped ancestor of a term, for the "inherited" hint. */
-$slh_inherited = function ( $term_id ) use ( $slh_map ) {
+$bsh_inherited = function ( $term_id ) use ( $bsh_map ) {
 	foreach ( get_ancestors( $term_id, 'product_cat', 'taxonomy' ) as $ancestor ) {
-		if ( isset( $slh_map[ $ancestor ] ) ) {
+		if ( isset( $bsh_map[ $ancestor ] ) ) {
 			$t = get_term( $ancestor, 'product_cat' );
 			return $t && ! is_wp_error( $t ) ? $t->name : '';
 		}
@@ -45,125 +45,125 @@ $slh_inherited = function ( $term_id ) use ( $slh_map ) {
 	return '';
 };
 ?>
-<header class="slh-page-head">
-	<h1 class="slh-page-title"><?php esc_html_e( 'نگاشت دسته‌ها', 'salamhub' ); ?></h1>
-	<p class="slh-card__meta"><?php esc_html_e( 'برای هر دسته‌ی ووکامرس یک بار دسته‌ی باسلام را انتخاب کن؛ برای همه‌ی محصولات آن دسته و زیردسته‌هایش اعمال می‌شود.', 'salamhub' ); ?></p>
+<header class="bsh-page-head">
+	<h1 class="bsh-page-title"><?php esc_html_e( 'نگاشت دسته‌ها', 'basalamhub' ); ?></h1>
+	<p class="bsh-card__meta"><?php esc_html_e( 'برای هر دسته‌ی ووکامرس یک بار دسته‌ی باسلام را انتخاب کن؛ برای همه‌ی محصولات آن دسته و زیردسته‌هایش اعمال می‌شود.', 'basalamhub' ); ?></p>
 </header>
 
-<?php SLH_Admin::print_notice(); ?>
+<?php BSH_Admin::print_notice(); ?>
 
-<section class="slh-card slh-section">
-	<div class="slh-card__head">
-		<h2 class="slh-card__title"><?php esc_html_e( 'فهرست دسته‌های باسلام', 'salamhub' ); ?></h2>
-		<?php echo $slh_items ? slh_badge( 'synced' ) : slh_badge( 'stale' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+<section class="bsh-card bsh-section">
+	<div class="bsh-card__head">
+		<h2 class="bsh-card__title"><?php esc_html_e( 'فهرست دسته‌های باسلام', 'basalamhub' ); ?></h2>
+		<?php echo $bsh_items ? bsh_badge( 'synced' ) : bsh_badge( 'stale' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
-	<p class="slh-card__meta">
+	<p class="bsh-card__meta">
 		<?php
 		echo esc_html(
-			$slh_items
+			$bsh_items
 				/* translators: 1: count, 2: relative time */
-				? sprintf( __( '%1$s دسته · دریافت‌شده %2$s', 'salamhub' ), slh_fa_number( count( $slh_items ) ), slh_time_ago( $slh_cache['fetched_at'] ) )
-				: __( 'هنوز دریافت نشده. برای جستجوی دسته با نام، فهرست را از باسلام بگیر.', 'salamhub' )
+				? sprintf( __( '%1$s دسته · دریافت‌شده %2$s', 'basalamhub' ), bsh_fa_number( count( $bsh_items ) ), bsh_time_ago( $bsh_cache['fetched_at'] ) )
+				: __( 'هنوز دریافت نشده. برای جستجوی دسته با نام، فهرست را از باسلام بگیر.', 'basalamhub' )
 		);
 		?>
 	</p>
-	<div class="slh-card__foot">
-		<button type="button" class="slh-btn" data-slh-cat-refresh <?php disabled( ! SLH_Settings::is_connected() ); ?>>
+	<div class="bsh-card__foot">
+		<button type="button" class="bsh-btn" data-bsh-cat-refresh <?php disabled( ! BSH_Settings::is_connected() ); ?>>
 			<span class="dashicons dashicons-update" aria-hidden="true"></span>
-			<?php echo $slh_items ? esc_html__( 'به‌روزرسانی فهرست', 'salamhub' ) : esc_html__( 'دریافت فهرست از باسلام', 'salamhub' ); ?>
+			<?php echo $bsh_items ? esc_html__( 'به‌روزرسانی فهرست', 'basalamhub' ) : esc_html__( 'دریافت فهرست از باسلام', 'basalamhub' ); ?>
 		</button>
 	</div>
-	<p class="slh-field__hint" data-slh-cat-message aria-live="polite"></p>
+	<p class="bsh-field__hint" data-bsh-cat-message aria-live="polite"></p>
 </section>
 
-<?php if ( $slh_unmapped ) : ?>
-	<p class="slh-alert slh-alert--warning">
+<?php if ( $bsh_unmapped ) : ?>
+	<p class="bsh-alert bsh-alert--warning">
 		<?php
 		echo esc_html(
-			$slh_default
+			$bsh_default
 				/* translators: %s: count */
-				? sprintf( __( '%s دسته‌ی دارای محصول نگاشت نشده‌اند؛ محصولاتشان با دسته‌ی پیش‌فرض تنظیمات ارسال می‌شوند.', 'salamhub' ), slh_fa_number( $slh_unmapped ) )
+				? sprintf( __( '%s دسته‌ی دارای محصول نگاشت نشده‌اند؛ محصولاتشان با دسته‌ی پیش‌فرض تنظیمات ارسال می‌شوند.', 'basalamhub' ), bsh_fa_number( $bsh_unmapped ) )
 				/* translators: %s: count */
-				: sprintf( __( '%s دسته‌ی دارای محصول نگاشت نشده‌اند؛ محصولاتشان ارسال نمی‌شوند و دلیلش در لاگ می‌آید.', 'salamhub' ), slh_fa_number( $slh_unmapped ) )
+				: sprintf( __( '%s دسته‌ی دارای محصول نگاشت نشده‌اند؛ محصولاتشان ارسال نمی‌شوند و دلیلش در لاگ می‌آید.', 'basalamhub' ), bsh_fa_number( $bsh_unmapped ) )
 		);
 		?>
 	</p>
 <?php endif; ?>
 
-<?php if ( ! $slh_tree ) : ?>
-	<div class="slh-card"><p class="slh-card__body"><?php esc_html_e( 'فروشگاه هنوز دسته‌بندی محصول ندارد.', 'salamhub' ); ?></p></div>
+<?php if ( ! $bsh_tree ) : ?>
+	<div class="bsh-card"><p class="bsh-card__body"><?php esc_html_e( 'فروشگاه هنوز دسته‌بندی محصول ندارد.', 'basalamhub' ); ?></p></div>
 <?php else : ?>
 <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-	<?php wp_nonce_field( 'slh_save_category_map' ); ?>
-	<input type="hidden" name="action" value="slh_save_category_map">
+	<?php wp_nonce_field( 'bsh_save_category_map' ); ?>
+	<input type="hidden" name="action" value="bsh_save_category_map">
 
-	<?php if ( $slh_items ) : ?>
-		<datalist id="slh-basalam-categories">
-			<?php foreach ( $slh_items as $slh_id => $slh_cat ) : ?>
-				<?php if ( $slh_cat['leaf'] ) : ?>
-					<option value="<?php echo esc_attr( $slh_cat['path'] . ' (' . $slh_id . ')' ); ?>"></option>
+	<?php if ( $bsh_items ) : ?>
+		<datalist id="bsh-basalam-categories">
+			<?php foreach ( $bsh_items as $bsh_id => $bsh_cat ) : ?>
+				<?php if ( $bsh_cat['leaf'] ) : ?>
+					<option value="<?php echo esc_attr( $bsh_cat['path'] . ' (' . $bsh_id . ')' ); ?>"></option>
 				<?php endif; ?>
 			<?php endforeach; ?>
 		</datalist>
 	<?php endif; ?>
 
-	<div class="slh-table-wrap">
-	<table class="slh-table slh-map-table">
+	<div class="bsh-table-wrap">
+	<table class="bsh-table bsh-map-table">
 		<thead>
 			<tr>
-				<th scope="col"><?php esc_html_e( 'دسته‌ی ووکامرس', 'salamhub' ); ?></th>
-				<th scope="col"><?php esc_html_e( 'دسته‌ی باسلام', 'salamhub' ); ?></th>
-				<th scope="col"><?php esc_html_e( 'وضعیت', 'salamhub' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'دسته‌ی ووکامرس', 'basalamhub' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'دسته‌ی باسلام', 'basalamhub' ); ?></th>
+				<th scope="col"><?php esc_html_e( 'وضعیت', 'basalamhub' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
-		<?php foreach ( $slh_tree as $slh_row ) : ?>
+		<?php foreach ( $bsh_tree as $bsh_row ) : ?>
 			<?php
-			list( $slh_term, $slh_depth ) = $slh_row;
-			$slh_tid     = (int) $slh_term->term_id;
-			$slh_mapped  = isset( $slh_map[ $slh_tid ] );
-			$slh_parent  = $slh_mapped ? '' : $slh_inherited( $slh_tid );
-			$slh_cat_id  = $slh_mapped ? (int) $slh_map[ $slh_tid ]['category_id'] : 0;
-			$slh_cached  = $slh_cat_id && isset( $slh_attrs[ $slh_cat_id ] ) ? $slh_attrs[ $slh_cat_id ]['attrs'] : null;
-			$slh_err     = isset( $slh_errors[ $slh_tid ] ) ? $slh_errors[ $slh_tid ] : '';
+			list( $bsh_term, $bsh_depth ) = $bsh_row;
+			$bsh_tid                      = (int) $bsh_term->term_id;
+			$bsh_mapped                   = isset( $bsh_map[ $bsh_tid ] );
+			$bsh_parent                   = $bsh_mapped ? '' : $bsh_inherited( $bsh_tid );
+			$bsh_cat_id                   = $bsh_mapped ? (int) $bsh_map[ $bsh_tid ]['category_id'] : 0;
+			$bsh_cached                   = $bsh_cat_id && isset( $bsh_attrs[ $bsh_cat_id ] ) ? $bsh_attrs[ $bsh_cat_id ]['attrs'] : null;
+			$bsh_err                      = isset( $bsh_errors[ $bsh_tid ] ) ? $bsh_errors[ $bsh_tid ] : '';
 			?>
-			<tr data-term="<?php echo esc_attr( $slh_tid ); ?>">
+			<tr data-term="<?php echo esc_attr( $bsh_tid ); ?>">
 				<td>
-					<span class="slh-map-name" style="padding-inline-start:<?php echo esc_attr( 16 * $slh_depth ); ?>px"><?php echo esc_html( $slh_term->name ); ?></span>
+					<span class="bsh-map-name" style="padding-inline-start:<?php echo esc_attr( 16 * $bsh_depth ); ?>px"><?php echo esc_html( $bsh_term->name ); ?></span>
 					<?php /* translators: %s: product count */ ?>
-					<span class="slh-table__why"><?php echo esc_html( sprintf( __( '%s محصول', 'salamhub' ), slh_fa_number( $slh_term->count ) ) ); ?></span>
+					<span class="bsh-table__why"><?php echo esc_html( sprintf( __( '%s محصول', 'basalamhub' ), bsh_fa_number( $bsh_term->count ) ) ); ?></span>
 				</td>
 				<td>
-					<div class="slh-field<?php echo $slh_err ? ' slh-field--error' : ''; ?>">
-						<input class="slh-field__input" type="text" name="map[<?php echo esc_attr( $slh_tid ); ?>][category_id]" value="<?php echo esc_attr( $slh_input_value( $slh_tid ) ); ?>"
-							<?php echo $slh_items ? 'list="slh-basalam-categories"' : ''; ?>
-							placeholder="<?php echo esc_attr( $slh_parent ? __( 'از دسته‌ی والد', 'salamhub' ) : ( $slh_items ? __( 'نام دسته را تایپ کن…', 'salamhub' ) : __( 'شناسه‌ی دسته', 'salamhub' ) ) ); ?>"
-							aria-label="<?php /* translators: %s: category name */ echo esc_attr( sprintf( __( 'دسته‌ی باسلام برای %s', 'salamhub' ), $slh_term->name ) ); ?>">
-						<?php if ( $slh_err ) : ?>
-							<span class="slh-field__hint"><?php echo esc_html( $slh_err ); ?></span>
+					<div class="bsh-field<?php echo $bsh_err ? ' bsh-field--error' : ''; ?>">
+						<input class="bsh-field__input" type="text" name="map[<?php echo esc_attr( $bsh_tid ); ?>][category_id]" value="<?php echo esc_attr( $bsh_input_value( $bsh_tid ) ); ?>"
+							<?php echo $bsh_items ? 'list="bsh-basalam-categories"' : ''; ?>
+							placeholder="<?php echo esc_attr( $bsh_parent ? __( 'از دسته‌ی والد', 'basalamhub' ) : ( $bsh_items ? __( 'نام دسته را تایپ کن…', 'basalamhub' ) : __( 'شناسه‌ی دسته', 'basalamhub' ) ) ); ?>"
+							aria-label="<?php /* translators: %s: category name */ echo esc_attr( sprintf( __( 'دسته‌ی باسلام برای %s', 'basalamhub' ), $bsh_term->name ) ); ?>">
+						<?php if ( $bsh_err ) : ?>
+							<span class="bsh-field__hint"><?php echo esc_html( $bsh_err ); ?></span>
 						<?php endif; ?>
 					</div>
-					<div class="slh-map-attrs" data-slh-attrs>
+					<div class="bsh-map-attrs" data-bsh-attrs>
 						<?php
-						if ( is_array( $slh_cached ) ) {
-							SLH_Admin_Tools::attribute_fields( $slh_tid, $slh_cached, $slh_map[ $slh_tid ]['attrs'] );
-						} elseif ( $slh_cat_id ) {
-							echo '<button type="button" class="slh-btn slh-btn--ghost" data-slh-load-attrs>' . esc_html__( 'بررسی ویژگی‌های اجباری', 'salamhub' ) . '</button>';
+						if ( is_array( $bsh_cached ) ) {
+							BSH_Admin_Tools::attribute_fields( $bsh_tid, $bsh_cached, $bsh_map[ $bsh_tid ]['attrs'] );
+						} elseif ( $bsh_cat_id ) {
+							echo '<button type="button" class="bsh-btn bsh-btn--ghost" data-bsh-load-attrs>' . esc_html__( 'بررسی ویژگی‌های اجباری', 'basalamhub' ) . '</button>';
 						}
 						?>
 					</div>
 				</td>
 				<td>
 					<?php
-					if ( $slh_mapped ) {
-						echo '<span class="slh-badge slh-badge--synced">' . esc_html__( 'نگاشت شده', 'salamhub' ) . '</span>';
-					} elseif ( $slh_parent ) {
+					if ( $bsh_mapped ) {
+						echo '<span class="bsh-badge bsh-badge--synced">' . esc_html__( 'نگاشت شده', 'basalamhub' ) . '</span>';
+					} elseif ( $bsh_parent ) {
 						/* translators: %s: parent category */
-						echo '<span class="slh-table__why">' . esc_html( sprintf( __( 'از «%s»', 'salamhub' ), $slh_parent ) ) . '</span>';
-					} elseif ( $slh_term->count ) {
-						echo '<span class="slh-badge slh-badge--stale">' . esc_html__( 'نگاشت نشده', 'salamhub' ) . '</span>';
+						echo '<span class="bsh-table__why">' . esc_html( sprintf( __( 'از «%s»', 'basalamhub' ), $bsh_parent ) ) . '</span>';
+					} elseif ( $bsh_term->count ) {
+						echo '<span class="bsh-badge bsh-badge--stale">' . esc_html__( 'نگاشت نشده', 'basalamhub' ) . '</span>';
 					} else {
-						echo '<span class="slh-muted">—</span>';
+						echo '<span class="bsh-muted">—</span>';
 					}
 					?>
 				</td>
@@ -172,9 +172,9 @@ $slh_inherited = function ( $term_id ) use ( $slh_map ) {
 		</tbody>
 	</table>
 	</div>
-	<div class="slh-form-actions">
-		<button type="submit" class="slh-btn slh-btn--primary"><?php esc_html_e( 'ذخیره‌ی نگاشت', 'salamhub' ); ?></button>
-		<span class="slh-field__hint"><?php esc_html_e( 'برای حذف نگاشت یک دسته، کادرش را خالی کن.', 'salamhub' ); ?></span>
+	<div class="bsh-form-actions">
+		<button type="submit" class="bsh-btn bsh-btn--primary"><?php esc_html_e( 'ذخیره‌ی نگاشت', 'basalamhub' ); ?></button>
+		<span class="bsh-field__hint"><?php esc_html_e( 'برای حذف نگاشت یک دسته، کادرش را خالی کن.', 'basalamhub' ); ?></span>
 	</div>
 </form>
 <?php endif; ?>

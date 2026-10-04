@@ -1,73 +1,73 @@
 <?php
 /**
- * Log table partial. Expects $slh_rows (log rows).
+ * Log table partial. Expects $bsh_rows (log rows).
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$slh_level_badge = array(
+$bsh_level_badge = array(
 	'success' => 'synced',
 	'warning' => 'queued',
 	'error'   => 'error',
 );
 ?>
-<div class="slh-table-wrap">
-<table class="slh-table">
+<div class="bsh-table-wrap">
+<table class="bsh-table">
 	<thead>
 		<tr>
-			<th scope="col"><?php esc_html_e( 'زمان', 'salamhub' ); ?></th>
-			<th scope="col"><?php esc_html_e( 'مورد', 'salamhub' ); ?></th>
-			<th scope="col"><?php esc_html_e( 'وضعیت', 'salamhub' ); ?></th>
-			<th scope="col"><span class="screen-reader-text"><?php esc_html_e( 'اقدام', 'salamhub' ); ?></span></th>
+			<th scope="col"><?php esc_html_e( 'زمان', 'basalamhub' ); ?></th>
+			<th scope="col"><?php esc_html_e( 'مورد', 'basalamhub' ); ?></th>
+			<th scope="col"><?php esc_html_e( 'وضعیت', 'basalamhub' ); ?></th>
+			<th scope="col"><span class="screen-reader-text"><?php esc_html_e( 'اقدام', 'basalamhub' ); ?></span></th>
 		</tr>
 	</thead>
 	<tbody>
-	<?php foreach ( $slh_rows as $slh_row ) : ?>
+	<?php foreach ( $bsh_rows as $bsh_row ) : ?>
 		<?php
-		$slh_title = $slh_row->title;
-		$slh_edit  = 'product' === $slh_row->object_type && $slh_row->object_id ? get_edit_post_link( (int) $slh_row->object_id ) : '';
+		$bsh_title = $bsh_row->title;
+		$bsh_edit  = 'product' === $bsh_row->object_type && $bsh_row->object_id ? get_edit_post_link( (int) $bsh_row->object_id ) : '';
 		?>
-		<tr id="slh-log-<?php echo esc_attr( $slh_row->id ); ?>" class="<?php echo $slh_row->resolved ? 'slh-row--resolved' : ''; ?>">
-			<td class="slh-table__time"><?php echo esc_html( slh_format_time( $slh_row->created_at ) ); ?></td>
+		<tr id="bsh-log-<?php echo esc_attr( $bsh_row->id ); ?>" class="<?php echo $bsh_row->resolved ? 'bsh-row--resolved' : ''; ?>">
+			<td class="bsh-table__time"><?php echo esc_html( bsh_format_time( $bsh_row->created_at ) ); ?></td>
 			<td>
-				<?php if ( $slh_edit ) : ?>
-					<a href="<?php echo esc_url( $slh_edit ); ?>"><?php echo esc_html( $slh_title ); ?></a>
+				<?php if ( $bsh_edit ) : ?>
+					<a href="<?php echo esc_url( $bsh_edit ); ?>"><?php echo esc_html( $bsh_title ); ?></a>
 				<?php else : ?>
-					<?php echo esc_html( $slh_title ); ?>
+					<?php echo esc_html( $bsh_title ); ?>
 				<?php endif; ?>
-				<span class="slh-table__why">
-					<?php echo esc_html( $slh_row->message ); ?>
-					<?php if ( $slh_row->reason ) : ?>
-						<?php echo esc_html( $slh_row->reason ); ?>
+				<span class="bsh-table__why">
+					<?php echo esc_html( $bsh_row->message ); ?>
+					<?php if ( $bsh_row->reason ) : ?>
+						<?php echo esc_html( $bsh_row->reason ); ?>
 					<?php endif; ?>
 				</span>
-				<?php if ( $slh_row->suggestion && 'success' !== $slh_row->level ) : ?>
-					<span class="slh-table__todo"><?php echo esc_html( $slh_row->suggestion ); ?></span>
+				<?php if ( $bsh_row->suggestion && 'success' !== $bsh_row->level ) : ?>
+					<span class="bsh-table__todo"><?php echo esc_html( $bsh_row->suggestion ); ?></span>
 				<?php endif; ?>
-				<?php if ( $slh_row->context ) : ?>
-					<details class="slh-details">
-						<summary><?php esc_html_e( 'جزئیات فنی', 'salamhub' ); ?></summary>
-						<pre dir="ltr"><?php echo esc_html( $slh_row->context ); ?></pre>
+				<?php if ( $bsh_row->context ) : ?>
+					<details class="bsh-details">
+						<summary><?php esc_html_e( 'جزئیات فنی', 'basalamhub' ); ?></summary>
+						<pre dir="ltr"><?php echo esc_html( $bsh_row->context ); ?></pre>
 					</details>
 				<?php endif; ?>
 			</td>
 			<td>
 				<?php
-				if ( isset( $slh_level_badge[ $slh_row->level ] ) ) {
-					echo slh_badge( $slh_level_badge[ $slh_row->level ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				if ( isset( $bsh_level_badge[ $bsh_row->level ] ) ) {
+					echo bsh_badge( $bsh_level_badge[ $bsh_row->level ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				} else {
-					echo '<span class="slh-muted">' . esc_html__( 'اطلاع', 'salamhub' ) . '</span>';
+					echo '<span class="bsh-muted">' . esc_html__( 'اطلاع', 'basalamhub' ) . '</span>';
 				}
-				if ( $slh_row->resolved && 'error' === $slh_row->level ) {
-					echo '<span class="slh-table__resolved">' . esc_html__( 'برطرف شد', 'salamhub' ) . '</span>';
+				if ( $bsh_row->resolved && 'error' === $bsh_row->level ) {
+					echo '<span class="bsh-table__resolved">' . esc_html__( 'برطرف شد', 'basalamhub' ) . '</span>';
 				}
 				?>
 			</td>
 			<td>
-				<?php if ( 'error' === $slh_row->level && ! $slh_row->resolved && $slh_row->retry_hook ) : ?>
-					<button type="button" class="slh-btn slh-btn--ghost" data-slh-retry="<?php echo esc_attr( $slh_row->id ); ?>"><?php esc_html_e( 'تلاش مجدد', 'salamhub' ); ?></button>
+				<?php if ( 'error' === $bsh_row->level && ! $bsh_row->resolved && $bsh_row->retry_hook ) : ?>
+					<button type="button" class="bsh-btn bsh-btn--ghost" data-bsh-retry="<?php echo esc_attr( $bsh_row->id ); ?>"><?php esc_html_e( 'تلاش مجدد', 'basalamhub' ); ?></button>
 				<?php endif; ?>
 			</td>
 		</tr>

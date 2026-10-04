@@ -3,19 +3,19 @@
  * The links table: WooCommerce ID ⇄ Basalam ID. This is what makes every operation
  * idempotent — a product that already has a Basalam ID is always updated, never re-created.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Links {
+class BSH_Links {
 
 	/**
 	 * @return string
 	 */
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'slh_links';
+		return $wpdb->prefix . 'bsh_links';
 	}
 
 	/**
@@ -47,7 +47,7 @@ class SLH_Links {
 	 */
 	public static function upsert( $type, $wc_id, array $data ) {
 		global $wpdb;
-		$data['updated_at'] = slh_now();
+		$data['updated_at'] = bsh_now();
 		$existing           = self::get( $type, $wc_id );
 		if ( $existing ) {
 			$wpdb->update( self::table(), $data, array( 'id' => $existing->id ) );
@@ -71,7 +71,14 @@ class SLH_Links {
 				$row['updated_at']
 			)
 		);
-		$wpdb->update( self::table(), $data, array( 'object_type' => $type, 'wc_id' => $wc_id ) );
+		$wpdb->update(
+			self::table(),
+			$data,
+			array(
+				'object_type' => $type,
+				'wc_id'       => $wc_id,
+			)
+		);
 	}
 
 	/**
@@ -92,7 +99,13 @@ class SLH_Links {
 	public static function counts( $type ) {
 		global $wpdb;
 		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT sync_status, COUNT(*) AS n FROM ' . self::table() . ' WHERE object_type = %s GROUP BY sync_status', $type ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$out  = array( 'synced' => 0, 'queued' => 0, 'stale' => 0, 'error' => 0, 'linked' => 0 );
+		$out  = array(
+			'synced' => 0,
+			'queued' => 0,
+			'stale'  => 0,
+			'error'  => 0,
+			'linked' => 0,
+		);
 		foreach ( (array) $rows as $r ) {
 			$out[ $r->sync_status ] = (int) $r->n;
 		}
@@ -114,7 +127,7 @@ class SLH_Links {
 			return array();
 		}
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-		$rows         = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . " WHERE object_type = %s AND wc_id IN ({$placeholders})", array_merge( array( $type ), $ids ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$rows         = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . " WHERE object_type = %s AND wc_id IN ({$placeholders})", array_merge( array( $type ), $ids ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholders are a list of %d.
 		$out          = array();
 		foreach ( (array) $rows as $r ) {
 			$out[ (int) $r->wc_id ] = $r;

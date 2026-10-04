@@ -2,17 +2,19 @@
 /**
  * Creates and upgrades the plugin's database tables.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Installer {
+class BSH_Installer {
 
 	/**
 	 * Activation hook.
 	 */
 	public static function activate() {
+		// An install of the old SalamHub plugin is moved over first (same tables, renamed).
+		BSH_Migrate::maybe_run();
 		self::install();
 	}
 
@@ -21,17 +23,17 @@ class SLH_Installer {
 	 */
 	public static function deactivate() {
 		if ( function_exists( 'as_unschedule_all_actions' ) ) {
-			as_unschedule_all_actions( '', array(), SLH_Queue::GROUP );
+			as_unschedule_all_actions( '', array(), BSH_Queue::GROUP );
 		}
-		delete_option( 'slh_lock_worker' );
-		delete_option( 'slh_pause_until' );
+		delete_option( 'bsh_lock_worker' );
+		delete_option( 'bsh_pause_until' );
 	}
 
 	/**
 	 * Runs dbDelta when the stored schema version is older than the code's.
 	 */
 	public static function maybe_upgrade() {
-		if ( get_option( 'slh_db_version' ) !== SLH_DB_VERSION ) {
+		if ( get_option( 'bsh_db_version' ) !== BSH_DB_VERSION ) {
 			self::install();
 		}
 	}
@@ -44,8 +46,8 @@ class SLH_Installer {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 		$charset = $wpdb->get_charset_collate();
-		$links   = $wpdb->prefix . 'slh_links';
-		$logs    = $wpdb->prefix . 'slh_logs';
+		$links   = $wpdb->prefix . 'bsh_links';
+		$logs    = $wpdb->prefix . 'bsh_logs';
 
 		// Links: the anti-duplicate backbone. One row per WooCommerce object, unique.
 		dbDelta(
@@ -93,7 +95,7 @@ class SLH_Installer {
 		);
 
 		// Snapshot of the booth's products on Basalam, for linking (and later, importing).
-		$remote = $wpdb->prefix . 'slh_remote_products';
+		$remote = $wpdb->prefix . 'bsh_remote_products';
 		dbDelta(
 			"CREATE TABLE {$remote} (
 				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -117,6 +119,6 @@ class SLH_Installer {
 			) {$charset};"
 		);
 
-		update_option( 'slh_db_version', SLH_DB_VERSION, false );
+		update_option( 'bsh_db_version', BSH_DB_VERSION, false );
 	}
 }

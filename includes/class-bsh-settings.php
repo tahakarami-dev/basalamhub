@@ -2,16 +2,16 @@
 /**
  * Settings storage: plugin options, the encrypted token and the connection state.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Settings {
+class BSH_Settings {
 
-	const OPTION            = 'slh_settings';
-	const TOKEN_OPTION      = 'slh_token';
-	const CONNECTION_OPTION = 'slh_connection';
+	const OPTION            = 'bsh_settings';
+	const TOKEN_OPTION      = 'bsh_token';
+	const CONNECTION_OPTION = 'bsh_connection';
 
 	/** Basalam product status codes (from the official OpenAPI spec). */
 	const BASALAM_STATUS_PUBLISHED   = 2976;
@@ -25,13 +25,13 @@ class SLH_Settings {
 	 */
 	public static function field_groups() {
 		return array(
-			'title'       => __( 'نام محصول', 'salamhub' ),
-			'description' => __( 'توضیحات', 'salamhub' ),
-			'images'      => __( 'تصاویر', 'salamhub' ),
-			'price'       => __( 'قیمت', 'salamhub' ),
-			'stock'       => __( 'موجودی', 'salamhub' ),
-			'shipping'    => __( 'وزن، ابعاد و زمان آماده‌سازی', 'salamhub' ),
-			'category'    => __( 'دسته‌بندی', 'salamhub' ),
+			'title'       => __( 'نام محصول', 'basalamhub' ),
+			'description' => __( 'توضیحات', 'basalamhub' ),
+			'images'      => __( 'تصاویر', 'basalamhub' ),
+			'price'       => __( 'قیمت', 'basalamhub' ),
+			'stock'       => __( 'موجودی', 'basalamhub' ),
+			'shipping'    => __( 'وزن، ابعاد و زمان آماده‌سازی', 'basalamhub' ),
+			'category'    => __( 'دسته‌بندی', 'basalamhub' ),
 		);
 	}
 
@@ -40,24 +40,24 @@ class SLH_Settings {
 	 */
 	public static function defaults() {
 		return array(
-			'sync_fields'          => array_keys( self::field_groups() ),
-			'auto_update'          => 1,
-			'auto_send_new'        => 0,
-			'default_category_id'  => '',
-			'preparation_days'     => 3,
-			'default_weight'       => 500,
-			'packaging_weight'     => 0,
-			'unmanaged_stock'      => 1,
-			'price_unit'           => 'auto',
-			'create_status'        => self::BASALAM_STATUS_PUBLISHED,
-			'log_retention_days'   => 30,
+			'sync_fields'         => array_keys( self::field_groups() ),
+			'auto_update'         => 1,
+			'auto_send_new'       => 0,
+			'default_category_id' => '',
+			'preparation_days'    => 3,
+			'default_weight'      => 500,
+			'packaging_weight'    => 0,
+			'unmanaged_stock'     => 1,
+			'price_unit'          => 'auto',
+			'create_status'       => self::BASALAM_STATUS_PUBLISHED,
+			'log_retention_days'  => 30,
 			// Phase 4: orders and stock.
-			'orders_enabled'       => 1,
-			'orders_interval'      => 5,
-			'orders_import_days'   => 3,
-			'orders_auto_confirm'  => 0,
-			'stock_reference'      => 'site',
-			'safety_stock'         => 0,
+			'orders_enabled'      => 1,
+			'orders_interval'     => 5,
+			'orders_import_days'  => 3,
+			'orders_auto_confirm' => 0,
+			'stock_reference'     => 'site',
+			'safety_stock'        => 0,
 		);
 	}
 
@@ -103,23 +103,37 @@ class SLH_Settings {
 
 		$cat = isset( $input['default_category_id'] ) ? trim( (string) $input['default_category_id'] ) : '';
 		if ( '' !== $cat && ! ctype_digit( $cat ) ) {
-			$errors['default_category_id'] = __( 'شناسه‌ی دسته فقط عدد است؛ مثلاً 1287.', 'salamhub' );
+			$errors['default_category_id'] = __( 'شناسه‌ی دسته فقط عدد است؛ مثلاً 1287.', 'basalamhub' );
 		} else {
 			$clean['default_category_id'] = $cat;
 		}
 
 		foreach ( array(
-			'preparation_days' => array( 0, 60, __( 'زمان آماده‌سازی باید بین ۰ تا ۶۰ روز باشد.', 'salamhub' ) ),
-			'default_weight'   => array( 1, 1000000, __( 'وزن پیش‌فرض باید بیشتر از صفر گرم باشد.', 'salamhub' ) ),
-			'packaging_weight' => array( 0, 100000, __( 'وزن بسته‌بندی باید صفر یا بیشتر باشد.', 'salamhub' ) ),
-			'unmanaged_stock'  => array( 0, 100000, __( 'موجودی پیش‌فرض باید صفر یا بیشتر باشد.', 'salamhub' ) ),
-			'log_retention_days' => array( 7, 365, __( 'نگهداری لاگ باید بین ۷ تا ۳۶۵ روز باشد.', 'salamhub' ) ),
-			'orders_interval'    => array( 2, 60, __( 'فاصله‌ی دریافت سفارش باید بین ۲ تا ۶۰ دقیقه باشد.', 'salamhub' ) ),
-			'orders_import_days' => array( 0, 30, __( 'سفارش‌های گذشته را بین ۰ تا ۳۰ روز می‌شود وارد کرد.', 'salamhub' ) ),
-			'safety_stock'       => array( 0, 100000, __( 'موجودی اطمینان باید صفر یا بیشتر باشد.', 'salamhub' ) ),
+			'preparation_days'   => array( 0, 60, __( 'زمان آماده‌سازی باید بین ۰ تا ۶۰ روز باشد.', 'basalamhub' ) ),
+			'default_weight'     => array( 1, 1000000, __( 'وزن پیش‌فرض باید بیشتر از صفر گرم باشد.', 'basalamhub' ) ),
+			'packaging_weight'   => array( 0, 100000, __( 'وزن بسته‌بندی باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
+			'unmanaged_stock'    => array( 0, 100000, __( 'موجودی پیش‌فرض باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
+			'log_retention_days' => array( 7, 365, __( 'نگهداری لاگ باید بین ۷ تا ۳۶۵ روز باشد.', 'basalamhub' ) ),
+			'orders_interval'    => array( 2, 60, __( 'فاصله‌ی دریافت سفارش باید بین ۲ تا ۶۰ دقیقه باشد.', 'basalamhub' ) ),
+			'orders_import_days' => array( 0, 30, __( 'سفارش‌های گذشته را بین ۰ تا ۳۰ روز می‌شود وارد کرد.', 'basalamhub' ) ),
+			'safety_stock'       => array( 0, 100000, __( 'موجودی اطمینان باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
 		) as $key => $rule ) {
 			$raw = isset( $input[ $key ] ) ? trim( (string) $input[ $key ] ) : '';
-			$raw = strtr( $raw, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' ) );
+			$raw = strtr(
+				$raw,
+				array(
+					'۰' => '0',
+					'۱' => '1',
+					'۲' => '2',
+					'۳' => '3',
+					'۴' => '4',
+					'۵' => '5',
+					'۶' => '6',
+					'۷' => '7',
+					'۸' => '8',
+					'۹' => '9',
+				)
+			);
 			if ( '' === $raw || ! preg_match( '/^-?\d+$/', $raw ) || (int) $raw < $rule[0] || (int) $raw > $rule[1] ) {
 				$errors[ $key ] = $rule[2];
 				continue;
@@ -135,14 +149,15 @@ class SLH_Settings {
 
 		update_option( self::OPTION, $clean, false );
 		if ( function_exists( 'as_next_scheduled_action' ) ) {
-			SLH_Order_Sync::reschedule();
-			SLH_Inventory::schedule();
-			SLH_Reconcile::schedule();
+			BSH_Order_Sync::reschedule();
+			BSH_Inventory::schedule();
+			BSH_Reconcile::schedule();
 		}
 		return $errors;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Token
 	 * ------------------------------------------------------------------ */
 
@@ -156,7 +171,7 @@ class SLH_Settings {
 			delete_option( self::TOKEN_OPTION );
 			return true;
 		}
-		$encrypted = SLH_Crypto::encrypt( $token );
+		$encrypted = BSH_Crypto::encrypt( $token );
 		if ( '' === $encrypted ) {
 			return false;
 		}
@@ -168,7 +183,7 @@ class SLH_Settings {
 	 * @return string|null Plain token, '' when not set, null when stored but unreadable.
 	 */
 	public static function get_token() {
-		return SLH_Crypto::decrypt( (string) get_option( self::TOKEN_OPTION, '' ) );
+		return BSH_Crypto::decrypt( (string) get_option( self::TOKEN_OPTION, '' ) );
 	}
 
 	/**
@@ -178,7 +193,8 @@ class SLH_Settings {
 		return '' !== (string) get_option( self::TOKEN_OPTION, '' );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Connection state (filled by "test connection")
 	 * ------------------------------------------------------------------ */
 

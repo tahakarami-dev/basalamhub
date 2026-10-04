@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, sync, marketplace, iran
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.6.1
+Stable tag: 0.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,12 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 فقط از API رسمی باسلام استفاده می‌کند.
 
 == Changelog ==
+
+= 0.7.0 =
+* تغییر کامل نام به باسلام‌هاب: نامک basalamhub، پیشوند کد bsh_
+* انتقال خودکار همه‌ی داده‌های نسخه‌ی قبلی (اتصال، محصولات متصل، سفارش‌ها، لاگ، تنظیمات، صف) و غیرفعال‌شدن افزونه‌ی قدیمی
+* آدرس وب‌هوک قدیمی و SKUهای ساختگی قدیمی همچنان کار می‌کنند
+* بازبینی امنیتی و استانداردهای کدنویسی وردپرس؛ سازگاری با PHP 7.4 تأیید شد
 
 = 0.6.1 =
 * نام افزونه به «باسلام‌هاب» تغییر کرد (نامک، تنظیمات و داده‌ها بدون تغییر؛ به‌روزرسانی امن است)
