@@ -3,7 +3,7 @@
  * Plugin Name:       سلام‌هاب – همگام‌سازی ووکامرس و باسلام
  * Plugin URI:        https://github.com/tahakarami-dev/salamhub
  * Description:       فروشگاه ووکامرس و غرفه‌ی باسلام را دوطرفه همگام نگه می‌دارد: محصول یک بار ثبت می‌شود، در دو جا فروخته می‌شود و هیچ سفارشی گم نمی‌شود.
- * Version:           0.4.0
+ * Version:           0.4.1
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
@@ -19,7 +19,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SLH_VERSION', '0.4.0' );
+define( 'SLH_VERSION', '0.4.1' );
 define( 'SLH_DB_VERSION', '3' );
 define( 'SLH_FILE', __FILE__ );
 define( 'SLH_DIR', plugin_dir_path( __FILE__ ) );
