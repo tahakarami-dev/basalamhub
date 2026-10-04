@@ -77,9 +77,9 @@ class SLH_Product_Sync {
 			$this->fail(
 				$product,
 				array(
-					'message'    => __( 'ارسال نشد؛ سلام‌هاب به باسلام وصل نیست.', 'salamhub' ),
+					'message'    => __( 'ارسال نشد؛ باسلام‌هاب به باسلام وصل نیست.', 'salamhub' ),
 					'reason'     => __( 'توکن وارد نشده یا آخرین تست اتصال ناموفق بوده است.', 'salamhub' ),
-					'suggestion' => __( 'در سلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن، بعد «تلاش مجدد».', 'salamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن، بعد «تلاش مجدد».', 'salamhub' ),
 				)
 			);
 			return 'failed';
@@ -109,7 +109,7 @@ class SLH_Product_Sync {
 					'message'    => __( 'به باسلام ارسال نشد.', 'salamhub' ),
 					/* translators: %s: attribute names */
 					'reason'     => sprintf( __( 'دسته‌ی باسلام این ویژگی‌های اجباری را می‌خواهد که مقدار ندارند: %s.', 'salamhub' ), implode( '، ', $payload['_slh_missing_attributes'] ) ),
-					'suggestion' => __( 'در سلام‌هاب › نگاشت دسته‌ها مقدار پیش‌فرض این ویژگی‌ها را وارد کن، یا در محصول ویژگی ووکامرسی با همین نام بساز.', 'salamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › نگاشت دسته‌ها مقدار پیش‌فرض این ویژگی‌ها را وارد کن، یا در محصول ویژگی ووکامرسی با همین نام بساز.', 'salamhub' ),
 					'context'    => array( 'category_id' => $payload['category_id'] ),
 				)
 			);
@@ -339,7 +339,7 @@ class SLH_Product_Sync {
 						( $dupes ? sprintf( /* translators: %s: labels */ __( 'تنوع تکراری: %s.', 'salamhub' ), implode( '، ', $dupes ) ) . ' ' : '' )
 						. ( $unmatched ? sprintf( /* translators: %s: labels */ __( 'در باسلام پیدا نشد: %s.', 'salamhub' ), implode( '، ', $unmatched ) ) : '' )
 					),
-					'suggestion'  => __( 'تنوع‌های اضافه را در پنل باسلام حذف کن. سلام‌هاب از این به بعد فقط جدیدترین تنوع هر ردیف را به‌روز می‌کند و تنوع تازه نمی‌سازد.', 'salamhub' ),
+					'suggestion'  => __( 'تنوع‌های اضافه را در پنل باسلام حذف کن. باسلام‌هاب از این به بعد فقط جدیدترین تنوع هر ردیف را به‌روز می‌کند و تنوع تازه نمی‌سازد.', 'salamhub' ),
 					'context'     => array( 'basalam_id' => $basalam_id, 'remote_variants' => wp_list_pluck( $remote, 'id' ) ),
 				)
 			);

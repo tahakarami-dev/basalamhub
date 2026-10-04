@@ -223,7 +223,7 @@ class SLH_Import_UI {
 	public static function ajax_notify_test() {
 		self::guard();
 		$ch  = self::channel();
-		$res = SLH_Notifier::send( $ch, '✅ ' . __( 'پیام آزمایشی سلام‌هاب: اعلان‌ها درست کار می‌کنند.', 'salamhub' ) . "\n" . home_url() );
+		$res = SLH_Notifier::send( $ch, '✅ ' . __( 'پیام آزمایشی باسلام‌هاب: اعلان‌ها درست کار می‌کنند.', 'salamhub' ) . "\n" . home_url() );
 		if ( true === $res ) {
 			wp_send_json_success( array( 'message' => __( 'پیام فرستاده شد. در پیام‌رسان نگاه کن.', 'salamhub' ) ) );
 		}

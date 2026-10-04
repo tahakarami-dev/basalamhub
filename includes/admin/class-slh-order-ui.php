@@ -82,7 +82,7 @@ class SLH_Order_UI {
 		if ( ! in_array( $screen_id, array( self::screen_id(), 'shop_order' ), true ) ) {
 			return;
 		}
-		add_meta_box( 'slh-order-box', __( 'سلام‌هاب · سفارش باسلام', 'salamhub' ), array( __CLASS__, 'render_box' ), $screen_id, 'side', 'high' );
+		add_meta_box( 'slh-order-box', __( 'باسلام‌هاب · سفارش باسلام', 'salamhub' ), array( __CLASS__, 'render_box' ), $screen_id, 'side', 'high' );
 	}
 
 	/**
@@ -384,7 +384,7 @@ class SLH_Order_UI {
 				/* translators: %s: global safety stock */
 				'placeholder'       => sprintf( __( 'پیش‌فرض: %s', 'salamhub' ), SLH_Settings::get( 'safety_stock', 0 ) ),
 				'desc_tip'          => true,
-				'description'       => __( 'این تعداد از موجودی در باسلام نمایش داده نمی‌شود تا فروش هم‌زمان در دو جا باعث بیش‌فروشی نشود. خالی = مقدار تنظیمات سلام‌هاب.', 'salamhub' ),
+				'description'       => __( 'این تعداد از موجودی در باسلام نمایش داده نمی‌شود تا فروش هم‌زمان در دو جا باعث بیش‌فروشی نشود. خالی = مقدار تنظیمات باسلام‌هاب.', 'salamhub' ),
 				'type'              => 'number',
 				'custom_attributes' => array( 'min' => 0, 'step' => 1 ),
 			)

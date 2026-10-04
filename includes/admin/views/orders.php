@@ -185,7 +185,7 @@ $slh_failed    = SLH_Logger::query( array( 'object_type' => 'parcel', 'level' =>
 
 <section class="slh-card slh-section">
 	<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'سریع‌تر با وب‌هوک (اختیاری)', 'salamhub' ); ?></h2></div>
-	<p class="slh-card__meta"><?php esc_html_e( 'بدون وب‌هوک هم هیچ سفارشی گم نمی‌شود؛ فقط تا چند دقیقه دیرتر می‌رسد. اگر در پنل توسعه‌دهندگان باسلام وب‌هوک سفارش ساختی، این آدرس را بده. سلام‌هاب به محتوای وب‌هوک اعتماد نمی‌کند و فقط با آن زودتر سفارش‌ها را از API می‌خواند.', 'salamhub' ); ?></p>
+	<p class="slh-card__meta"><?php esc_html_e( 'بدون وب‌هوک هم هیچ سفارشی گم نمی‌شود؛ فقط تا چند دقیقه دیرتر می‌رسد. اگر در پنل توسعه‌دهندگان باسلام وب‌هوک سفارش ساختی، این آدرس را بده. باسلام‌هاب به محتوای وب‌هوک اعتماد نمی‌کند و فقط با آن زودتر سفارش‌ها را از API می‌خواند.', 'salamhub' ); ?></p>
 	<div class="slh-copy">
 		<input class="slh-field__input" type="text" readonly value="<?php echo esc_attr( SLH_Order_Sync::webhook_url() ); ?>" aria-label="<?php esc_attr_e( 'آدرس وب‌هوک', 'salamhub' ); ?>" data-slh-copy-src>
 		<button type="button" class="slh-btn" data-slh-copy><?php esc_html_e( 'کپی', 'salamhub' ); ?></button>

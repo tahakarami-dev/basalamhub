@@ -135,6 +135,6 @@ class SLH_Plugin {
 	 * Admin notice when WooCommerce is missing.
 	 */
 	public static function notice_missing_woocommerce() {
-		echo '<div class="notice notice-error"><p>' . esc_html__( 'سلام‌هاب برای کار به ووکامرس نیاز دارد. اول ووکامرس را نصب و فعال کن.', 'salamhub' ) . '</p></div>';
+		echo '<div class="notice notice-error"><p>' . esc_html__( 'باسلام‌هاب برای کار به ووکامرس نیاز دارد. اول ووکامرس را نصب و فعال کن.', 'salamhub' ) . '</p></div>';
 	}
 }

@@ -25,7 +25,7 @@ class SLH_Product_UI {
 	 * Registers the side box.
 	 */
 	public static function add_box() {
-		add_meta_box( 'slh-product-box', __( 'سلام‌هاب · باسلام', 'salamhub' ), array( __CLASS__, 'render_box' ), 'product', 'side', 'high' );
+		add_meta_box( 'slh-product-box', __( 'باسلام‌هاب · باسلام', 'salamhub' ), array( __CLASS__, 'render_box' ), 'product', 'side', 'high' );
 	}
 
 	/**
@@ -198,7 +198,7 @@ class SLH_Product_UI {
 	public static function ajax_send() {
 		$id = self::ajax_product_id();
 		if ( ! SLH_Settings::is_connected() ) {
-			wp_send_json_error( array( 'message' => __( 'اول در سلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) ) );
+			wp_send_json_error( array( 'message' => __( 'اول در باسلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) ) );
 		}
 		SLH_Queue::reset_attempts( 'product_' . $id );
 		SLH_Queue::enqueue_product( $id, true );

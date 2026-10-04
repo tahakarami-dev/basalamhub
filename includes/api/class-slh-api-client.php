@@ -45,7 +45,7 @@ class SLH_Api_Client {
 				'auth',
 				array(
 					'reason'     => __( 'کلیدهای امنیتی وردپرس (wp-config.php) عوض شده‌اند و توکن رمزنگاری‌شده دیگر باز نمی‌شود.', 'salamhub' ),
-					'suggestion' => __( 'توکن باسلام را دوباره در سلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
+					'suggestion' => __( 'توکن باسلام را دوباره در باسلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
 				)
 			);
 		}
@@ -55,7 +55,7 @@ class SLH_Api_Client {
 				'auth',
 				array(
 					'reason'     => __( 'توکن دسترسی باسلام وارد نشده است.', 'salamhub' ),
-					'suggestion' => __( 'در سلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن.', 'salamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن.', 'salamhub' ),
 				)
 			);
 		}
@@ -80,7 +80,7 @@ class SLH_Api_Client {
 			'headers' => array(
 				'Authorization' => 'Bearer ' . $this->token(),
 				'Accept'        => 'application/json',
-				'User-Agent'    => 'SalamHub/' . SLH_VERSION . '; WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
+				'User-Agent'    => 'BasalamHub/' . SLH_VERSION . '; WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
 			),
 		);
 		if ( null !== $body ) {
@@ -352,7 +352,7 @@ class SLH_Api_Client {
 				'Authorization' => 'Bearer ' . $this->token(),
 				'Accept'        => 'application/json',
 				'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
-				'User-Agent'    => 'SalamHub/' . SLH_VERSION,
+				'User-Agent'    => 'BasalamHub/' . SLH_VERSION,
 			),
 			'body'    => $body,
 		);

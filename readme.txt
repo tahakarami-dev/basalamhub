@@ -1,10 +1,10 @@
-=== SalamHub – WooCommerce & Basalam Sync ===
+=== BasalamHub – WooCommerce & Basalam Sync ===
 Contributors: tahakarami
 Tags: woocommerce, basalam, sync, marketplace, iran
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,11 +12,14 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Description ==
 
-سلام‌هاب سر اطمینان رقابت می‌کند: هیچ داده‌ای بی‌صدا گم نمی‌شود، کارهای سنگین فقط در صف پس‌زمینه اجرا می‌شوند، و هر خطا به فارسی ساده می‌گوید چه شد و چه باید کرد.
+باسلام‌هاب سر اطمینان رقابت می‌کند: هیچ داده‌ای بی‌صدا گم نمی‌شود، کارهای سنگین فقط در صف پس‌زمینه اجرا می‌شوند، و هر خطا به فارسی ساده می‌گوید چه شد و چه باید کرد.
 
 فقط از API رسمی باسلام استفاده می‌کند.
 
 == Changelog ==
+
+= 0.6.1 =
+* نام افزونه به «باسلام‌هاب» تغییر کرد (نامک، تنظیمات و داده‌ها بدون تغییر؛ به‌روزرسانی امن است)
 
 = 0.6.0 =
 * ایمپورت کل غرفه به ووکامرس با پیش‌نمایش: عکس، قیمت، موجودی، دسته و تنوع‌ها؛ اجرای دوباره فقط به‌روز می‌کند و تکراری نمی‌سازد

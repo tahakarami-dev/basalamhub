@@ -71,7 +71,7 @@ class SLH_App {
 			wp_die( esc_html__( 'دسترسی کافی نداری.', 'salamhub' ) );
 		}
 		$pages     = self::pages();
-		$title     = isset( $pages[ $slug ] ) ? $pages[ $slug ][0] : __( 'سلام‌هاب', 'salamhub' );
+		$title     = isset( $pages[ $slug ] ) ? $pages[ $slug ][0] : __( 'باسلام‌هاب', 'salamhub' );
 		$connected = SLH_Settings::is_connected();
 		$conn      = SLH_Settings::connection();
 		$user      = wp_get_current_user();
@@ -81,10 +81,10 @@ class SLH_App {
 			<script>
 				try { var t = localStorage.getItem( 'slh-theme' ); if ( t ) { document.currentScript.parentNode.setAttribute( 'data-theme', t ); } } catch ( e ) {}
 			</script>
-			<aside class="slh-app__sidebar" data-slh-sidebar aria-label="<?php esc_attr_e( 'منوی سلام‌هاب', 'salamhub' ); ?>">
+			<aside class="slh-app__sidebar" data-slh-sidebar aria-label="<?php esc_attr_e( 'منوی باسلام‌هاب', 'salamhub' ); ?>">
 				<a class="slh-app__brand" href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub' ) ); ?>" data-slh-nav>
 					<span class="slh-app__logo" aria-hidden="true"><span class="dashicons dashicons-update"></span></span>
-					<span class="slh-app__brand-name"><?php esc_html_e( 'سلام‌هاب', 'salamhub' ); ?></span>
+					<span class="slh-app__brand-name"><?php esc_html_e( 'باسلام‌هاب', 'salamhub' ); ?></span>
 				</a>
 				<nav class="slh-app__nav" data-slh-sidebar-nav>
 					<?php self::nav( $slug ); ?>
@@ -111,7 +111,7 @@ class SLH_App {
 						<span class="dashicons dashicons-menu-alt3" aria-hidden="true"></span>
 					</button>
 					<div class="slh-app__crumbs">
-						<span><?php esc_html_e( 'سلام‌هاب', 'salamhub' ); ?></span>
+						<span><?php esc_html_e( 'باسلام‌هاب', 'salamhub' ); ?></span>
 						<span aria-hidden="true">/</span>
 						<strong data-slh-crumb><?php echo esc_html( $title ); ?></strong>
 					</div>
