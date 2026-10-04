@@ -25,6 +25,19 @@ $body   = json_decode( $raw, true );
 
 $state['requests'][] = array( 'method' => $method, 'path' => $path, 'query' => $_SERVER['QUERY_STRING'] ?? '', 'body' => is_array( $body ) ? $body : ( $_POST ?: null ) );
 
+/** ProductVariants input → VariantResponse-like records with new IDs. */
+function mock_variants( array $in, array &$state ) {
+	$out = array();
+	foreach ( $in as $v ) {
+		$props = array();
+		foreach ( $v['properties'] ?? array() as $p ) {
+			$props[] = array( 'property' => array( 'id' => crc32( $p['property'] ) % 1000, 'title' => $p['property'] ), 'value' => array( 'id' => crc32( $p['value'] ) % 10000, 'title' => $p['value'] ) );
+		}
+		$out[] = array( 'id' => $state['next_id']++, 'primary_price' => $v['primary_price'], 'stock' => $v['stock'], 'sku' => $v['sku'] ?? null, 'properties' => $props );
+	}
+	return $out;
+}
+
 function out( $code, $data, &$state, $state_file ) {
 	file_put_contents( $state_file, json_encode( $state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) );
 	http_response_code( $code );
@@ -116,21 +129,55 @@ if ( 'POST' === $method && preg_match( '#^/v1/vendors/(\d+)/products$#', $path, 
 	if ( $missing ) {
 		out( 422, array( 'detail' => $missing ), $state, $state_file );
 	}
-	$id                       = $state['next_id']++;
+	$id = $state['next_id']++;
+	if ( ! empty( $body['variants'] ) ) {
+		$body['variants'] = mock_variants( $body['variants'], $state );
+	}
 	$state['products'][ $id ] = array_merge( $body, array( 'id' => $id, 'vendor_id' => (int) $m[1] ) );
 	if ( $injected ) {
 		out( $injected['status'], array( 'detail' => 'gateway timeout' ), $state, $state_file );
 	}
-	out( 201, array( 'id' => $id, 'title' => $body['name'], 'sku' => $body['sku'] ?? null ), $state, $state_file );
+	out( 201, array( 'id' => $id, 'title' => $body['name'], 'sku' => $body['sku'] ?? null, 'variants' => $body['variants'] ?? array() ), $state, $state_file );
 }
 
 if ( 'GET' === $method && preg_match( '#^/v1/vendors/(\d+)/products$#', $path ) ) {
-	parse_str( str_replace( 'skus=', 'skus[]=', $_SERVER['QUERY_STRING'] ?? '' ), $q );
+	parse_str( preg_replace( '/(^|&)skus=/', '$1skus[]=', $_SERVER['QUERY_STRING'] ?? '' ), $q );
 	$skus = isset( $q['skus'] ) ? (array) $q['skus'] : array();
 	$data = array_values( array_filter( $state['products'], function ( $p ) use ( $skus ) {
 		return ! $skus || in_array( $p['sku'] ?? '', $skus, true );
 	} ) );
-	out( 200, array( 'data' => $data, 'result_count' => count( $data ), 'page' => 1, 'per_page' => 10 ), $state, $state_file );
+	$per   = max( 1, (int) ( $q['per_page'] ?? 10 ) );
+	$page  = max( 1, (int) ( $q['page'] ?? 1 ) );
+	$total = count( $data );
+	// VendorProductResponse shape.
+	$data = array_map( function ( $p ) {
+		return array(
+			'id'            => $p['id'],
+			'title'         => $p['title'] ?? $p['name'] ?? '',
+			'sku'           => $p['sku'] ?? null,
+			'price'         => $p['primary_price'] ?? null,
+			'primary_price' => $p['primary_price'] ?? null,
+			'inventory'     => $p['stock'] ?? 0,
+			'photo'         => array( 'id' => 1, 'sm' => 'https://statics.basalam.com/mock/' . $p['id'] . '.jpg' ),
+			'variant'       => $p['variants'] ?? array(),
+		);
+	}, array_slice( $data, ( $page - 1 ) * $per, $per ) );
+	out( 200, array( 'data' => $data, 'total_count' => $total, 'result_count' => count( $data ), 'total_page' => (int) ceil( $total / $per ), 'page' => $page, 'per_page' => $per ), $state, $state_file );
+}
+
+if ( 'PATCH' === $method && preg_match( '#^/v1/products/(\d+)/variations/(\d+)$#', $path, $m ) ) {
+	$pid = (int) $m[1];
+	$vid = (int) $m[2];
+	if ( ! isset( $state['products'][ $pid ] ) ) {
+		out( 404, array( 'detail' => 'Not found' ), $state, $state_file );
+	}
+	foreach ( $state['products'][ $pid ]['variants'] ?? array() as $i => $v ) {
+		if ( (int) $v['id'] === $vid ) {
+			$state['products'][ $pid ]['variants'][ $i ] = array_merge( $v, (array) $body );
+			out( 200, $state['products'][ $pid ], $state, $state_file );
+		}
+	}
+	out( 404, array( 'detail' => 'Variation not found' ), $state, $state_file );
 }
 
 if ( preg_match( '#^/v1/products/(\d+)$#', $path, $m ) ) {
@@ -139,6 +186,11 @@ if ( preg_match( '#^/v1/products/(\d+)$#', $path, $m ) ) {
 		out( 404, array( 'detail' => 'Not found' ), $state, $state_file );
 	}
 	if ( 'PATCH' === $method ) {
+		if ( isset( $body['variants'] ) ) {
+			$new = mock_variants( $body['variants'], $state );
+			// Basalam's real behaviour is unverified: "replace" (default) or "append".
+			$body['variants'] = 'append' === ( $state['variants_mode'] ?? 'replace' ) ? array_merge( $state['products'][ $id ]['variants'] ?? array(), $new ) : $new;
+		}
 		$state['products'][ $id ] = array_merge( $state['products'][ $id ], (array) $body );
 	}
 	out( 200, $state['products'][ $id ], $state, $state_file );

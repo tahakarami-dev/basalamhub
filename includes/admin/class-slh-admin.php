@@ -93,6 +93,9 @@ class SLH_Admin {
 					'chartOk'        => __( 'ارسال موفق', 'salamhub' ),
 					'chartErr'       => __( 'خطا', 'salamhub' ),
 					'queuedShort'    => __( 'در صف', 'salamhub' ),
+					'linking'        => __( 'در حال اتصال…', 'salamhub' ),
+					'nothingSelected' => __( 'هیچ ردیفی انتخاب نشده.', 'salamhub' ),
+					'confirmLinkAll' => __( 'همه‌ی جفت‌های قطعی متصل شوند؟ تا وقتی گزینه‌ی ارسال تیک نخورده، چیزی در باسلام تغییر نمی‌کند.', 'salamhub' ),
 					/* translators: %s: number of selected products */
 					'selected'       => __( '%s محصول انتخاب شده', 'salamhub' ),
 					/* translators: %s: product count */

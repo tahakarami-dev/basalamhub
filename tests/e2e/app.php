@@ -35,15 +35,16 @@ update_option( 'timezone_string', '' );
 
 echo "\n[A-2] Products page filters\n";
 $sku    = 'FIND-' . wp_generate_password( 5, false );
+$rose   = 'گلاب کاشان ' . wp_generate_password( 5, false );
 $a      = slh_t_product( array( 'name' => 'زعفران سرگل', 'sku' => $sku ) );
-$b      = slh_t_product( array( 'name' => 'گلاب کاشان' ) );
+$b      = slh_t_product( array( 'name' => $rose ) );
 SLH_Links::upsert( 'product', $a->get_id(), array( 'sync_status' => 'synced', 'basalam_id' => 777 ) );
 SLH_Links::upsert( 'product', $b->get_id(), array( 'sync_status' => 'error' ) );
 $r = SLH_App::products( array( 'search' => $sku ) );
 slh_t_ok( 1 === $r['total'] && (int) $r['items'][0]->ID === $a->get_id(), 'search by SKU' );
-$r = SLH_App::products( array( 'search' => 'گلاب کاشان' ) );
+$r = SLH_App::products( array( 'search' => $rose ) );
 slh_t_ok( 1 === $r['total'] && 'error' === $r['items'][0]->sync_status, 'search by name, joined with link status' );
-$r = SLH_App::products( array( 'search' => 'گلاب کاشان', 'status' => 'unsent' ) );
+$r = SLH_App::products( array( 'search' => $rose, 'status' => 'unsent' ) );
 slh_t_ok( 1 === $r['total'], 'error product without Basalam ID also shows under «ارسال‌نشده»' );
 $r = SLH_App::products( array( 'search' => $sku, 'status' => 'error' ) );
 slh_t_ok( 0 === $r['total'], 'status filter applies' );
@@ -64,7 +65,7 @@ set_error_handler( function ( $no, $str, $file, $line ) use ( &$errors ) {
 } );
 foreach ( array_keys( SLH_App::pages() ) as $slug ) {
 	$_GET['page'] = $slug;
-	$views        = array( 'salamhub' => 'dashboard', 'salamhub-products' => 'products', 'salamhub-bulk' => 'bulk', 'salamhub-categories' => 'categories', 'salamhub-pricing' => 'pricing', 'salamhub-logs' => 'logs', 'salamhub-settings' => 'settings' );
+	$views        = array( 'salamhub' => 'dashboard', 'salamhub-products' => 'products', 'salamhub-bulk' => 'bulk', 'salamhub-link' => 'link', 'salamhub-categories' => 'categories', 'salamhub-pricing' => 'pricing', 'salamhub-logs' => 'logs', 'salamhub-settings' => 'settings' );
 	ob_start();
 	SLH_App::render( $views[ $slug ], $slug );
 	$html = ob_get_clean();

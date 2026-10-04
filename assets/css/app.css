@@ -308,3 +308,12 @@ body.slh-app-screen #wpbody-content > .update-nag { display: none; }
 @media (prefers-reduced-motion: reduce) {
 	.slh-app__sidebar, .slh-root .slh-tile, .slh-app__progress { transition: none; animation: none; }
 }
+
+/* ---- Link page ---- */
+.slh-linkbar { position: static; }
+.slh-link-table__arrow { width: 32px; color: var(--ink-muted); text-align: center; }
+.slh-link-table td:nth-last-child(1) { width: 24%; min-width: 180px; }
+.slh-root .slh-link-table .slh-field__select { max-width: 320px; }
+.slh-root .slh-link-table strong { font-weight: 600; }
+.slh-score { display: block; width: 96px; height: 4px; margin-top: 6px; border-radius: var(--radius-pill); background: var(--brand-tint); overflow: hidden; }
+.slh-score > span { display: block; width: var(--score); height: 100%; background: var(--brand); }

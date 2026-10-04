@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, sync, marketplace, iran
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,11 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 فقط از API رسمی باسلام استفاده می‌کند.
 
 == Changelog ==
+
+= 0.4.0 =
+* محصولات متغیر: هر تنوع با قیمت و موجودی مستقل؛ ضدتکرار تنوع با نگاشت شناسه‌ها
+* به‌روزرسانی فقط تنوع‌های تغییرکرده؛ ارسال کامل فهرست فقط با تغییر ساختاری
+* اتصال محصولات موجود غرفه با پیش‌نمایش قطعی / مشکوک / بدون جفت و تأیید دستی
 
 = 0.3.0 =
 * پنل SaaS تمام‌صفحه: منوی کناری، نوار بالا، جستجوی محصول، پوسته‌ی روشن/تیره/خودکار

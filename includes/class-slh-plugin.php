@@ -29,12 +29,18 @@ class SLH_Plugin {
 		SLH_Installer::maybe_upgrade();
 		SLH_Queue::init();
 		SLH_Bulk::init();
+		SLH_Linker::init();
 		SLH_Categories::init();
 		SLH_Price_Rules::init();
 
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_update_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_product_set_stock', array( __CLASS__, 'on_stock_changed' ), 20, 1 );
+		add_action( 'woocommerce_variation_set_stock', array( __CLASS__, 'on_stock_changed' ), 20, 1 );
+		add_action( 'woocommerce_new_product_variation', array( __CLASS__, 'on_variation_changed' ), 20, 1 );
+		add_action( 'woocommerce_update_product_variation', array( __CLASS__, 'on_variation_changed' ), 20, 1 );
+		add_action( 'woocommerce_before_delete_product_variation', array( __CLASS__, 'on_variation_changed' ), 20, 1 );
+		add_action( 'woocommerce_trash_product_variation', array( __CLASS__, 'on_variation_changed' ), 20, 1 );
 
 		if ( is_admin() ) {
 			SLH_Admin::init();
@@ -80,6 +86,25 @@ class SLH_Plugin {
 
 		if ( SLH_Settings::get( 'auto_send_new' ) && 'publish' === $product->get_status() && SLH_Settings::is_connected() ) {
 			SLH_Queue::enqueue_product( $product_id );
+		}
+	}
+
+	/**
+	 * A variation was added, edited or removed: queue its (linked) parent product.
+	 *
+	 * @param int $variation_id Variation ID.
+	 */
+	public static function on_variation_changed( $variation_id ) {
+		if ( self::$suspend_hooks ) {
+			return;
+		}
+		$parent_id = (int) wp_get_post_parent_id( $variation_id );
+		if ( ! $parent_id ) {
+			return;
+		}
+		$link = SLH_Links::get( 'product', $parent_id );
+		if ( $link && $link->basalam_id && SLH_Settings::get( 'auto_update' ) ) {
+			SLH_Queue::enqueue_product( $parent_id );
 		}
 	}
 

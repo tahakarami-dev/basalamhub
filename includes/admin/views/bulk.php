@@ -86,7 +86,7 @@ $slh_connected = SLH_Settings::is_connected();
 					<option value="<?php echo esc_attr( $slh_row[0]->term_id ); ?>"><?php echo esc_html( str_repeat( '— ', $slh_row[1] ) . $slh_row[0]->name ); ?></option>
 				<?php endforeach; ?>
 			</select>
-			<span class="slh-field__hint"><?php esc_html_e( 'زیردسته‌ها هم شامل می‌شوند. فقط محصولات ساده‌ی منتشرشده ارسال می‌شوند؛ محصولات متغیر در نسخه‌ی بعدی اضافه می‌شوند.', 'salamhub' ); ?></span>
+			<span class="slh-field__hint"><?php esc_html_e( 'زیردسته‌ها هم شامل می‌شوند. محصولات ساده و متغیرِ منتشرشده ارسال می‌شوند.', 'salamhub' ); ?></span>
 		</label>
 
 		<div class="slh-card__foot">

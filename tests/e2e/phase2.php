@@ -202,23 +202,23 @@ SLH_Plugin::$suspend_hooks = true;
 $var->save();
 SLH_Plugin::$suspend_hooks = false;
 $counts = SLH_Bulk::count_candidates( $bulk_cat );
-slh_t_ok( 23 === $counts['all'] && 23 === $counts['unsent'], 'count: 23 simple products (variable excluded)' );
+slh_t_ok( 24 === $counts['all'] && 24 === $counts['unsent'], 'count: 23 simple + 1 variable product' );
 add_filter( 'slh_bulk_chunk', function () {
 	return 10;
 } );
 $batch = SLH_Bulk::start( array( 'scope' => 'unsent', 'term_id' => $bulk_cat ) );
-slh_t_ok( is_array( $batch ) && 23 === $batch['total'], 'batch started with 23 products' );
+slh_t_ok( is_array( $batch ) && 24 === $batch['total'], 'batch started with 24 products' );
 slh_t_ok( 0 === slh_t_pending_product_actions(), 'the browser request itself queued nothing heavy (only the planner)' );
 $second = SLH_Bulk::start( array( 'scope' => 'all' ) );
 slh_t_ok( is_wp_error( $second ) && 'busy' === $second->get_error_code(), 'a second batch is refused while one runs' );
 slh_t_run_all();
 $p = SLH_Bulk::progress();
-slh_t_ok( 23 === $p['done'] && 0 === $p['waiting'] && 100 === $p['percent'], 'all 23 sent, progress 100%' );
+slh_t_ok( 23 === $p['done'] && 1 === $p['failed'] && 0 === $p['waiting'] && 100 === $p['percent'], '23 sent, the variable product without variations failed with a reason, progress 100%' );
 slh_t_ok( 'done' === SLH_Bulk::current()['status'], 'batch marked done' );
 $sys = SLH_Logger::query( array( 'object_type' => 'system', 'per_page' => 1 ) )['items'][0];
-slh_t_ok( 'bulk_done' === $sys->event && false !== strpos( $sys->message, '۲۳ موفق' ), 'summary logged: «۲۳ موفق، ۰ خطا»' );
+slh_t_ok( 'bulk_done' === $sys->event && false !== strpos( $sys->message, '۲۳ موفق، ۱ خطا' ), 'summary logged: «۲۳ موفق، ۱ خطا»' );
 $counts = SLH_Bulk::count_candidates( $bulk_cat );
-slh_t_ok( 0 === $counts['unsent'], 'nothing left unsent in that category' );
+slh_t_ok( 1 === $counts['unsent'], 'only the failed variable product is left unsent' );
 
 echo "\n[P2-8] Bulk with failures and cancel\n";
 $bad = slh_t_product_in( $misc, array( 'name' => 'بی‌دسته' ) );

@@ -170,7 +170,7 @@ class SLH_Queue {
 	 * @param array    $args Args (for rescheduling).
 	 * @param callable $job  Work.
 	 */
-	private static function run_exclusive( $hook, array $args, callable $job ) {
+	public static function run_exclusive( $hook, array $args, callable $job ) {
 		// Basalam asked us to slow down (429): hold every job until the pause ends.
 		$paused_until = (int) get_option( 'slh_pause_until', 0 );
 		if ( $paused_until > time() ) {

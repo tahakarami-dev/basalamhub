@@ -49,6 +49,7 @@ class SLH_App {
 			'salamhub'            => array( __( 'داشبورد', 'salamhub' ), 'dashicons-chart-area', 'store' ),
 			'salamhub-products'   => array( __( 'محصولات', 'salamhub' ), 'dashicons-products', 'store' ),
 			'salamhub-bulk'       => array( __( 'ارسال گروهی', 'salamhub' ), 'dashicons-upload', 'sync' ),
+			'salamhub-link'       => array( __( 'اتصال محصولات غرفه', 'salamhub' ), 'dashicons-admin-links', 'sync' ),
 			'salamhub-categories' => array( __( 'نگاشت دسته‌ها', 'salamhub' ), 'dashicons-category', 'sync' ),
 			'salamhub-pricing'    => array( __( 'قوانین قیمت', 'salamhub' ), 'dashicons-tag', 'sync' ),
 			'salamhub-logs'       => array( __( 'لاگ', 'salamhub' ), 'dashicons-list-view', 'system' ),
@@ -163,6 +164,8 @@ class SLH_App {
 				$badge = '';
 				if ( 'salamhub-logs' === $slug && $errors ) {
 					$badge = '<span class="slh-app__badge slh-app__badge--alert">' . esc_html( slh_fa_digits( $errors ) ) . '</span>';
+				} elseif ( 'salamhub-link' === $slug && SLH_Linker::is_running() ) {
+					$badge = '<span class="slh-app__badge">…</span>';
 				} elseif ( 'salamhub-bulk' === $slug && $batch && 'running' === $batch['status'] ) {
 					$badge = '<span class="slh-app__badge">' . esc_html( slh_fa_digits( SLH_Bulk::progress( $batch )['percent'] ) ) . '٪</span>';
 				}

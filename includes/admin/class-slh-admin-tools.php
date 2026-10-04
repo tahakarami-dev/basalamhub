@@ -19,6 +19,9 @@ class SLH_Admin_Tools {
 		add_action( 'wp_ajax_slh_bulk_status', array( __CLASS__, 'ajax_bulk_status' ) );
 		add_action( 'wp_ajax_slh_bulk_cancel', array( __CLASS__, 'ajax_bulk_cancel' ) );
 		add_action( 'wp_ajax_slh_bulk_count', array( __CLASS__, 'ajax_bulk_count' ) );
+		add_action( 'wp_ajax_slh_link_start', array( __CLASS__, 'ajax_link_start' ) );
+		add_action( 'wp_ajax_slh_link_status', array( __CLASS__, 'ajax_link_status' ) );
+		add_action( 'wp_ajax_slh_link_approve', array( __CLASS__, 'ajax_link_approve' ) );
 		add_action( 'wp_ajax_slh_categories_refresh', array( __CLASS__, 'ajax_categories_refresh' ) );
 		add_action( 'wp_ajax_slh_category_attributes', array( __CLASS__, 'ajax_category_attributes' ) );
 		add_filter( 'bulk_actions-edit-product', array( __CLASS__, 'register_bulk_action' ) );
@@ -30,6 +33,7 @@ class SLH_Admin_Tools {
 	 */
 	public static function add_pages() {
 		add_submenu_page( 'salamhub', __( 'ارسال گروهی', 'salamhub' ), __( 'ارسال گروهی', 'salamhub' ), SLH_Admin::CAP, 'salamhub-bulk', array( __CLASS__, 'page_bulk' ) );
+		add_submenu_page( 'salamhub', __( 'اتصال محصولات غرفه', 'salamhub' ), __( 'اتصال محصولات غرفه', 'salamhub' ), SLH_Admin::CAP, 'salamhub-link', array( __CLASS__, 'page_link' ) );
 		add_submenu_page( 'salamhub', __( 'نگاشت دسته‌ها', 'salamhub' ), __( 'نگاشت دسته‌ها', 'salamhub' ), SLH_Admin::CAP, 'salamhub-categories', array( __CLASS__, 'page_categories' ) );
 		add_submenu_page( 'salamhub', __( 'قوانین قیمت', 'salamhub' ), __( 'قوانین قیمت', 'salamhub' ), SLH_Admin::CAP, 'salamhub-pricing', array( __CLASS__, 'page_pricing' ) );
 	}
@@ -45,6 +49,11 @@ class SLH_Admin_Tools {
 	/** Bulk page. */
 	public static function page_bulk() {
 		self::render( 'bulk', 'salamhub-bulk' );
+	}
+
+	/** Linking existing booth products. */
+	public static function page_link() {
+		self::render( 'link', 'salamhub-link' );
 	}
 
 	/** Category mapping page. */
@@ -290,6 +299,92 @@ class SLH_Admin_Tools {
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Starts fetching + matching the booth's products.
+	 */
+	public static function ajax_link_start() {
+		self::guard();
+		$r = SLH_Linker::start();
+		if ( is_wp_error( $r ) ) {
+			wp_send_json_error( array( 'message' => $r->get_error_message() ) );
+		}
+		wp_send_json_success( self::link_status_payload() );
+	}
+
+	/**
+	 * Light poll for the linking job.
+	 */
+	public static function ajax_link_status() {
+		self::guard();
+		wp_send_json_success( self::link_status_payload() );
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function link_status_payload() {
+		$s = SLH_Linker::state();
+		ob_start();
+		self::link_progress_html( $s );
+		return array( 'running' => SLH_Linker::is_running(), 'status' => $s['status'], 'html' => ob_get_clean() );
+	}
+
+	/**
+	 * Progress of the linking job.
+	 *
+	 * @param array $s State.
+	 */
+	public static function link_progress_html( array $s ) {
+		if ( 'fetching' === $s['status'] ) {
+			$pct = $s['total_pages'] ? (int) floor( 100 * $s['page'] / $s['total_pages'] ) : 5;
+			/* translators: %s: count */
+			$text = sprintf( __( 'در حال دریافت محصولات غرفه از باسلام… %s محصول تا الان', 'salamhub' ), slh_fa_number( $s['fetched'] ) );
+		} elseif ( 'matching' === $s['status'] ) {
+			$pct = $s['total'] ? (int) floor( 100 * $s['matched'] / $s['total'] ) : 50;
+			/* translators: 1: matched, 2: total */
+			$text = sprintf( __( 'در حال تطبیق با محصولات سایت… %1$s از %2$s', 'salamhub' ), slh_fa_number( $s['matched'] ), slh_fa_number( $s['total'] ) );
+		} else {
+			return;
+		}
+		?>
+		<div class="slh-progress">
+			<div class="slh-progress__row"><span><?php echo esc_html( $text ); ?></span></div>
+			<div class="slh-progress__track" role="progressbar" aria-valuenow="<?php echo esc_attr( $pct ); ?>" aria-valuemin="0" aria-valuemax="100"><div class="slh-progress__bar" style="width:<?php echo esc_attr( max( 3, $pct ) ); ?>%"></div></div>
+			<div class="slh-progress__legend"><span><?php esc_html_e( 'می‌توانی این صفحه را ببندی؛ کار در پس‌زمینه ادامه دارد. تا تأیید تو چیزی متصل نمی‌شود.', 'salamhub' ); ?></span></div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Approves pairs from the preview.
+	 */
+	public static function ajax_link_approve() {
+		self::guard();
+		$pairs = array();
+		$raw   = isset( $_POST['pairs'] ) ? json_decode( sanitize_text_field( wp_unslash( $_POST['pairs'] ) ), true ) : array();
+		foreach ( is_array( $raw ) ? $raw : array() as $basalam_id => $wc_id ) {
+			if ( (int) $basalam_id > 0 && (int) $wc_id > 0 ) {
+				$pairs[ (int) $basalam_id ] = (int) $wc_id;
+			}
+		}
+		if ( ! empty( $_POST['all_certain'] ) ) {
+			global $wpdb;
+			foreach ( $wpdb->get_results( 'SELECT basalam_id, match_wc_id FROM ' . SLH_Linker::table() . " WHERE match_status = 'certain'" ) as $r ) { // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				$pairs[ (int) $r->basalam_id ] = (int) $r->match_wc_id;
+			}
+		}
+		if ( ! $pairs ) {
+			wp_send_json_error( array( 'message' => __( 'هیچ جفتی انتخاب نشده.', 'salamhub' ) ) );
+		}
+		$result = SLH_Linker::approve( $pairs, ! empty( $_POST['push'] ) );
+		/* translators: %s: count */
+		$msg = sprintf( __( '%s محصول متصل شد.', 'salamhub' ), slh_fa_number( $result['linked'] ) );
+		if ( $result['errors'] ) {
+			$msg .= ' ' . implode( ' ', array_slice( $result['errors'], 0, 3 ) );
+		}
+		wp_send_json_success( array( 'message' => $msg, 'linked' => $result['linked'] ) );
 	}
 
 	/**

@@ -92,6 +92,31 @@ class SLH_Installer {
 			) {$charset};"
 		);
 
+		// Snapshot of the booth's products on Basalam, for linking (and later, importing).
+		$remote = $wpdb->prefix . 'slh_remote_products';
+		dbDelta(
+			"CREATE TABLE {$remote} (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				basalam_id bigint(20) unsigned NOT NULL,
+				title varchar(255) NOT NULL,
+				sku varchar(100) DEFAULT NULL,
+				price bigint(20) DEFAULT NULL,
+				stock int(11) DEFAULT NULL,
+				photo varchar(255) DEFAULT NULL,
+				variants longtext DEFAULT NULL,
+				match_status varchar(12) NOT NULL DEFAULT 'none',
+				match_wc_id bigint(20) unsigned DEFAULT NULL,
+				match_score smallint(5) unsigned NOT NULL DEFAULT 0,
+				match_reason varchar(255) DEFAULT NULL,
+				candidates text DEFAULT NULL,
+				run_id varchar(20) NOT NULL,
+				fetched_at datetime NOT NULL,
+				PRIMARY KEY  (id),
+				UNIQUE KEY basalam (basalam_id),
+				KEY match_status (match_status)
+			) {$charset};"
+		);
+
 		update_option( 'slh_db_version', SLH_DB_VERSION, false );
 	}
 }

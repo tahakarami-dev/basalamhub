@@ -180,6 +180,18 @@ class SLH_Api_Client {
 	}
 
 	/**
+	 * PATCH /v1/products/{product_id}/variations/{variation_id} — price/stock/SKU of one variant.
+	 *
+	 * @param int   $product_id Basalam product.
+	 * @param int   $variant_id Basalam variant.
+	 * @param array $payload    primary_price, stock, sku.
+	 * @return array
+	 */
+	public function update_variant( $product_id, $variant_id, array $payload ) {
+		return $this->request( 'PATCH', '/v1/products/' . (int) $product_id . '/variations/' . (int) $variant_id, $payload );
+	}
+
+	/**
 	 * GET /v1/products/{product_id}
 	 *
 	 * @param int $product_id Basalam product.
@@ -221,6 +233,23 @@ class SLH_Api_Client {
 	public function category_attributes( $category_id ) {
 		$res = $this->request( 'GET', '/v1/categories/' . (int) $category_id . '/attributes', null, array( 'exclude_multi_selects' => true ) );
 		return isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array();
+	}
+
+	/**
+	 * GET /v1/vendors/{vendor_id}/products — one page of the booth's products.
+	 *
+	 * @param int $vendor_id Vendor.
+	 * @param int $page      Page (1-based).
+	 * @param int $per_page  Page size.
+	 * @return array{data: array[], total_page: int|null, total_count: int|null}
+	 */
+	public function vendor_products( $vendor_id, $page, $per_page = 50 ) {
+		$res = $this->request( 'GET', '/v1/vendors/' . (int) $vendor_id . '/products', null, array( 'page' => (int) $page, 'per_page' => (int) $per_page, 'variants_flatting' => false ) );
+		return array(
+			'data'        => isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array(),
+			'total_page'  => isset( $res['total_page'] ) ? (int) $res['total_page'] : null,
+			'total_count' => isset( $res['total_count'] ) ? (int) $res['total_count'] : null,
+		);
 	}
 
 	/**

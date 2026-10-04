@@ -37,7 +37,7 @@ $slh_rule_fields = function ( $name, array $rule, $error ) {
 	<?php
 };
 
-// Preview: the 8 most recent published simple products.
+// Preview: the 8 most recent published simple products (a variable product's price is per variant).
 $slh_preview = wc_get_products( array( 'status' => 'publish', 'type' => 'simple', 'limit' => 8, 'orderby' => 'date', 'order' => 'DESC' ) );
 $slh_mult    = SLH_Product_Mapper::rial_multiplier();
 ?>

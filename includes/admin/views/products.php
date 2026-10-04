@@ -78,7 +78,7 @@ $slh_base   = admin_url( 'admin.php?page=salamhub-products' );
 			if ( ! $slh_p ) {
 				continue;
 			}
-			$slh_sendable = $slh_p->is_type( 'simple' ) && 'publish' === $slh_p->get_status();
+			$slh_sendable = ( $slh_p->is_type( 'simple' ) || $slh_p->is_type( 'variable' ) ) && 'publish' === $slh_p->get_status();
 			?>
 			<tr data-product-id="<?php echo esc_attr( $slh_row->ID ); ?>">
 				<td class="slh-products__check">
@@ -98,8 +98,11 @@ $slh_base   = admin_url( 'admin.php?page=salamhub-products' );
 								if ( $slh_p->get_sku() ) {
 									$slh_meta[] = 'SKU: ' . $slh_p->get_sku();
 								}
-								if ( ! $slh_p->is_type( 'simple' ) ) {
-									$slh_meta[] = $slh_p->is_type( 'variable' ) ? __( 'متغیر (نسخه‌ی بعد)', 'salamhub' ) : __( 'نوع پشتیبانی‌نشده', 'salamhub' );
+								if ( $slh_p->is_type( 'variable' ) ) {
+									/* translators: %s: variation count */
+									$slh_meta[] = sprintf( __( 'متغیر · %s تنوع', 'salamhub' ), slh_fa_number( count( $slh_p->get_children() ) ) );
+								} elseif ( ! $slh_p->is_type( 'simple' ) ) {
+									$slh_meta[] = __( 'نوع پشتیبانی‌نشده', 'salamhub' );
 								}
 								if ( 'publish' !== $slh_p->get_status() ) {
 									$slh_meta[] = __( 'منتشرنشده', 'salamhub' );

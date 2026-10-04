@@ -80,6 +80,9 @@
 	 * ---------------------------------------------------------------- */
 
 	var app = document.querySelector( '[data-slh-app]' );
+	var reloadContent = function () {
+		window.location.reload();
+	};
 
 	function store( key, value ) {
 		try {
@@ -209,6 +212,10 @@
 			url.search = new URLSearchParams( new FormData( form ) ).toString();
 			navigate( url.toString(), true );
 		} );
+
+		reloadContent = function () {
+			navigate( window.location.href, false );
+		};
 
 		window.addEventListener( 'popstate', function () {
 			if ( isAppUrl( window.location.href ) ) {
@@ -344,6 +351,54 @@
 			return;
 		}
 
+		// Link page: approve selected / all certain.
+		if ( ( btn = closest( e, '[data-slh-link-selected], [data-slh-link-all]' ) ) ) {
+			var all = btn.hasAttribute( 'data-slh-link-all' );
+			var pairs = {};
+			document.querySelectorAll( '.slh-link-table tbody tr' ).forEach( function ( tr ) {
+				var c = tr.querySelector( '[data-slh-link-check]' );
+				var target = tr.querySelector( '[data-slh-link-target]' );
+				if ( c && c.checked && target && parseInt( target.value, 10 ) > 0 ) {
+					pairs[ tr.getAttribute( 'data-basalam-id' ) ] = target.value;
+				}
+			} );
+			var out = document.querySelector( '[data-slh-link-result]' );
+			if ( ! all && ! Object.keys( pairs ).length ) {
+				setMessage( out, t.nothingSelected, 'error' );
+				return;
+			}
+			if ( all && ! window.confirm( t.confirmLinkAll ) ) {
+				return;
+			}
+			var push = document.querySelector( '[data-slh-link-push]' );
+			busy( btn, t.linking );
+			post( 'slh_link_approve', { pairs: JSON.stringify( all ? {} : pairs ), all_certain: all ? 1 : '', push: push && push.checked ? 1 : '' } ).then( function ( res ) {
+				idle( btn );
+				setMessage( out, res.data && res.data.message, res.success ? 'ok' : 'error' );
+				if ( res.success ) {
+					later( reloadContent, 1200 );
+				}
+			} );
+			return;
+		}
+
+		// Link page: start fetch + match.
+		if ( ( btn = closest( e, '[data-slh-link-start]' ) ) ) {
+			var box = document.querySelector( '[data-slh-link-progress]' );
+			busy( btn, t.starting );
+			post( 'slh_link_start' ).then( function ( res ) {
+				box.hidden = false;
+				if ( ! res.success ) {
+					idle( btn );
+					setMessage( box.querySelector( '[data-slh-link-message]' ), res.data.message, 'error' );
+					return;
+				}
+				box.querySelector( '[data-slh-link-html]' ).innerHTML = res.data.html;
+				later( linkPoll, 3000 );
+			} );
+			return;
+		}
+
 		// Products page: send one row.
 		if ( ( btn = closest( e, '[data-slh-row-send]' ) ) ) {
 			var id = btn.getAttribute( 'data-slh-row-send' );
@@ -401,6 +456,13 @@
 				bar.hidden = ! n;
 				bar.querySelector( '[data-slh-selected-count]' ).textContent = ( t.selected || '%s' ).replace( '%s', n.toLocaleString( 'fa-IR' ) );
 			}
+			return;
+		}
+
+		if ( el.matches && el.matches( '[data-slh-link-check-all]' ) ) {
+			document.querySelectorAll( '[data-slh-link-check]' ).forEach( function ( c ) {
+				c.checked = el.checked;
+			} );
 			return;
 		}
 
@@ -610,7 +672,29 @@
 		}
 	}
 
+	function linkPoll() {
+		var box = document.querySelector( '[data-slh-link-progress]' );
+		if ( ! box ) {
+			return;
+		}
+		post( 'slh_link_status' ).then( function ( res ) {
+			if ( ! res.success || ! document.body.contains( box ) ) {
+				return;
+			}
+			if ( res.data.running ) {
+				box.querySelector( '[data-slh-link-html]' ).innerHTML = res.data.html;
+				later( linkPoll, 4000 );
+			} else {
+				reloadContent();
+			}
+		} );
+	}
+
 	function initPage( root ) {
+		var linkBox = root.querySelector( '[data-slh-link-progress]' );
+		if ( linkBox && linkBox.getAttribute( 'data-running' ) === '1' ) {
+			later( linkPoll, 3000 );
+		}
 		initChart( root );
 		initBulk( root );
 		initProductBox( root );
