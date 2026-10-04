@@ -279,6 +279,57 @@
 			return;
 		}
 
+		// Orders: poll now / stock pull now.
+		if ( ( btn = closest( e, '[data-slh-orders-poll], [data-slh-stock-pull]' ) ) ) {
+			var pollMsg = document.querySelector( '[data-slh-message]' );
+			var isPull = btn.hasAttribute( 'data-slh-stock-pull' );
+			busy( btn, t.starting );
+			post( isPull ? 'slh_stock_pull' : 'slh_orders_poll' ).then( function ( res ) {
+				idle( btn );
+				setMessage( pollMsg, ( res.data || {} ).message, res.success ? 'ok' : 'error' );
+			} );
+			return;
+		}
+
+		// Orders: copy the webhook URL.
+		if ( ( btn = closest( e, '[data-slh-copy]' ) ) ) {
+			var src = btn.parentNode.querySelector( '[data-slh-copy-src]' );
+			src.select();
+			( navigator.clipboard ? navigator.clipboard.writeText( src.value ) : Promise.reject() ).catch( function () {
+				document.execCommand( 'copy' );
+			} );
+			btn.textContent = t.copied;
+			return;
+		}
+
+		// Order box: confirm / posted on Basalam.
+		if ( ( btn = closest( e, '[data-slh-order-action]' ) ) ) {
+			var box = btn.closest( '[data-slh-order]' );
+			var todo = btn.getAttribute( 'data-slh-order-action' );
+			var boxMsg = box.querySelector( '[data-slh-message]' );
+			var method = box.querySelector( '[name="slh_shipping_method"]' );
+			var code = box.querySelector( '[name="slh_tracking_code"]' );
+			if ( todo === 'posted' && ! window.confirm( t.confirmPosted ) ) {
+				return;
+			}
+			busy( btn, t.saving );
+			post( 'slh_order_action', {
+				order_id: box.getAttribute( 'data-slh-order' ),
+				todo: todo,
+				shipping_method: method ? method.value : '',
+				tracking_code: code ? code.value : ''
+			} ).then( function ( res ) {
+				var d = res.data || {};
+				setMessage( boxMsg, d.message, res.success ? 'ok' : 'error' );
+				if ( res.success && d.reload ) {
+					window.location.reload();
+				} else {
+					idle( btn );
+				}
+			} );
+			return;
+		}
+
 		// Categories: refresh Basalam list.
 		if ( ( btn = closest( e, '[data-slh-cat-refresh]' ) ) ) {
 			var catMsg = document.querySelector( '[data-slh-cat-message]' );

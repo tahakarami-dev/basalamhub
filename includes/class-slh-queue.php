@@ -246,6 +246,13 @@ class SLH_Queue {
 			self::reset_attempts( 'product_' . (int) $args['product_id'] );
 			return self::enqueue_product( (int) $args['product_id'], true );
 		}
+		// Order jobs (phase 4): the job itself checks whether it is still needed.
+		if ( in_array( $log->retry_hook, array( 'slh_import_parcel', 'slh_parcel_action' ), true ) && ! empty( $args['parcel_id'] ) ) {
+			$key = 'slh_import_parcel' === $log->retry_hook ? 'parcel_' . (int) $args['parcel_id'] : 'action_' . (int) $args['parcel_id'] . ( isset( $args['action'] ) ? $args['action'] : '' );
+			self::reset_attempts( $key );
+			as_enqueue_async_action( $log->retry_hook, $args, self::GROUP );
+			return true;
+		}
 		return false;
 	}
 
@@ -280,8 +287,12 @@ class SLH_Queue {
 			),
 			'count'
 		);
-		// Recurring maintenance is always pending; don't count it as work.
-		$out['pending'] = max( 0, $out['pending'] - ( as_has_scheduled_action( self::HOOK_MAINTENANCE, array(), self::GROUP ) ? 1 : 0 ) );
+		// Recurring jobs (maintenance, order poll, stock pull) are always pending; don't count them as work.
+		$recurring = 0;
+		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'slh_poll_orders', array() ), array( 'slh_stock_pull', array( 'page' => 1 ) ) ) as $job ) {
+			$recurring += as_has_scheduled_action( $job[0], $job[1], self::GROUP ) ? 1 : 0;
+		}
+		$out['pending'] = max( 0, $out['pending'] - $recurring );
 		return $out;
 	}
 }

@@ -131,12 +131,55 @@ function slh_t_fresh_start( $state_file ) {
 	update_option( 'woocommerce_currency', 'IRT' );
 	update_option( 'woocommerce_weight_unit', 'kg' );
 	update_option( 'woocommerce_dimension_unit', 'cm' );
-	foreach ( array( SLH_Settings::OPTION, SLH_Settings::TOKEN_OPTION, SLH_Settings::CONNECTION_OPTION, SLH_Bulk::OPTION, SLH_Categories::MAP_OPTION, SLH_Categories::CACHE_OPTION, SLH_Categories::ATTR_OPTION, SLH_Price_Rules::OPTION, 'slh_pause_until' ) as $o ) {
+	foreach ( array( SLH_Settings::OPTION, SLH_Settings::TOKEN_OPTION, SLH_Settings::CONNECTION_OPTION, SLH_Bulk::OPTION, SLH_Categories::MAP_OPTION, SLH_Categories::CACHE_OPTION, SLH_Categories::ATTR_OPTION, SLH_Price_Rules::OPTION, 'slh_pause_until', 'slh_orders_polled_at', 'slh_orders_poll_error', 'slh_webhook_last', 'slh_stock_pulled_at', 'slh_stock_pull_changed' ) as $o ) {
 		delete_option( $o );
 	}
 	$wpdb->query( 'DELETE FROM ' . SLH_Links::table() );
 	$wpdb->query( 'DELETE FROM ' . SLH_Logger::table() );
 	as_unschedule_all_actions( SLH_Bulk::HOOK_PLAN, null, 'salamhub' );
+	foreach ( array( SLH_Order_Sync::HOOK_POLL, SLH_Order_Sync::HOOK_IMPORT, SLH_Order_Sync::HOOK_ACTION, SLH_Inventory::HOOK_PULL, SLH_Inventory::HOOK_DECREMENT ) as $h ) {
+		as_unschedule_all_actions( $h, null, 'salamhub' );
+	}
 	slh_t_clear_queue();
 	slh_t_reset_mock( $state_file );
+}
+
+/**
+ * Variable product with local attributes رنگ × سایز and one variation per combination.
+ */
+function slh_t_variable( $name, array $colors = array( 'قرمز', 'آبی' ), array $sizes = array( 'S', 'M' ), $price = '200000' ) {
+	$p = new WC_Product_Variable();
+	$p->set_name( $name );
+	$p->set_status( 'publish' );
+	$a1 = new WC_Product_Attribute();
+	$a1->set_name( 'رنگ' );
+	$a1->set_options( $colors );
+	$a1->set_variation( true );
+	$a1->set_visible( true );
+	$a2 = new WC_Product_Attribute();
+	$a2->set_name( 'سایز' );
+	$a2->set_options( $sizes );
+	$a2->set_variation( true );
+	$a2->set_visible( true );
+	$p->set_attributes( array( $a1, $a2 ) );
+	$p->set_image_id( slh_t_image() );
+	SLH_Plugin::$suspend_hooks = true;
+	$id = $p->save();
+	$i  = 0;
+	foreach ( $colors as $c ) {
+		foreach ( $sizes as $s ) {
+			$v = new WC_Product_Variation();
+			$v->set_parent_id( $id );
+			$v->set_attributes( array( sanitize_title( 'رنگ' ) => $c, sanitize_title( 'سایز' ) => $s ) );
+			$v->set_regular_price( (string) ( (int) $price + 10000 * $i ) );
+			$v->set_manage_stock( true );
+			$v->set_stock_quantity( 3 + $i );
+			$v->set_status( 'publish' );
+			$v->save();
+			++$i;
+		}
+	}
+	WC_Product_Variable::sync( $id );
+	SLH_Plugin::$suspend_hooks = false;
+	return wc_get_product( $id );
 }

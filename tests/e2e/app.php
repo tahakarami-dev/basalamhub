@@ -65,7 +65,7 @@ set_error_handler( function ( $no, $str, $file, $line ) use ( &$errors ) {
 } );
 foreach ( array_keys( SLH_App::pages() ) as $slug ) {
 	$_GET['page'] = $slug;
-	$views        = array( 'salamhub' => 'dashboard', 'salamhub-products' => 'products', 'salamhub-bulk' => 'bulk', 'salamhub-link' => 'link', 'salamhub-categories' => 'categories', 'salamhub-pricing' => 'pricing', 'salamhub-logs' => 'logs', 'salamhub-settings' => 'settings' );
+	$views        = array( 'salamhub' => 'dashboard', 'salamhub-products' => 'products', 'salamhub-orders' => 'orders', 'salamhub-bulk' => 'bulk', 'salamhub-link' => 'link', 'salamhub-categories' => 'categories', 'salamhub-pricing' => 'pricing', 'salamhub-logs' => 'logs', 'salamhub-settings' => 'settings' );
 	ob_start();
 	SLH_App::render( $views[ $slug ], $slug );
 	$html = ob_get_clean();

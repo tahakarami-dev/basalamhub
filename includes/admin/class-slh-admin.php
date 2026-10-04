@@ -37,6 +37,9 @@ class SLH_Admin {
 		add_menu_page( __( 'سلام‌هاب', 'salamhub' ), __( 'سلام‌هاب', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
 		add_submenu_page( 'salamhub', __( 'داشبورد و سلامت', 'salamhub' ), __( 'داشبورد', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ) );
 		add_submenu_page( 'salamhub', __( 'محصولات', 'salamhub' ), __( 'محصولات', 'salamhub' ), self::CAP, 'salamhub-products', array( __CLASS__, 'page_products' ) );
+		$missing = SLH_Order_Sync::missing_count();
+		$orders  = $missing ? ' <span class="awaiting-mod">' . esc_html( slh_fa_digits( $missing ) ) . '</span>' : '';
+		add_submenu_page( 'salamhub', __( 'سفارش‌های باسلام', 'salamhub' ), __( 'سفارش‌ها', 'salamhub' ) . $orders, self::CAP, 'salamhub-orders', array( __CLASS__, 'page_orders' ) );
 		SLH_Admin_Tools::add_pages();
 
 		$errors = SLH_Logger::count_open_errors( 24 * 7 );
@@ -63,7 +66,7 @@ class SLH_Admin {
 		$screen  = get_current_screen();
 		$ours    = false !== strpos( (string) $hook, 'salamhub' );
 		$product = $screen && 'product' === $screen->post_type && in_array( $screen->base, array( 'post', 'edit' ), true );
-		if ( ! $ours && ! $product ) {
+		if ( ! $ours && ! $product && ! SLH_Order_UI::is_order_screen() ) {
 			return;
 		}
 		wp_enqueue_style( 'salamhub-admin', SLH_URL . 'assets/css/admin.css', array(), SLH_VERSION );
@@ -101,6 +104,9 @@ class SLH_Admin {
 					/* translators: %s: product count */
 					'confirmBulk'    => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'salamhub' ),
 					'confirmCancel'  => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'salamhub' ),
+					'saving'         => __( 'در حال ثبت در باسلام…', 'salamhub' ),
+					'confirmPosted'  => __( 'ارسال این سفارش در باسلام ثبت شود؟ بعد از ثبت، مشتری کد رهگیری را می‌بیند و این کار برگشت‌پذیر نیست.', 'salamhub' ),
+					'copied'         => __( 'کپی شد.', 'salamhub' ),
 					'confirmDisconn' => __( 'اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند.', 'salamhub' ),
 				),
 			)
@@ -130,6 +136,13 @@ class SLH_Admin {
 	 */
 	public static function page_products() {
 		self::render( 'products', 'salamhub-products' );
+	}
+
+	/**
+	 * Basalam orders.
+	 */
+	public static function page_orders() {
+		self::render( 'orders', 'salamhub-orders' );
 	}
 
 	/**

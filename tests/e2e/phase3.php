@@ -13,46 +13,6 @@ SLH_Settings::set_token( 'good-token' );
 SLH_Admin::test_connection();
 SLH_Settings::save( array_merge( SLH_Settings::all(), array( 'default_category_id' => '1287' ) ) );
 
-/**
- * Variable product with local attributes رنگ × سایز and one variation per combination.
- */
-function slh_t_variable( $name, array $colors = array( 'قرمز', 'آبی' ), array $sizes = array( 'S', 'M' ), $price = '200000' ) {
-	$p = new WC_Product_Variable();
-	$p->set_name( $name );
-	$p->set_status( 'publish' );
-	$a1 = new WC_Product_Attribute();
-	$a1->set_name( 'رنگ' );
-	$a1->set_options( $colors );
-	$a1->set_variation( true );
-	$a1->set_visible( true );
-	$a2 = new WC_Product_Attribute();
-	$a2->set_name( 'سایز' );
-	$a2->set_options( $sizes );
-	$a2->set_variation( true );
-	$a2->set_visible( true );
-	$p->set_attributes( array( $a1, $a2 ) );
-	$p->set_image_id( slh_t_image() );
-	SLH_Plugin::$suspend_hooks = true;
-	$id = $p->save();
-	$i  = 0;
-	foreach ( $colors as $c ) {
-		foreach ( $sizes as $s ) {
-			$v = new WC_Product_Variation();
-			$v->set_parent_id( $id );
-			$v->set_attributes( array( sanitize_title( 'رنگ' ) => $c, sanitize_title( 'سایز' ) => $s ) );
-			$v->set_regular_price( (string) ( (int) $price + 10000 * $i ) );
-			$v->set_manage_stock( true );
-			$v->set_stock_quantity( 3 + $i );
-			$v->set_status( 'publish' );
-			$v->save();
-			++$i;
-		}
-	}
-	WC_Product_Variable::sync( $id );
-	SLH_Plugin::$suspend_hooks = false;
-	return wc_get_product( $id );
-}
-
 function slh_t_remote( $state_file, $product_id ) {
 	$bid = (int) SLH_Links::get( 'product', $product_id )->basalam_id;
 	$m   = slh_t_mock( $state_file );
