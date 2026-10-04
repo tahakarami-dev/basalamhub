@@ -9,23 +9,23 @@
  *
  * An image is uploaded again only when the file itself or the processing limits change.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Image_Sync {
+class BSH_Image_Sync {
 
-	const META_ID  = '_slh_basalam_file_id';
-	const META_SIG = '_slh_basalam_file_sig';
+	const META_ID  = '_bsh_basalam_file_id';
+	const META_SIG = '_bsh_basalam_file_sig';
 
-	/** @var SLH_Api_Client */
+	/** @var BSH_Api_Client */
 	private $api;
 
 	/**
-	 * @param SLH_Api_Client $api Client.
+	 * @param BSH_Api_Client $api Client.
 	 */
-	public function __construct( SLH_Api_Client $api ) {
+	public function __construct( BSH_Api_Client $api ) {
 		$this->api = $api;
 	}
 
@@ -37,7 +37,7 @@ class SLH_Image_Sync {
 	 */
 	public static function limits() {
 		return wp_parse_args(
-			(array) apply_filters( 'slh_image_limits', array() ),
+			(array) apply_filters( 'bsh_image_limits', array() ),
 			array(
 				'max_side'   => 2048,
 				'max_bytes'  => 2 * MB_IN_BYTES,
@@ -51,7 +51,7 @@ class SLH_Image_Sync {
 	/**
 	 * @param int[] $attachment_ids Attachments, first is the main photo.
 	 * @return int[] Basalam file IDs in the same order (failed gallery images are skipped).
-	 * @throws SLH_Api_Error When the main image cannot be uploaded.
+	 * @throws BSH_Api_Error When the main image cannot be uploaded.
 	 */
 	public function ensure_uploaded( array $attachment_ids ) {
 		$out    = array();
@@ -62,7 +62,7 @@ class SLH_Image_Sync {
 				if ( $file_id ) {
 					$out[] = $file_id;
 				}
-			} catch ( SLH_Api_Error $e ) {
+			} catch ( BSH_Api_Error $e ) {
 				// The main image is required; gallery images are best-effort.
 				if ( 0 === $i || $e->retryable || 'auth' === $e->kind ) {
 					throw $e;
@@ -75,7 +75,7 @@ class SLH_Image_Sync {
 	/**
 	 * @param int $attachment_id Attachment.
 	 * @return int Basalam file ID, 0 if the attachment has no file.
-	 * @throws SLH_Api_Error On upload failure.
+	 * @throws BSH_Api_Error On upload failure.
 	 */
 	private function ensure_one( $attachment_id ) {
 		$path = self::original_path( $attachment_id );
@@ -96,7 +96,7 @@ class SLH_Image_Sync {
 			 * @param string $path          File to upload.
 			 * @param int    $attachment_id Attachment ID.
 			 */
-			$upload_path = apply_filters( 'slh_image_upload_path', $prepared['path'], $attachment_id );
+			$upload_path = apply_filters( 'bsh_image_upload_path', $prepared['path'], $attachment_id );
 			$file        = $this->api->upload_file( $upload_path, 'product.photo' );
 		} finally {
 			if ( $prepared['temp'] && file_exists( $prepared['path'] ) ) {
@@ -105,13 +105,13 @@ class SLH_Image_Sync {
 		}
 
 		if ( empty( $file['id'] ) ) {
-			throw new SLH_Api_Error(
-				__( 'آپلود تصویر در باسلام کامل نشد.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'آپلود تصویر در باسلام کامل نشد.', 'basalamhub' ),
 				'server',
 				array(
 					'retryable'  => true,
-					'reason'     => __( 'باسلام شناسه‌ی فایل را برنگرداند.', 'salamhub' ),
-					'suggestion' => __( 'لازم نیست کاری کنی؛ خودکار دوباره تلاش می‌شود.', 'salamhub' ),
+					'reason'     => __( 'باسلام شناسه‌ی فایل را برنگرداند.', 'basalamhub' ),
+					'suggestion' => __( 'لازم نیست کاری کنی؛ خودکار دوباره تلاش می‌شود.', 'basalamhub' ),
 					'details'    => array( 'response' => $file ),
 				)
 			);
@@ -170,7 +170,7 @@ class SLH_Image_Sync {
 		$out_mime = 'image/png' === $mime ? 'image/png' : 'image/jpeg';
 		$ext      = 'image/png' === $out_mime ? 'png' : 'jpg';
 		$dir      = self::temp_dir();
-		$target   = trailingslashit( $dir ) . 'slh-' . (int) $attachment_id . '-' . wp_generate_password( 8, false ) . '.' . $ext;
+		$target   = trailingslashit( $dir ) . 'bsh-' . (int) $attachment_id . '-' . wp_generate_password( 8, false ) . '.' . $ext;
 
 		foreach ( array( $limits['quality'], 72, 62, 50 ) as $quality ) {
 			$editor->set_quality( $quality );
@@ -205,7 +205,7 @@ class SLH_Image_Sync {
 	 */
 	private static function temp_dir() {
 		$uploads = wp_upload_dir( null, false );
-		$dir     = trailingslashit( $uploads['basedir'] ) . 'salamhub-tmp';
+		$dir     = trailingslashit( $uploads['basedir'] ) . 'basalamhub-tmp';
 		if ( ! is_dir( $dir ) ) {
 			wp_mkdir_p( $dir );
 			// Not browsable; files live only for the seconds of an upload.

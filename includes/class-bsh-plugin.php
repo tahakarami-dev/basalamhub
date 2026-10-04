@@ -2,41 +2,42 @@
 /**
  * Wires everything together.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Plugin {
+class BSH_Plugin {
 
-	/** @var bool Set while SalamHub itself saves products, so it doesn't re-queue them. */
+	/** @var bool Set while BasalamHub itself saves products, so it doesn't re-queue them. */
 	public static $suspend_hooks = false;
 
-	/** @var SLH_Api_Client|null */
+	/** @var BSH_Api_Client|null */
 	private static $api;
 
 	/**
 	 * plugins_loaded.
 	 */
 	public static function boot() {
-		load_plugin_textdomain( 'salamhub', false, dirname( plugin_basename( SLH_FILE ) ) . '/languages' );
+		load_plugin_textdomain( 'basalamhub', false, dirname( plugin_basename( BSH_FILE ) ) . '/languages' );
 
 		if ( ! class_exists( 'WooCommerce' ) ) {
 			add_action( 'admin_notices', array( __CLASS__, 'notice_missing_woocommerce' ) );
 			return;
 		}
 
-		SLH_Installer::maybe_upgrade();
-		SLH_Queue::init();
-		SLH_Bulk::init();
-		SLH_Linker::init();
-		SLH_Categories::init();
-		SLH_Price_Rules::init();
-		SLH_Inventory::init();
-		SLH_Order_Sync::init();
-		SLH_Reconcile::init();
-		SLH_Importer::init();
-		SLH_Notifier::init();
+		BSH_Migrate::maybe_run();
+		BSH_Installer::maybe_upgrade();
+		BSH_Queue::init();
+		BSH_Bulk::init();
+		BSH_Linker::init();
+		BSH_Categories::init();
+		BSH_Price_Rules::init();
+		BSH_Inventory::init();
+		BSH_Order_Sync::init();
+		BSH_Reconcile::init();
+		BSH_Importer::init();
+		BSH_Notifier::init();
 
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_update_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
@@ -48,21 +49,24 @@ class SLH_Plugin {
 		add_action( 'woocommerce_trash_product_variation', array( __CLASS__, 'on_variation_changed' ), 20, 1 );
 
 		if ( is_admin() ) {
-			SLH_Admin::init();
-			SLH_Admin_Tools::init();
-			SLH_App::init();
-			SLH_Product_UI::init();
-			SLH_Order_UI::init();
-			SLH_Import_UI::init();
+			add_action( 'admin_notices', array( 'BSH_Migrate', 'notice' ) );
+			// The old SalamHub plugin must never run next to this one (everything would sync twice).
+			add_action( 'admin_init', array( 'BSH_Migrate', 'deactivate_old' ) );
+			BSH_Admin::init();
+			BSH_Admin_Tools::init();
+			BSH_App::init();
+			BSH_Product_UI::init();
+			BSH_Order_UI::init();
+			BSH_Import_UI::init();
 		}
 	}
 
 	/**
-	 * @return SLH_Api_Client
+	 * @return BSH_Api_Client
 	 */
 	public static function api() {
 		if ( ! self::$api ) {
-			self::$api = new SLH_Api_Client();
+			self::$api = new BSH_Api_Client();
 		}
 		return self::$api;
 	}
@@ -81,18 +85,18 @@ class SLH_Plugin {
 			return;
 		}
 
-		$link = SLH_Links::get( 'product', $product_id );
+		$link = BSH_Links::get( 'product', $product_id );
 		if ( $link && $link->basalam_id ) {
-			if ( SLH_Settings::get( 'auto_update' ) ) {
-				SLH_Queue::enqueue_product( $product_id );
+			if ( BSH_Settings::get( 'auto_update' ) ) {
+				BSH_Queue::enqueue_product( $product_id );
 			} elseif ( 'synced' === $link->sync_status ) {
-				SLH_Links::set_status( 'product', $product_id, 'stale' );
+				BSH_Links::set_status( 'product', $product_id, 'stale' );
 			}
 			return;
 		}
 
-		if ( SLH_Settings::get( 'auto_send_new' ) && 'publish' === $product->get_status() && SLH_Settings::is_connected() ) {
-			SLH_Queue::enqueue_product( $product_id );
+		if ( BSH_Settings::get( 'auto_send_new' ) && 'publish' === $product->get_status() && BSH_Settings::is_connected() ) {
+			BSH_Queue::enqueue_product( $product_id );
 		}
 	}
 
@@ -109,9 +113,9 @@ class SLH_Plugin {
 		if ( ! $parent_id ) {
 			return;
 		}
-		$link = SLH_Links::get( 'product', $parent_id );
-		if ( $link && $link->basalam_id && SLH_Settings::get( 'auto_update' ) ) {
-			SLH_Queue::enqueue_product( $parent_id );
+		$link = BSH_Links::get( 'product', $parent_id );
+		if ( $link && $link->basalam_id && BSH_Settings::get( 'auto_update' ) ) {
+			BSH_Queue::enqueue_product( $parent_id );
 		}
 	}
 
@@ -125,9 +129,9 @@ class SLH_Plugin {
 			return;
 		}
 		$id   = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
-		$link = SLH_Links::get( 'product', $id );
-		if ( $link && $link->basalam_id && SLH_Settings::get( 'auto_update' ) ) {
-			SLH_Queue::enqueue_product( $id );
+		$link = BSH_Links::get( 'product', $id );
+		if ( $link && $link->basalam_id && BSH_Settings::get( 'auto_update' ) ) {
+			BSH_Queue::enqueue_product( $id );
 		}
 	}
 
@@ -135,6 +139,6 @@ class SLH_Plugin {
 	 * Admin notice when WooCommerce is missing.
 	 */
 	public static function notice_missing_woocommerce() {
-		echo '<div class="notice notice-error"><p>' . esc_html__( 'باسلام‌هاب برای کار به ووکامرس نیاز دارد. اول ووکامرس را نصب و فعال کن.', 'salamhub' ) . '</p></div>';
+		echo '<div class="notice notice-error"><p>' . esc_html__( 'باسلام‌هاب برای کار به ووکامرس نیاز دارد. اول ووکامرس را نصب و فعال کن.', 'basalamhub' ) . '</p></div>';
 	}
 }

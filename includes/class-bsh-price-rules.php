@@ -6,20 +6,20 @@
  *
  * The guard that refuses zero or negative prices lives in the mapper and runs after this.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Price_Rules {
+class BSH_Price_Rules {
 
-	const OPTION = 'slh_price_rules';
+	const OPTION = 'bsh_price_rules';
 
 	/**
 	 * Hooks into the mapper.
 	 */
 	public static function init() {
-		add_filter( 'slh_basalam_price', array( __CLASS__, 'filter_price' ), 10, 2 );
+		add_filter( 'bsh_basalam_price', array( __CLASS__, 'filter_price' ), 10, 2 );
 	}
 
 	/**
@@ -105,16 +105,16 @@ class SLH_Price_Rules {
 			return self::empty_rule();
 		}
 		if ( '' === $raw || ! is_numeric( $raw ) || (float) $raw <= 0 ) {
-			$error = __( 'مقدار باید عددی بزرگ‌تر از صفر باشد.', 'salamhub' );
+			$error = __( 'مقدار باید عددی بزرگ‌تر از صفر باشد.', 'basalamhub' );
 			return self::empty_rule();
 		}
 		$value = (float) $raw;
 		if ( 'percent' === $type && 'down' === $dir && $value >= 100 ) {
-			$error = __( 'کاهش ۱۰۰ درصد یا بیشتر قیمت را صفر می‌کند.', 'salamhub' );
+			$error = __( 'کاهش ۱۰۰ درصد یا بیشتر قیمت را صفر می‌کند.', 'basalamhub' );
 			return self::empty_rule();
 		}
 		if ( 'percent' === $type && $value > 1000 ) {
-			$error = __( 'درصد بیش از ۱۰۰۰ احتمالاً اشتباه تایپی است.', 'salamhub' );
+			$error = __( 'درصد بیش از ۱۰۰۰ احتمالاً اشتباه تایپی است.', 'basalamhub' );
 			return self::empty_rule();
 		}
 		return array( 'type' => $type, 'direction' => $dir, 'value' => 'fixed' === $type ? (int) round( $value ) : $value );
@@ -179,7 +179,7 @@ class SLH_Price_Rules {
 	}
 
 	/**
-	 * slh_basalam_price filter.
+	 * bsh_basalam_price filter.
 	 *
 	 * @param int        $rial    Price in Rial.
 	 * @param WC_Product $product Product.
@@ -201,14 +201,14 @@ class SLH_Price_Rules {
 	 */
 	public static function describe( array $rule ) {
 		if ( 'none' === $rule['type'] ) {
-			return __( 'بدون تغییر', 'salamhub' );
+			return __( 'بدون تغییر', 'basalamhub' );
 		}
-		$dir = 'down' === $rule['direction'] ? __( 'کاهش', 'salamhub' ) : __( 'افزایش', 'salamhub' );
+		$dir = 'down' === $rule['direction'] ? __( 'کاهش', 'basalamhub' ) : __( 'افزایش', 'basalamhub' );
 		if ( 'percent' === $rule['type'] ) {
 			/* translators: 1: percent, 2: increase/decrease */
-			return sprintf( __( '%1$s٪ %2$s', 'salamhub' ), slh_fa_digits( rtrim( rtrim( number_format( $rule['value'], 2, '.', '' ), '0' ), '.' ) ), $dir );
+			return sprintf( __( '%1$s٪ %2$s', 'basalamhub' ), bsh_fa_digits( rtrim( rtrim( number_format( $rule['value'], 2, '.', '' ), '0' ), '.' ) ), $dir );
 		}
 		/* translators: 1: amount in Toman, 2: increase/decrease */
-		return sprintf( __( '%1$s تومان %2$s', 'salamhub' ), slh_fa_number( $rule['value'] ), $dir );
+		return sprintf( __( '%1$s تومان %2$s', 'basalamhub' ), bsh_fa_number( $rule['value'] ), $dir );
 	}
 }

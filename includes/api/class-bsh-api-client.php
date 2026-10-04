@@ -7,12 +7,12 @@
  * it requires Guzzle, and two plugins shipping different Guzzle versions is a classic
  * cause of fatal errors on WordPress sites.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Api_Client {
+class BSH_Api_Client {
 
 	/** @var string|null */
 	private $token;
@@ -29,33 +29,33 @@ class SLH_Api_Client {
 	 */
 	public function __construct( $token = null, $timeout = 30 ) {
 		$this->token   = $token;
-		$this->base    = untrailingslashit( apply_filters( 'slh_api_base', SLH_API_BASE ) );
+		$this->base    = untrailingslashit( apply_filters( 'bsh_api_base', BSH_API_BASE ) );
 		$this->timeout = $timeout;
 	}
 
 	/**
 	 * @return string
-	 * @throws SLH_Api_Error When no usable token exists.
+	 * @throws BSH_Api_Error When no usable token exists.
 	 */
 	private function token() {
-		$token = null !== $this->token ? $this->token : SLH_Settings::get_token();
+		$token = null !== $this->token ? $this->token : BSH_Settings::get_token();
 		if ( null === $token ) {
-			throw new SLH_Api_Error(
-				__( 'توکن ذخیره‌شده قابل خواندن نیست.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'توکن ذخیره‌شده قابل خواندن نیست.', 'basalamhub' ),
 				'auth',
 				array(
-					'reason'     => __( 'کلیدهای امنیتی وردپرس (wp-config.php) عوض شده‌اند و توکن رمزنگاری‌شده دیگر باز نمی‌شود.', 'salamhub' ),
-					'suggestion' => __( 'توکن باسلام را دوباره در باسلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
+					'reason'     => __( 'کلیدهای امنیتی وردپرس (wp-config.php) عوض شده‌اند و توکن رمزنگاری‌شده دیگر باز نمی‌شود.', 'basalamhub' ),
+					'suggestion' => __( 'توکن باسلام را دوباره در باسلام‌هاب › تنظیمات وارد کن.', 'basalamhub' ),
 				)
 			);
 		}
 		if ( '' === $token ) {
-			throw new SLH_Api_Error(
-				__( 'هنوز به باسلام وصل نشده‌ای.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'هنوز به باسلام وصل نشده‌ای.', 'basalamhub' ),
 				'auth',
 				array(
-					'reason'     => __( 'توکن دسترسی باسلام وارد نشده است.', 'salamhub' ),
-					'suggestion' => __( 'در باسلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن.', 'salamhub' ),
+					'reason'     => __( 'توکن دسترسی باسلام وارد نشده است.', 'basalamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن.', 'basalamhub' ),
 				)
 			);
 		}
@@ -70,7 +70,7 @@ class SLH_Api_Client {
 	 * @param array|null $body   JSON body.
 	 * @param array      $query  Query args (arrays become repeated keys: a=1&a=2).
 	 * @return array
-	 * @throws SLH_Api_Error On any failure.
+	 * @throws BSH_Api_Error On any failure.
 	 */
 	public function request( $method, $path, $body = null, array $query = array() ) {
 		$url  = $this->base . $path . self::build_query( $query );
@@ -80,7 +80,7 @@ class SLH_Api_Client {
 			'headers' => array(
 				'Authorization' => 'Bearer ' . $this->token(),
 				'Accept'        => 'application/json',
-				'User-Agent'    => 'BasalamHub/' . SLH_VERSION . '; WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
+				'User-Agent'    => 'BasalamHub/' . BSH_VERSION . '; WordPress/' . get_bloginfo( 'version' ) . '; ' . home_url(),
 			),
 		);
 		if ( null !== $body ) {
@@ -96,16 +96,16 @@ class SLH_Api_Client {
 	 * @param string $method Method (for errors).
 	 * @param string $path   Path (for errors).
 	 * @return array
-	 * @throws SLH_Api_Error On failure.
+	 * @throws BSH_Api_Error On failure.
 	 */
 	private function send( $url, array $args, $method, $path ) {
 		$response = wp_remote_request( $url, $args );
 		if ( is_wp_error( $response ) ) {
-			throw SLH_Api_Error::from_response( $response, $method, $path );
+			throw BSH_Api_Error::from_response( $response, $method, $path );
 		}
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		if ( $code < 200 || $code >= 300 ) {
-			throw SLH_Api_Error::from_response( $response, $method, $path );
+			throw BSH_Api_Error::from_response( $response, $method, $path );
 		}
 		$raw = wp_remote_retrieve_body( $response );
 		if ( '' === $raw ) {
@@ -113,13 +113,13 @@ class SLH_Api_Client {
 		}
 		$data = json_decode( $raw, true );
 		if ( ! is_array( $data ) ) {
-			throw new SLH_Api_Error(
-				__( 'پاسخ باسلام قابل خواندن نبود.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'پاسخ باسلام قابل خواندن نبود.', 'basalamhub' ),
 				'server',
 				array(
 					'retryable'  => true,
-					'reason'     => __( 'باسلام به‌جای داده‌ی معتبر، پاسخ ناقص یا صفحه‌ی HTML برگرداند.', 'salamhub' ),
-					'suggestion' => __( 'لازم نیست کاری کنی؛ خودکار دوباره تلاش می‌شود.', 'salamhub' ),
+					'reason'     => __( 'باسلام به‌جای داده‌ی معتبر، پاسخ ناقص یا صفحه‌ی HTML برگرداند.', 'basalamhub' ),
+					'suggestion' => __( 'لازم نیست کاری کنی؛ خودکار دوباره تلاش می‌شود.', 'basalamhub' ),
 					'details'    => array( 'request' => $method . ' ' . $path, 'status' => $code, 'body' => mb_substr( $raw, 0, 1000 ) ),
 				)
 			);
@@ -318,21 +318,21 @@ class SLH_Api_Client {
 	 * @param string $path      Local file path.
 	 * @param string $file_type Basalam file type.
 	 * @return array
-	 * @throws SLH_Api_Error On failure.
+	 * @throws BSH_Api_Error On failure.
 	 */
 	public function upload_file( $path, $file_type = 'product.photo' ) {
 		if ( ! is_readable( $path ) ) {
-			throw new SLH_Api_Error(
-				__( 'فایل تصویر روی سرور پیدا نشد.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'فایل تصویر روی سرور پیدا نشد.', 'basalamhub' ),
 				'validation',
 				array(
-					'reason'     => __( 'تصویر در کتابخانه‌ی رسانه ثبت شده ولی فایلش روی هاست نیست.', 'salamhub' ),
-					'suggestion' => __( 'تصویر را دوباره در محصول بارگذاری کن.', 'salamhub' ),
+					'reason'     => __( 'تصویر در کتابخانه‌ی رسانه ثبت شده ولی فایلش روی هاست نیست.', 'basalamhub' ),
+					'suggestion' => __( 'تصویر را دوباره در محصول بارگذاری کن.', 'basalamhub' ),
 					'details'    => array( 'path' => basename( $path ) ),
 				)
 			);
 		}
-		$boundary = 'slh' . wp_generate_password( 24, false );
+		$boundary = 'bsh' . wp_generate_password( 24, false );
 		$mime     = wp_check_filetype( $path );
 		$mime     = $mime['type'] ? $mime['type'] : 'application/octet-stream';
 		$eol      = "\r\n";
@@ -352,7 +352,7 @@ class SLH_Api_Client {
 				'Authorization' => 'Bearer ' . $this->token(),
 				'Accept'        => 'application/json',
 				'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
-				'User-Agent'    => 'BasalamHub/' . SLH_VERSION,
+				'User-Agent'    => 'BasalamHub/' . BSH_VERSION,
 			),
 			'body'    => $body,
 		);

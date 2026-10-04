@@ -12,22 +12,22 @@
  * Safety stock ("موجودی اطمینان"): N units are hidden from Basalam so a simultaneous sale on
  * both channels can't oversell. Global value in settings, overridable per product/variation.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Inventory {
+class BSH_Inventory {
 
-	const HOOK_PULL      = 'slh_stock_pull';
-	const HOOK_DECREMENT = 'slh_stock_decrement';
-	const META_SAFETY    = '_slh_safety_stock';
+	const HOOK_PULL      = 'bsh_stock_pull';
+	const HOOK_DECREMENT = 'bsh_stock_decrement';
+	const META_SAFETY    = '_bsh_safety_stock';
 
 	/**
 	 * Hooks.
 	 */
 	public static function init() {
-		add_filter( 'slh_basalam_stock', array( __CLASS__, 'apply_safety' ), 5, 2 );
+		add_filter( 'bsh_basalam_stock', array( __CLASS__, 'apply_safety' ), 5, 2 );
 		add_action( self::HOOK_PULL, array( __CLASS__, 'handle_pull' ), 10, 1 );
 		add_action( self::HOOK_DECREMENT, array( __CLASS__, 'handle_decrement' ), 10, 3 );
 		add_action( 'action_scheduler_init', array( __CLASS__, 'schedule' ) );
@@ -38,7 +38,7 @@ class SLH_Inventory {
 	 * @return bool Whether Basalam is the stock reference.
 	 */
 	public static function basalam_is_reference() {
-		return 'basalam' === SLH_Settings::get( 'stock_reference', 'site' );
+		return 'basalam' === BSH_Settings::get( 'stock_reference', 'site' );
 	}
 
 	/**
@@ -47,7 +47,7 @@ class SLH_Inventory {
 	 * @return string[]
 	 */
 	public static function push_groups() {
-		$groups = (array) SLH_Settings::get( 'sync_fields', array() );
+		$groups = (array) BSH_Settings::get( 'sync_fields', array() );
 		if ( self::basalam_is_reference() ) {
 			$groups = array_values( array_diff( $groups, array( 'stock' ) ) );
 		}
@@ -78,11 +78,11 @@ class SLH_Inventory {
 				}
 			}
 		}
-		return max( 0, (int) SLH_Settings::get( 'safety_stock', 0 ) );
+		return max( 0, (int) BSH_Settings::get( 'safety_stock', 0 ) );
 	}
 
 	/**
-	 * slh_basalam_stock filter.
+	 * bsh_basalam_stock filter.
 	 *
 	 * @param int        $stock   Stock to publish.
 	 * @param WC_Product $product Product.
@@ -106,15 +106,15 @@ class SLH_Inventory {
 		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
 			return;
 		}
-		$next = as_next_scheduled_action( self::HOOK_PULL, array( 'page' => 1 ), SLH_Queue::GROUP );
-		if ( ! self::basalam_is_reference() || ! SLH_Settings::is_connected() ) {
+		$next = as_next_scheduled_action( self::HOOK_PULL, array( 'page' => 1 ), BSH_Queue::GROUP );
+		if ( ! self::basalam_is_reference() || ! BSH_Settings::is_connected() ) {
 			if ( $next ) {
-				as_unschedule_all_actions( self::HOOK_PULL, array( 'page' => 1 ), SLH_Queue::GROUP );
+				as_unschedule_all_actions( self::HOOK_PULL, array( 'page' => 1 ), BSH_Queue::GROUP );
 			}
 			return;
 		}
 		if ( ! $next ) {
-			as_schedule_recurring_action( time() + 60, HOUR_IN_SECONDS, self::HOOK_PULL, array( 'page' => 1 ), SLH_Queue::GROUP );
+			as_schedule_recurring_action( time() + 60, HOUR_IN_SECONDS, self::HOOK_PULL, array( 'page' => 1 ), BSH_Queue::GROUP );
 		}
 	}
 
@@ -122,7 +122,7 @@ class SLH_Inventory {
 	 * Starts a pull right away (button).
 	 */
 	public static function pull_now() {
-		as_enqueue_async_action( self::HOOK_PULL, array( 'page' => 1, 'manual' => 1 ), SLH_Queue::GROUP );
+		as_enqueue_async_action( self::HOOK_PULL, array( 'page' => 1, 'manual' => 1 ), BSH_Queue::GROUP );
 	}
 
 	/**
@@ -131,57 +131,57 @@ class SLH_Inventory {
 	 * @param int $page Page.
 	 */
 	public static function handle_pull( $page = 1 ) {
-		if ( ! self::basalam_is_reference() || ! SLH_Settings::is_connected() ) {
+		if ( ! self::basalam_is_reference() || ! BSH_Settings::is_connected() ) {
 			return;
 		}
 		$page = max( 1, (int) $page );
-		SLH_Queue::run_exclusive(
+		BSH_Queue::run_exclusive(
 			self::HOOK_PULL,
 			array( 'page' => $page, 'manual' => 1 ),
 			function () use ( $page ) {
 				try {
-					$res     = SLH_Plugin::api()->vendor_products( SLH_Settings::vendor_id(), $page, 50 );
+					$res     = BSH_Plugin::api()->vendor_products( BSH_Settings::vendor_id(), $page, 50 );
 					$changed = 0;
 					foreach ( $res['data'] as $item ) {
 						$changed += self::apply_remote_item( $item );
 					}
-					$total = (int) get_option( 'slh_stock_pull_changed', 0 ) + $changed;
+					$total = (int) get_option( 'bsh_stock_pull_changed', 0 ) + $changed;
 					$more  = $res['data'] && ( null === $res['total_page'] ? count( $res['data'] ) >= 50 : $page < $res['total_page'] );
 					if ( $more && $page < 400 ) {
-						update_option( 'slh_stock_pull_changed', $total, false );
-						as_enqueue_async_action( self::HOOK_PULL, array( 'page' => $page + 1, 'manual' => 1 ), SLH_Queue::GROUP );
+						update_option( 'bsh_stock_pull_changed', $total, false );
+						as_enqueue_async_action( self::HOOK_PULL, array( 'page' => $page + 1, 'manual' => 1 ), BSH_Queue::GROUP );
 						return;
 					}
-					delete_option( 'slh_stock_pull_changed' );
-					update_option( 'slh_stock_pulled_at', slh_now(), false );
-					SLH_Queue::reset_attempts( 'stock_pull' );
+					delete_option( 'bsh_stock_pull_changed' );
+					update_option( 'bsh_stock_pulled_at', bsh_now(), false );
+					BSH_Queue::reset_attempts( 'stock_pull' );
 					if ( $total ) {
-						SLH_Logger::log(
+						BSH_Logger::log(
 							array(
 								'level'       => 'info',
 								'event'       => 'stock_pulled',
 								'object_type' => 'system',
-								'title'       => __( 'موجودی از باسلام', 'salamhub' ),
+								'title'       => __( 'موجودی از باسلام', 'basalamhub' ),
 								/* translators: %s: count */
-								'message'     => sprintf( __( 'موجودی %s کالا در سایت با باسلام یکی شد.', 'salamhub' ), slh_fa_number( $total ) ),
+								'message'     => sprintf( __( 'موجودی %s کالا در سایت با باسلام یکی شد.', 'basalamhub' ), bsh_fa_number( $total ) ),
 							)
 						);
 					}
-				} catch ( SLH_Api_Error $e ) {
+				} catch ( BSH_Api_Error $e ) {
 					if ( 'rate_limit' === $e->kind ) {
-						SLH_Queue::pause( $e->retry_after );
+						BSH_Queue::pause( $e->retry_after );
 					}
-					if ( $e->retryable && false !== SLH_Queue::retry_later( self::HOOK_PULL, array( 'page' => $page, 'manual' => 1 ), 'stock_pull', $e->retry_after ) ) {
+					if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK_PULL, array( 'page' => $page, 'manual' => 1 ), 'stock_pull', $e->retry_after ) ) {
 						return;
 					}
-					delete_option( 'slh_stock_pull_changed' );
-					SLH_Logger::log(
+					delete_option( 'bsh_stock_pull_changed' );
+					BSH_Logger::log(
 						array_merge(
 							array(
 								'level'       => 'error',
 								'event'       => 'stock_pull_failed',
 								'object_type' => 'system',
-								'title'       => __( 'دریافت موجودی از باسلام', 'salamhub' ),
+								'title'       => __( 'دریافت موجودی از باسلام', 'basalamhub' ),
 							),
 							$e->to_log()
 						)
@@ -201,7 +201,7 @@ class SLH_Inventory {
 		if ( empty( $item['id'] ) ) {
 			return 0;
 		}
-		$link    = SLH_Links::get_by_basalam( 'product', (int) $item['id'] );
+		$link    = BSH_Links::get_by_basalam( 'product', (int) $item['id'] );
 		$product = $link ? wc_get_product( (int) $link->wc_id ) : null;
 		if ( ! $product ) {
 			return 0;
@@ -215,7 +215,7 @@ class SLH_Inventory {
 					$remote[ (int) $v['id'] ] = (int) $v['stock'];
 				}
 			}
-			$map = SLH_Product_Sync::variant_map( $product );
+			$map = BSH_Product_Sync::variant_map( $product );
 			foreach ( $map as $vid => $row ) {
 				if ( ! isset( $remote[ (int) $row['id'] ] ) ) {
 					continue;
@@ -226,7 +226,7 @@ class SLH_Inventory {
 				}
 				$map[ $vid ]['stock'] = $remote[ (int) $row['id'] ];
 			}
-			update_post_meta( $product->get_id(), '_slh_variants', $map );
+			update_post_meta( $product->get_id(), '_bsh_variants', $map );
 		} else {
 			$stock = isset( $item['inventory'] ) ? (int) $item['inventory'] : ( isset( $item['stock'] ) ? (int) $item['stock'] : null );
 			if ( null !== $stock && self::set_local_stock( $product, $stock ) ) {
@@ -246,8 +246,8 @@ class SLH_Inventory {
 	 */
 	public static function set_local_stock( WC_Product $product, $remote ) {
 		$remote = max( 0, (int) $remote );
-		$was    = SLH_Plugin::$suspend_hooks;
-		SLH_Plugin::$suspend_hooks = true;
+		$was    = BSH_Plugin::$suspend_hooks;
+		BSH_Plugin::$suspend_hooks = true;
 		try {
 			if ( $product->managing_stock() ) {
 				$target = $remote + ( $remote > 0 ? self::safety_for( $product ) : (int) min( max( 0, (int) $product->get_stock_quantity() ), self::safety_for( $product ) ) );
@@ -265,7 +265,7 @@ class SLH_Inventory {
 			$product->save();
 			return true;
 		} finally {
-			SLH_Plugin::$suspend_hooks = $was;
+			BSH_Plugin::$suspend_hooks = $was;
 		}
 	}
 
@@ -280,7 +280,7 @@ class SLH_Inventory {
 	 * @param WC_Order $order Order.
 	 */
 	public static function on_site_sale( $order ) {
-		if ( ! self::basalam_is_reference() || ! $order instanceof WC_Order || 'salamhub' === $order->get_created_via() ) {
+		if ( ! self::basalam_is_reference() || ! $order instanceof WC_Order || in_array( $order->get_created_via(), array( 'basalamhub', 'salamhub' ), true ) ) {
 			return; // Basalam orders were already subtracted on Basalam.
 		}
 		foreach ( $order->get_items() as $item ) {
@@ -288,14 +288,14 @@ class SLH_Inventory {
 				continue;
 			}
 			$pid  = (int) $item->get_product_id();
-			$link = SLH_Links::get( 'product', $pid );
+			$link = BSH_Links::get( 'product', $pid );
 			if ( ! $link || ! $link->basalam_id ) {
 				continue;
 			}
 			as_enqueue_async_action(
 				self::HOOK_DECREMENT,
 				array( 'product_id' => $pid, 'variation_id' => (int) $item->get_variation_id(), 'qty' => (int) $item->get_quantity() ),
-				SLH_Queue::GROUP
+				BSH_Queue::GROUP
 			);
 		}
 	}
@@ -309,7 +309,7 @@ class SLH_Inventory {
 	 */
 	public static function handle_decrement( $product_id, $variation_id, $qty ) {
 		$args = array( 'product_id' => (int) $product_id, 'variation_id' => (int) $variation_id, 'qty' => (int) $qty );
-		SLH_Queue::run_exclusive(
+		BSH_Queue::run_exclusive(
 			self::HOOK_DECREMENT,
 			$args,
 			function () use ( $args ) {
@@ -328,17 +328,17 @@ class SLH_Inventory {
 	 */
 	public static function decrement( $product_id, $variation_id, $qty ) {
 		$product = wc_get_product( $product_id );
-		$link    = SLH_Links::get( 'product', $product_id );
+		$link    = BSH_Links::get( 'product', $product_id );
 		if ( ! $product || ! $link || ! $link->basalam_id || $qty <= 0 ) {
 			return false;
 		}
 		$args = array( 'product_id' => (int) $product_id, 'variation_id' => (int) $variation_id, 'qty' => (int) $qty );
 		$key  = 'decrement_' . $product_id . '_' . $variation_id;
 		try {
-			$api    = SLH_Plugin::api();
+			$api    = BSH_Plugin::api();
 			$remote = $api->get_product( (int) $link->basalam_id );
 			if ( $variation_id ) {
-				$map = SLH_Product_Sync::variant_map( $product );
+				$map = BSH_Product_Sync::variant_map( $product );
 				if ( empty( $map[ $variation_id ]['id'] ) ) {
 					return false;
 				}
@@ -355,7 +355,7 @@ class SLH_Inventory {
 				$new = max( 0, $current - $qty );
 				$api->update_variant( (int) $link->basalam_id, $bvid, array( 'stock' => $new ) );
 				$map[ $variation_id ]['stock'] = $new;
-				update_post_meta( $product_id, '_slh_variants', $map );
+				update_post_meta( $product_id, '_bsh_variants', $map );
 				$local = wc_get_product( $variation_id );
 			} else {
 				$current = isset( $remote['inventory'] ) ? (int) $remote['inventory'] : ( isset( $remote['stock'] ) ? (int) $remote['stock'] : 0 );
@@ -366,16 +366,16 @@ class SLH_Inventory {
 			if ( $local ) {
 				self::set_local_stock( $local, $new );
 			}
-			SLH_Queue::reset_attempts( $key );
+			BSH_Queue::reset_attempts( $key );
 			return $new;
-		} catch ( SLH_Api_Error $e ) {
+		} catch ( BSH_Api_Error $e ) {
 			if ( 'rate_limit' === $e->kind ) {
-				SLH_Queue::pause( $e->retry_after );
+				BSH_Queue::pause( $e->retry_after );
 			}
-			if ( $e->retryable && false !== SLH_Queue::retry_later( self::HOOK_DECREMENT, $args, $key, $e->retry_after ) ) {
+			if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK_DECREMENT, $args, $key, $e->retry_after ) ) {
 				return false;
 			}
-			SLH_Logger::log(
+			BSH_Logger::log(
 				array_merge(
 					array(
 						'level'       => 'error',
@@ -386,8 +386,8 @@ class SLH_Inventory {
 					),
 					$e->to_log(),
 					array(
-						'message'    => __( 'فروش سایت از موجودی باسلام کم نشد.', 'salamhub' ) . ' ' . $e->getMessage(),
-						'suggestion' => __( 'موجودی این محصول را در پنل باسلام دستی اصلاح کن تا بیش‌فروشی نشود.', 'salamhub' ),
+						'message'    => __( 'فروش سایت از موجودی باسلام کم نشد.', 'basalamhub' ) . ' ' . $e->getMessage(),
+						'suggestion' => __( 'موجودی این محصول را در پنل باسلام دستی اصلاح کن تا بیش‌فروشی نشود.', 'basalamhub' ),
 					)
 				)
 			);

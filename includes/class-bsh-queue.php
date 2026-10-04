@@ -4,21 +4,21 @@
  *
  * Rules:
  * - Nothing heavy runs on an admin page load; pages only enqueue.
- * - Only one SalamHub job runs at a time (SLH_Lock "worker"); a job that finds the
+ * - Only one BasalamHub job runs at a time (BSH_Lock "worker"); a job that finds the
  *   lock taken reschedules itself a few seconds later instead of running in parallel.
  * - Jobs live in the database, so after a host outage the queue simply continues.
  * - Retryable failures (network, 5xx, rate limit) back off: 1m, 5m, 15m, 1h, 3h.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Queue {
+class BSH_Queue {
 
-	const GROUP        = 'salamhub';
-	const HOOK_PRODUCT = 'slh_sync_product';
-	const HOOK_MAINTENANCE   = 'slh_maintenance';
+	const GROUP        = 'basalamhub';
+	const HOOK_PRODUCT = 'bsh_sync_product';
+	const HOOK_MAINTENANCE   = 'bsh_maintenance';
 	const LOCK_TTL     = 180;
 	const BACKOFF      = array( 60, 300, 900, 3600, 10800 );
 
@@ -45,7 +45,7 @@ class SLH_Queue {
 	 */
 	public static function maintenance() {
 		self::heal();
-		SLH_Logger::prune();
+		BSH_Logger::prune();
 	}
 
 	/**
@@ -58,7 +58,7 @@ class SLH_Queue {
 		global $wpdb;
 		$ids = $wpdb->get_col(
 			$wpdb->prepare(
-				'SELECT wc_id FROM ' . SLH_Links::table() . " WHERE object_type = 'product' AND sync_status = 'queued' AND updated_at < %s LIMIT 200", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				'SELECT wc_id FROM ' . BSH_Links::table() . " WHERE object_type = 'product' AND sync_status = 'queued' AND updated_at < %s LIMIT 200", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 				gmdate( 'Y-m-d H:i:s', time() - 30 * MINUTE_IN_SECONDS )
 			)
 		);
@@ -72,15 +72,15 @@ class SLH_Queue {
 			++$healed;
 		}
 		if ( $healed ) {
-			SLH_Logger::log(
+			BSH_Logger::log(
 				array(
 					'level'       => 'info',
 					'event'       => 'queue_healed',
 					'object_type' => 'system',
-					'title'       => __( 'صف پس‌زمینه', 'salamhub' ),
+					'title'       => __( 'صف پس‌زمینه', 'basalamhub' ),
 					/* translators: %s: count */
-					'message'     => sprintf( __( '%s محصول که کارشان نیمه‌کاره متوقف شده بود دوباره در صف قرار گرفتند.', 'salamhub' ), slh_fa_digits( $healed ) ),
-					'reason'      => __( 'احتمالاً یک خطای سیستمی (مثلاً از افزونه‌ی دیگر یا قطعی هاست) کار قبلی را نیمه‌کاره گذاشته بود.', 'salamhub' ),
+					'message'     => sprintf( __( '%s محصول که کارشان نیمه‌کاره متوقف شده بود دوباره در صف قرار گرفتند.', 'basalamhub' ), bsh_fa_digits( $healed ) ),
+					'reason'      => __( 'احتمالاً یک خطای سیستمی (مثلاً از افزونه‌ی دیگر یا قطعی هاست) کار قبلی را نیمه‌کاره گذاشته بود.', 'basalamhub' ),
 				)
 			);
 		}
@@ -108,7 +108,7 @@ class SLH_Queue {
 			return false;
 		}
 		if ( $force ) {
-			set_transient( 'slh_force_product_' . $product_id, 1, DAY_IN_SECONDS );
+			set_transient( 'bsh_force_product_' . $product_id, 1, DAY_IN_SECONDS );
 		}
 		$args = array( 'product_id' => $product_id );
 		if ( ! self::has_pending( self::HOOK_PRODUCT, $args ) ) {
@@ -118,7 +118,7 @@ class SLH_Queue {
 		if ( null !== $batch_id ) {
 			$data['batch_id'] = $batch_id;
 		}
-		SLH_Links::upsert( 'product', $product_id, $data );
+		BSH_Links::upsert( 'product', $product_id, $data );
 		return true;
 	}
 
@@ -154,10 +154,10 @@ class SLH_Queue {
 			self::HOOK_PRODUCT,
 			array( 'product_id' => (int) $product_id ),
 			function () use ( $product_id ) {
-				( new SLH_Product_Sync( SLH_Plugin::api() ) )->sync( (int) $product_id );
-				$link = SLH_Links::get( 'product', (int) $product_id );
+				( new BSH_Product_Sync( BSH_Plugin::api() ) )->sync( (int) $product_id );
+				$link = BSH_Links::get( 'product', (int) $product_id );
 				if ( $link && $link->batch_id ) {
-					SLH_Bulk::maybe_finish( $link->batch_id );
+					BSH_Bulk::maybe_finish( $link->batch_id );
 				}
 			}
 		);
@@ -172,12 +172,12 @@ class SLH_Queue {
 	 */
 	public static function run_exclusive( $hook, array $args, callable $job ) {
 		// Basalam asked us to slow down (429): hold every job until the pause ends.
-		$paused_until = (int) get_option( 'slh_pause_until', 0 );
+		$paused_until = (int) get_option( 'bsh_pause_until', 0 );
 		if ( $paused_until > time() ) {
 			as_schedule_single_action( $paused_until + wp_rand( 1, 20 ), $hook, $args, self::GROUP );
 			return;
 		}
-		$owner = SLH_Lock::acquire( 'worker', self::LOCK_TTL );
+		$owner = BSH_Lock::acquire( 'worker', self::LOCK_TTL );
 		if ( ! $owner ) {
 			as_schedule_single_action( time() + 15, $hook, $args, self::GROUP );
 			return;
@@ -185,7 +185,7 @@ class SLH_Queue {
 		try {
 			$job();
 		} finally {
-			SLH_Lock::release( 'worker', $owner );
+			BSH_Lock::release( 'worker', $owner );
 		}
 	}
 
@@ -199,26 +199,26 @@ class SLH_Queue {
 	 * @return int|false Seconds until the retry, or false when attempts are exhausted.
 	 */
 	public static function retry_later( $hook, array $args, $attempt_key, $min_delay = 0 ) {
-		$attempt = (int) get_transient( 'slh_attempt_' . $attempt_key );
+		$attempt = (int) get_transient( 'bsh_attempt_' . $attempt_key );
 		if ( $attempt >= count( self::BACKOFF ) ) {
-			delete_transient( 'slh_attempt_' . $attempt_key );
+			delete_transient( 'bsh_attempt_' . $attempt_key );
 			return false;
 		}
 		$delay = max( (int) $min_delay, self::BACKOFF[ $attempt ] );
-		set_transient( 'slh_attempt_' . $attempt_key, $attempt + 1, DAY_IN_SECONDS );
+		set_transient( 'bsh_attempt_' . $attempt_key, $attempt + 1, DAY_IN_SECONDS );
 		as_schedule_single_action( time() + $delay, $hook, $args, self::GROUP );
 		return $delay;
 	}
 
 	/**
-	 * Pauses all SalamHub jobs (rate limit). Jobs keep their place and resume afterwards.
+	 * Pauses all BasalamHub jobs (rate limit). Jobs keep their place and resume afterwards.
 	 *
 	 * @param int $seconds Seconds.
 	 */
 	public static function pause( $seconds ) {
 		$until = time() + max( 10, (int) $seconds );
-		if ( $until > (int) get_option( 'slh_pause_until', 0 ) ) {
-			update_option( 'slh_pause_until', $until, false );
+		if ( $until > (int) get_option( 'bsh_pause_until', 0 ) ) {
+			update_option( 'bsh_pause_until', $until, false );
 		}
 	}
 
@@ -228,7 +228,7 @@ class SLH_Queue {
 	 * @param string $attempt_key Key.
 	 */
 	public static function reset_attempts( $attempt_key ) {
-		delete_transient( 'slh_attempt_' . $attempt_key );
+		delete_transient( 'bsh_attempt_' . $attempt_key );
 	}
 
 	/**
@@ -247,18 +247,18 @@ class SLH_Queue {
 			return self::enqueue_product( (int) $args['product_id'], true );
 		}
 		// Order jobs (phase 4): the job itself checks whether it is still needed.
-		if ( in_array( $log->retry_hook, array( 'slh_import_parcel', 'slh_parcel_action' ), true ) && ! empty( $args['parcel_id'] ) ) {
-			$key = 'slh_import_parcel' === $log->retry_hook ? 'parcel_' . (int) $args['parcel_id'] : 'action_' . (int) $args['parcel_id'] . ( isset( $args['action'] ) ? $args['action'] : '' );
+		if ( in_array( $log->retry_hook, array( 'bsh_import_parcel', 'bsh_parcel_action' ), true ) && ! empty( $args['parcel_id'] ) ) {
+			$key = 'bsh_import_parcel' === $log->retry_hook ? 'parcel_' . (int) $args['parcel_id'] : 'action_' . (int) $args['parcel_id'] . ( isset( $args['action'] ) ? $args['action'] : '' );
 			self::reset_attempts( $key );
 			as_enqueue_async_action( $log->retry_hook, $args, self::GROUP );
 			return true;
 		}
-		if ( 'slh_reconcile_orders' === $log->retry_hook ) {
+		if ( 'bsh_reconcile_orders' === $log->retry_hook ) {
 			self::reset_attempts( 'reconcile' );
-			SLH_Reconcile::run_now();
+			BSH_Reconcile::run_now();
 			return true;
 		}
-		if ( 'slh_import_one' === $log->retry_hook && ! empty( $args['basalam_id'] ) ) {
+		if ( 'bsh_import_one' === $log->retry_hook && ! empty( $args['basalam_id'] ) ) {
 			self::reset_attempts( 'import_' . (int) $args['basalam_id'] );
 			as_enqueue_async_action( $log->retry_hook, $args, self::GROUP );
 			return true;
@@ -299,7 +299,7 @@ class SLH_Queue {
 		);
 		// Recurring jobs (maintenance, order poll, stock pull) are always pending; don't count them as work.
 		$recurring = 0;
-		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'slh_poll_orders', array() ), array( 'slh_stock_pull', array( 'page' => 1 ) ), array( 'slh_reconcile_orders', array( 'manual' => 0 ) ) ) as $job ) {
+		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'bsh_poll_orders', array() ), array( 'bsh_stock_pull', array( 'page' => 1 ) ), array( 'bsh_reconcile_orders', array( 'manual' => 0 ) ) ) as $job ) {
 			$recurring += as_has_scheduled_action( $job[0], $job[1], self::GROUP ) ? 1 : 0;
 		}
 		$out['pending'] = max( 0, $out['pending'] - $recurring );

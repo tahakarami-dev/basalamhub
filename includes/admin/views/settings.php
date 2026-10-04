@@ -2,242 +2,242 @@
 /**
  * Settings page: connection + product sync settings.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$slh_user   = get_current_user_id();
-$slh_errors = get_transient( 'slh_settings_errors_' . $slh_user );
-$slh_input  = get_transient( 'slh_settings_input_' . $slh_user );
-delete_transient( 'slh_settings_errors_' . $slh_user );
-delete_transient( 'slh_settings_input_' . $slh_user );
-$slh_errors = is_array( $slh_errors ) ? $slh_errors : array();
+$bsh_user   = get_current_user_id();
+$bsh_errors = get_transient( 'bsh_settings_errors_' . $bsh_user );
+$bsh_input  = get_transient( 'bsh_settings_input_' . $bsh_user );
+delete_transient( 'bsh_settings_errors_' . $bsh_user );
+delete_transient( 'bsh_settings_input_' . $bsh_user );
+$bsh_errors = is_array( $bsh_errors ) ? $bsh_errors : array();
 
-$slh_s     = SLH_Settings::all();
-$slh_conn  = SLH_Settings::connection();
-$slh_token = SLH_Settings::get_token();
+$bsh_s     = BSH_Settings::all();
+$bsh_conn  = BSH_Settings::connection();
+$bsh_token = BSH_Settings::get_token();
 
 /**
  * Value to show in a field: the rejected input after a failed save, else the saved value.
  */
-$slh_val = function ( $key ) use ( $slh_s, $slh_input, $slh_errors ) {
-	if ( isset( $slh_errors[ $key ], $slh_input[ $key ] ) ) {
-		return (string) $slh_input[ $key ];
+$bsh_val = function ( $key ) use ( $bsh_s, $bsh_input, $bsh_errors ) {
+	if ( isset( $bsh_errors[ $key ], $bsh_input[ $key ] ) ) {
+		return (string) $bsh_input[ $key ];
 	}
-	return isset( $slh_s[ $key ] ) ? (string) $slh_s[ $key ] : '';
+	return isset( $bsh_s[ $key ] ) ? (string) $bsh_s[ $key ] : '';
 };
 
 /**
  * Prints the hint or the error message under a field.
  */
-$slh_hint = function ( $key, $hint ) use ( $slh_errors ) {
-	$text = isset( $slh_errors[ $key ] ) ? $slh_errors[ $key ] : $hint;
-	echo '<span class="slh-field__hint">' . esc_html( $text ) . '</span>';
+$bsh_hint = function ( $key, $hint ) use ( $bsh_errors ) {
+	$text = isset( $bsh_errors[ $key ] ) ? $bsh_errors[ $key ] : $hint;
+	echo '<span class="bsh-field__hint">' . esc_html( $text ) . '</span>';
 };
-$slh_err_class = function ( $key ) use ( $slh_errors ) {
-	return isset( $slh_errors[ $key ] ) ? ' slh-field--error' : '';
+$bsh_err_class = function ( $key ) use ( $bsh_errors ) {
+	return isset( $bsh_errors[ $key ] ) ? ' bsh-field--error' : '';
 };
-$slh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : '';
+$bsh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : '';
 ?>
-<header class="slh-page-head">
-	<h1 class="slh-page-title"><?php esc_html_e( 'تنظیمات باسلام‌هاب', 'salamhub' ); ?></h1>
+<header class="bsh-page-head">
+	<h1 class="bsh-page-title"><?php esc_html_e( 'تنظیمات باسلام‌هاب', 'basalamhub' ); ?></h1>
 </header>
 
-<?php SLH_Admin::print_notice(); ?>
+<?php BSH_Admin::print_notice(); ?>
 
-<section class="slh-card slh-section">
-	<div class="slh-card__head">
-		<h2 class="slh-card__title"><?php esc_html_e( 'اتصال به باسلام', 'salamhub' ); ?></h2>
-		<?php echo SLH_Settings::is_connected() ? slh_badge( 'synced' ) : slh_badge( 'error' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+<section class="bsh-card bsh-section">
+	<div class="bsh-card__head">
+		<h2 class="bsh-card__title"><?php esc_html_e( 'اتصال به باسلام', 'basalamhub' ); ?></h2>
+		<?php echo BSH_Settings::is_connected() ? bsh_badge( 'synced' ) : bsh_badge( 'error' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
-	<?php if ( SLH_Settings::is_connected() ) : ?>
-		<p class="slh-card__meta">
+	<?php if ( BSH_Settings::is_connected() ) : ?>
+		<p class="bsh-card__meta">
 			<?php
 			/* translators: 1: booth title, 2: booth id, 3: relative time */
-			echo esc_html( sprintf( __( 'غرفه‌ی «%1$s» · شناسه %2$s · آخرین بررسی %3$s', 'salamhub' ), $slh_conn['vendor_title'], $slh_conn['vendor_id'], slh_time_ago( $slh_conn['checked_at'] ) ) );
+			echo esc_html( sprintf( __( 'غرفه‌ی «%1$s» · شناسه %2$s · آخرین بررسی %3$s', 'basalamhub' ), $bsh_conn['vendor_title'], $bsh_conn['vendor_id'], bsh_time_ago( $bsh_conn['checked_at'] ) ) );
 			?>
 		</p>
-	<?php elseif ( null === $slh_token ) : ?>
-		<p class="slh-alert slh-alert--error"><?php esc_html_e( 'توکن ذخیره‌شده قابل خواندن نیست، چون کلیدهای امنیتی وردپرس عوض شده‌اند. توکن را دوباره وارد کن.', 'salamhub' ); ?></p>
-	<?php elseif ( $slh_conn['message'] ) : ?>
-		<p class="slh-alert slh-alert--error"><?php echo esc_html( $slh_conn['message'] ); ?></p>
+	<?php elseif ( null === $bsh_token ) : ?>
+		<p class="bsh-alert bsh-alert--error"><?php esc_html_e( 'توکن ذخیره‌شده قابل خواندن نیست، چون کلیدهای امنیتی وردپرس عوض شده‌اند. توکن را دوباره وارد کن.', 'basalamhub' ); ?></p>
+	<?php elseif ( $bsh_conn['message'] ) : ?>
+		<p class="bsh-alert bsh-alert--error"><?php echo esc_html( $bsh_conn['message'] ); ?></p>
 	<?php endif; ?>
 
-	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="slh-form">
-		<?php wp_nonce_field( 'slh_save_settings' ); ?>
-		<input type="hidden" name="action" value="slh_save_settings">
-		<input type="hidden" name="slh_section" value="connection">
-		<label class="slh-field">
-			<span class="slh-field__label"><?php esc_html_e( 'توکن دسترسی باسلام', 'salamhub' ); ?></span>
-			<input class="slh-field__input slh-field__ltr" type="password" name="slh_token" autocomplete="off" spellcheck="false"
-				placeholder="<?php echo esc_attr( $slh_token ? SLH_Crypto::mask( $slh_token ) : '' ); ?>">
-			<span class="slh-field__hint">
-				<?php esc_html_e( 'از پنل توسعه‌دهندگان باسلام › توکن‌ها، یک توکن شخصی با دسترسی «محصولات غرفه» و «سفارش‌های غرفه» بساز. رمزنگاری‌شده ذخیره می‌شود و دیگر کامل نمایش داده نمی‌شود.', 'salamhub' ); ?>
-				<a href="https://developers.basalam.com/panel/tokens" target="_blank" rel="noopener"><?php esc_html_e( 'رفتن به پنل', 'salamhub' ); ?></a>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="bsh-form">
+		<?php wp_nonce_field( 'bsh_save_settings' ); ?>
+		<input type="hidden" name="action" value="bsh_save_settings">
+		<input type="hidden" name="bsh_section" value="connection">
+		<label class="bsh-field">
+			<span class="bsh-field__label"><?php esc_html_e( 'توکن دسترسی باسلام', 'basalamhub' ); ?></span>
+			<input class="bsh-field__input bsh-field__ltr" type="password" name="bsh_token" autocomplete="off" spellcheck="false"
+				placeholder="<?php echo esc_attr( $bsh_token ? BSH_Crypto::mask( $bsh_token ) : '' ); ?>">
+			<span class="bsh-field__hint">
+				<?php esc_html_e( 'از پنل توسعه‌دهندگان باسلام › توکن‌ها، یک توکن شخصی با دسترسی «محصولات غرفه» و «سفارش‌های غرفه» بساز. رمزنگاری‌شده ذخیره می‌شود و دیگر کامل نمایش داده نمی‌شود.', 'basalamhub' ); ?>
+				<a href="https://developers.basalam.com/panel/tokens" target="_blank" rel="noopener"><?php esc_html_e( 'رفتن به پنل', 'basalamhub' ); ?></a>
 			</span>
 		</label>
-		<div class="slh-card__foot">
-			<button type="submit" class="slh-btn slh-btn--primary"><?php echo $slh_token ? esc_html__( 'ذخیره‌ی توکن جدید و تست اتصال', 'salamhub' ) : esc_html__( 'ذخیره و تست اتصال', 'salamhub' ); ?></button>
-			<?php if ( $slh_token ) : ?>
-				<button type="button" class="slh-btn" data-slh-test><?php esc_html_e( 'تست اتصال', 'salamhub' ); ?></button>
+		<div class="bsh-card__foot">
+			<button type="submit" class="bsh-btn bsh-btn--primary"><?php echo $bsh_token ? esc_html__( 'ذخیره‌ی توکن جدید و تست اتصال', 'basalamhub' ) : esc_html__( 'ذخیره و تست اتصال', 'basalamhub' ); ?></button>
+			<?php if ( $bsh_token ) : ?>
+				<button type="button" class="bsh-btn" data-bsh-test><?php esc_html_e( 'تست اتصال', 'basalamhub' ); ?></button>
 			<?php endif; ?>
 		</div>
-		<p class="slh-field__hint" data-slh-test-result aria-live="polite"></p>
+		<p class="bsh-field__hint" data-bsh-test-result aria-live="polite"></p>
 	</form>
 
-	<?php if ( SLH_Settings::has_token() ) : ?>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="slh-disconnect" data-slh-confirm="disconnect">
-			<?php wp_nonce_field( 'slh_disconnect' ); ?>
-			<input type="hidden" name="action" value="slh_disconnect">
-			<button type="submit" class="slh-btn slh-btn--danger"><?php esc_html_e( 'قطع اتصال', 'salamhub' ); ?></button>
+	<?php if ( BSH_Settings::has_token() ) : ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="bsh-disconnect" data-bsh-confirm="disconnect">
+			<?php wp_nonce_field( 'bsh_disconnect' ); ?>
+			<input type="hidden" name="action" value="bsh_disconnect">
+			<button type="submit" class="bsh-btn bsh-btn--danger"><?php esc_html_e( 'قطع اتصال', 'basalamhub' ); ?></button>
 		</form>
 	<?php endif; ?>
 </section>
 
-<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="slh-form">
-	<?php wp_nonce_field( 'slh_save_settings' ); ?>
-	<input type="hidden" name="action" value="slh_save_settings">
-	<input type="hidden" name="slh_section" value="products">
+<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="bsh-form">
+	<?php wp_nonce_field( 'bsh_save_settings' ); ?>
+	<input type="hidden" name="action" value="bsh_save_settings">
+	<input type="hidden" name="bsh_section" value="products">
 
-	<section class="slh-card slh-section">
-		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'ارسال محصول', 'salamhub' ); ?></h2></div>
-		<div class="slh-form-grid">
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'default_category_id' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'دسته‌ی پیش‌فرض باسلام (شناسه)', 'salamhub' ); ?></span>
-				<input class="slh-field__input slh-field__ltr" type="text" inputmode="numeric" name="default_category_id" value="<?php echo esc_attr( $slh_val( 'default_category_id' ) ); ?>">
-				<?php $slh_hint( 'default_category_id', __( 'اختیاری. فقط برای محصولی که دسته‌اش در «نگاشت دسته‌ها» نگاشت نشده. خالی بماند، چنین محصولی ارسال نمی‌شود و دلیلش در لاگ می‌آید.', 'salamhub' ) ); ?>
+	<section class="bsh-card bsh-section">
+		<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'ارسال محصول', 'basalamhub' ); ?></h2></div>
+		<div class="bsh-form-grid">
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'default_category_id' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'دسته‌ی پیش‌فرض باسلام (شناسه)', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input bsh-field__ltr" type="text" inputmode="numeric" name="default_category_id" value="<?php echo esc_attr( $bsh_val( 'default_category_id' ) ); ?>">
+				<?php $bsh_hint( 'default_category_id', __( 'اختیاری. فقط برای محصولی که دسته‌اش در «نگاشت دسته‌ها» نگاشت نشده. خالی بماند، چنین محصولی ارسال نمی‌شود و دلیلش در لاگ می‌آید.', 'basalamhub' ) ); ?>
 			</label>
 
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'preparation_days' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'زمان آماده‌سازی (روز)', 'salamhub' ); ?></span>
-				<input class="slh-field__input" type="number" min="0" max="60" name="preparation_days" value="<?php echo esc_attr( $slh_val( 'preparation_days' ) ); ?>">
-				<?php $slh_hint( 'preparation_days', __( 'چند روز طول می‌کشد سفارش را آماده‌ی ارسال کنی.', 'salamhub' ) ); ?>
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'preparation_days' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'زمان آماده‌سازی (روز)', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input" type="number" min="0" max="60" name="preparation_days" value="<?php echo esc_attr( $bsh_val( 'preparation_days' ) ); ?>">
+				<?php $bsh_hint( 'preparation_days', __( 'چند روز طول می‌کشد سفارش را آماده‌ی ارسال کنی.', 'basalamhub' ) ); ?>
 			</label>
 
-			<label class="slh-field">
-				<span class="slh-field__label"><?php esc_html_e( 'وضعیت محصول جدید در باسلام', 'salamhub' ); ?></span>
-				<select class="slh-field__select" name="create_status">
-					<option value="<?php echo esc_attr( SLH_Settings::BASALAM_STATUS_PUBLISHED ); ?>" <?php selected( (int) $slh_s['create_status'], SLH_Settings::BASALAM_STATUS_PUBLISHED ); ?>><?php esc_html_e( 'منتشرشده', 'salamhub' ); ?></option>
-					<option value="<?php echo esc_attr( SLH_Settings::BASALAM_STATUS_UNPUBLISHED ); ?>" <?php selected( (int) $slh_s['create_status'], SLH_Settings::BASALAM_STATUS_UNPUBLISHED ); ?>><?php esc_html_e( 'منتشرنشده (پیش‌نویس)', 'salamhub' ); ?></option>
+			<label class="bsh-field">
+				<span class="bsh-field__label"><?php esc_html_e( 'وضعیت محصول جدید در باسلام', 'basalamhub' ); ?></span>
+				<select class="bsh-field__select" name="create_status">
+					<option value="<?php echo esc_attr( BSH_Settings::BASALAM_STATUS_PUBLISHED ); ?>" <?php selected( (int) $bsh_s['create_status'], BSH_Settings::BASALAM_STATUS_PUBLISHED ); ?>><?php esc_html_e( 'منتشرشده', 'basalamhub' ); ?></option>
+					<option value="<?php echo esc_attr( BSH_Settings::BASALAM_STATUS_UNPUBLISHED ); ?>" <?php selected( (int) $bsh_s['create_status'], BSH_Settings::BASALAM_STATUS_UNPUBLISHED ); ?>><?php esc_html_e( 'منتشرنشده (پیش‌نویس)', 'basalamhub' ); ?></option>
 				</select>
-				<span class="slh-field__hint"><?php esc_html_e( 'فقط موقع ساخت اعمال می‌شود؛ وضعیت انتشار محصولات موجود در باسلام دست نمی‌خورد.', 'salamhub' ); ?></span>
+				<span class="bsh-field__hint"><?php esc_html_e( 'فقط موقع ساخت اعمال می‌شود؛ وضعیت انتشار محصولات موجود در باسلام دست نمی‌خورد.', 'basalamhub' ); ?></span>
 			</label>
 
-			<label class="slh-field">
-				<span class="slh-field__label"><?php esc_html_e( 'واحد قیمت‌های سایت', 'salamhub' ); ?></span>
-				<select class="slh-field__select" name="price_unit">
-					<option value="auto" <?php selected( $slh_s['price_unit'], 'auto' ); ?>>
+			<label class="bsh-field">
+				<span class="bsh-field__label"><?php esc_html_e( 'واحد قیمت‌های سایت', 'basalamhub' ); ?></span>
+				<select class="bsh-field__select" name="price_unit">
+					<option value="auto" <?php selected( $bsh_s['price_unit'], 'auto' ); ?>>
 						<?php
 						/* translators: %s: currency code */
-						echo esc_html( sprintf( __( 'خودکار از ووکامرس (%s)', 'salamhub' ), $slh_currency ) );
+						echo esc_html( sprintf( __( 'خودکار از ووکامرس (%s)', 'basalamhub' ), $bsh_currency ) );
 						?>
 					</option>
-					<option value="irt" <?php selected( $slh_s['price_unit'], 'irt' ); ?>><?php esc_html_e( 'تومان', 'salamhub' ); ?></option>
-					<option value="irr" <?php selected( $slh_s['price_unit'], 'irr' ); ?>><?php esc_html_e( 'ریال', 'salamhub' ); ?></option>
+					<option value="irt" <?php selected( $bsh_s['price_unit'], 'irt' ); ?>><?php esc_html_e( 'تومان', 'basalamhub' ); ?></option>
+					<option value="irr" <?php selected( $bsh_s['price_unit'], 'irr' ); ?>><?php esc_html_e( 'ریال', 'basalamhub' ); ?></option>
 				</select>
-				<span class="slh-field__hint"><?php esc_html_e( 'قیمت در باسلام به ریال ثبت می‌شود؛ قیمت تومانی خودکار ×۱۰ می‌شود.', 'salamhub' ); ?></span>
+				<span class="bsh-field__hint"><?php esc_html_e( 'قیمت در باسلام به ریال ثبت می‌شود؛ قیمت تومانی خودکار ×۱۰ می‌شود.', 'basalamhub' ); ?></span>
 			</label>
 		</div>
 	</section>
 
-	<section class="slh-card slh-section">
-		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'وزن و موجودی', 'salamhub' ); ?></h2></div>
-		<div class="slh-form-grid">
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'default_weight' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'وزن پیش‌فرض (گرم)', 'salamhub' ); ?></span>
-				<input class="slh-field__input" type="number" min="1" name="default_weight" value="<?php echo esc_attr( $slh_val( 'default_weight' ) ); ?>">
-				<?php $slh_hint( 'default_weight', __( 'برای محصولی که در ووکامرس وزن ندارد. باسلام هزینه‌ی ارسال را با وزن حساب می‌کند.', 'salamhub' ) ); ?>
+	<section class="bsh-card bsh-section">
+		<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'وزن و موجودی', 'basalamhub' ); ?></h2></div>
+		<div class="bsh-form-grid">
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'default_weight' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'وزن پیش‌فرض (گرم)', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input" type="number" min="1" name="default_weight" value="<?php echo esc_attr( $bsh_val( 'default_weight' ) ); ?>">
+				<?php $bsh_hint( 'default_weight', __( 'برای محصولی که در ووکامرس وزن ندارد. باسلام هزینه‌ی ارسال را با وزن حساب می‌کند.', 'basalamhub' ) ); ?>
 			</label>
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'packaging_weight' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'وزن بسته‌بندی (گرم)', 'salamhub' ); ?></span>
-				<input class="slh-field__input" type="number" min="0" name="packaging_weight" value="<?php echo esc_attr( $slh_val( 'packaging_weight' ) ); ?>">
-				<?php $slh_hint( 'packaging_weight', __( 'به وزن هر محصول اضافه می‌شود تا «وزن با بسته‌بندی» باسلام ساخته شود.', 'salamhub' ) ); ?>
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'packaging_weight' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'وزن بسته‌بندی (گرم)', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input" type="number" min="0" name="packaging_weight" value="<?php echo esc_attr( $bsh_val( 'packaging_weight' ) ); ?>">
+				<?php $bsh_hint( 'packaging_weight', __( 'به وزن هر محصول اضافه می‌شود تا «وزن با بسته‌بندی» باسلام ساخته شود.', 'basalamhub' ) ); ?>
 			</label>
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'unmanaged_stock' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'موجودی برای محصولات بدون مدیریت موجودی', 'salamhub' ); ?></span>
-				<input class="slh-field__input" type="number" min="0" name="unmanaged_stock" value="<?php echo esc_attr( $slh_val( 'unmanaged_stock' ) ); ?>">
-				<?php $slh_hint( 'unmanaged_stock', __( 'باسلام عدد موجودی می‌خواهد. عدد کم امن‌تر است: جلوی فروش کالای ناموجود را می‌گیرد.', 'salamhub' ) ); ?>
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'unmanaged_stock' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'موجودی برای محصولات بدون مدیریت موجودی', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input" type="number" min="0" name="unmanaged_stock" value="<?php echo esc_attr( $bsh_val( 'unmanaged_stock' ) ); ?>">
+				<?php $bsh_hint( 'unmanaged_stock', __( 'باسلام عدد موجودی می‌خواهد. عدد کم امن‌تر است: جلوی فروش کالای ناموجود را می‌گیرد.', 'basalamhub' ) ); ?>
 			</label>
 		</div>
 	</section>
 
-	<section class="slh-card slh-section" id="slh-orders-settings">
-		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'سفارش‌های باسلام', 'salamhub' ); ?></h2></div>
-		<label class="slh-checkbox">
-			<input type="checkbox" name="orders_enabled" value="1" <?php checked( (int) $slh_s['orders_enabled'], 1 ); ?>>
-			<?php esc_html_e( 'سفارش‌های باسلام خودکار در ووکامرس ثبت شوند', 'salamhub' ); ?>
+	<section class="bsh-card bsh-section" id="bsh-orders-settings">
+		<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'سفارش‌های باسلام', 'basalamhub' ); ?></h2></div>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="orders_enabled" value="1" <?php checked( (int) $bsh_s['orders_enabled'], 1 ); ?>>
+			<?php esc_html_e( 'سفارش‌های باسلام خودکار در ووکامرس ثبت شوند', 'basalamhub' ); ?>
 		</label>
-		<label class="slh-checkbox">
-			<input type="checkbox" name="orders_auto_confirm" value="1" <?php checked( (int) $slh_s['orders_auto_confirm'], 1 ); ?>>
-			<?php esc_html_e( 'سفارش جدید بلافاصله در باسلام «تأیید» شود (وضعیت: در حال آماده‌سازی)', 'salamhub' ); ?>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="orders_auto_confirm" value="1" <?php checked( (int) $bsh_s['orders_auto_confirm'], 1 ); ?>>
+			<?php esc_html_e( 'سفارش جدید بلافاصله در باسلام «تأیید» شود (وضعیت: در حال آماده‌سازی)', 'basalamhub' ); ?>
 		</label>
-		<div class="slh-form-grid">
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'orders_interval' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'بررسی سفارش‌ها هر چند دقیقه', 'salamhub' ); ?></span>
-				<input class="slh-field__input" type="number" min="2" max="60" name="orders_interval" value="<?php echo esc_attr( $slh_val( 'orders_interval' ) ); ?>">
-				<?php $slh_hint( 'orders_interval', __( 'هر بار سفارش‌های تازه و تغییر وضعیت سفارش‌های باز خوانده می‌شود. ۵ دقیقه برای بیشتر فروشگاه‌ها مناسب است.', 'salamhub' ) ); ?>
+		<div class="bsh-form-grid">
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'orders_interval' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'بررسی سفارش‌ها هر چند دقیقه', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input" type="number" min="2" max="60" name="orders_interval" value="<?php echo esc_attr( $bsh_val( 'orders_interval' ) ); ?>">
+				<?php $bsh_hint( 'orders_interval', __( 'هر بار سفارش‌های تازه و تغییر وضعیت سفارش‌های باز خوانده می‌شود. ۵ دقیقه برای بیشتر فروشگاه‌ها مناسب است.', 'basalamhub' ) ); ?>
 			</label>
-			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'orders_import_days' ) ); ?>">
-				<span class="slh-field__label"><?php esc_html_e( 'سفارش‌های چند روز گذشته وارد شوند', 'salamhub' ); ?></span>
-				<input class="slh-field__input" type="number" min="0" max="30" name="orders_import_days" value="<?php echo esc_attr( $slh_val( 'orders_import_days' ) ); ?>">
-				<?php $slh_hint( 'orders_import_days', __( 'فقط در اولین دریافت اعمال می‌شود. صفر یعنی فقط سفارش‌هایی که از این به بعد می‌آیند.', 'salamhub' ) ); ?>
+			<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'orders_import_days' ) ); ?>">
+				<span class="bsh-field__label"><?php esc_html_e( 'سفارش‌های چند روز گذشته وارد شوند', 'basalamhub' ); ?></span>
+				<input class="bsh-field__input" type="number" min="0" max="30" name="orders_import_days" value="<?php echo esc_attr( $bsh_val( 'orders_import_days' ) ); ?>">
+				<?php $bsh_hint( 'orders_import_days', __( 'فقط در اولین دریافت اعمال می‌شود. صفر یعنی فقط سفارش‌هایی که از این به بعد می‌آیند.', 'basalamhub' ) ); ?>
 			</label>
 		</div>
 	</section>
 
-	<section class="slh-card slh-section" id="slh-stock-settings">
-		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'موجودی دوطرفه', 'salamhub' ); ?></h2></div>
-		<fieldset class="slh-fieldset">
-			<legend class="slh-field__label"><?php esc_html_e( 'مرجع موجودی', 'salamhub' ); ?></legend>
-			<label class="slh-radio">
-				<input type="radio" name="stock_reference" value="site" <?php checked( $slh_s['stock_reference'], 'site' ); ?>>
-				<span><strong><?php esc_html_e( 'سایت (پیشنهادی)', 'salamhub' ); ?></strong> — <?php esc_html_e( 'موجودی را در ووکامرس مدیریت می‌کنی. هر فروش در سایت یا باسلام از موجودی سایت کم می‌شود و عدد جدید به باسلام می‌رود.', 'salamhub' ); ?></span>
+	<section class="bsh-card bsh-section" id="bsh-stock-settings">
+		<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'موجودی دوطرفه', 'basalamhub' ); ?></h2></div>
+		<fieldset class="bsh-fieldset">
+			<legend class="bsh-field__label"><?php esc_html_e( 'مرجع موجودی', 'basalamhub' ); ?></legend>
+			<label class="bsh-radio">
+				<input type="radio" name="stock_reference" value="site" <?php checked( $bsh_s['stock_reference'], 'site' ); ?>>
+				<span><strong><?php esc_html_e( 'سایت (پیشنهادی)', 'basalamhub' ); ?></strong> — <?php esc_html_e( 'موجودی را در ووکامرس مدیریت می‌کنی. هر فروش در سایت یا باسلام از موجودی سایت کم می‌شود و عدد جدید به باسلام می‌رود.', 'basalamhub' ); ?></span>
 			</label>
-			<label class="slh-radio">
-				<input type="radio" name="stock_reference" value="basalam" <?php checked( $slh_s['stock_reference'], 'basalam' ); ?>>
-				<span><strong><?php esc_html_e( 'باسلام', 'salamhub' ); ?></strong> — <?php esc_html_e( 'موجودی را در پنل باسلام مدیریت می‌کنی. هر ساعت موجودی باسلام در سایت نوشته می‌شود و فروش سایت از موجودی باسلام کم می‌شود.', 'salamhub' ); ?></span>
+			<label class="bsh-radio">
+				<input type="radio" name="stock_reference" value="basalam" <?php checked( $bsh_s['stock_reference'], 'basalam' ); ?>>
+				<span><strong><?php esc_html_e( 'باسلام', 'basalamhub' ); ?></strong> — <?php esc_html_e( 'موجودی را در پنل باسلام مدیریت می‌کنی. هر ساعت موجودی باسلام در سایت نوشته می‌شود و فروش سایت از موجودی باسلام کم می‌شود.', 'basalamhub' ); ?></span>
 			</label>
 		</fieldset>
-		<label class="slh-field<?php echo esc_attr( $slh_err_class( 'safety_stock' ) ); ?>">
-			<span class="slh-field__label"><?php esc_html_e( 'موجودی اطمینان', 'salamhub' ); ?></span>
-			<input class="slh-field__input" type="number" min="0" name="safety_stock" value="<?php echo esc_attr( $slh_val( 'safety_stock' ) ); ?>">
-			<?php $slh_hint( 'safety_stock', __( 'این تعداد از هر کالا در باسلام نمایش داده نمی‌شود تا اگر هم‌زمان در سایت و باسلام فروش رفت، بیش‌فروشی نشود. مثلاً موجودی ۱۰ و اطمینان ۲ یعنی باسلام ۸ می‌بیند. برای هر محصول جدا هم در تب «انبار» محصول قابل تغییر است.', 'salamhub' ) ); ?>
+		<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'safety_stock' ) ); ?>">
+			<span class="bsh-field__label"><?php esc_html_e( 'موجودی اطمینان', 'basalamhub' ); ?></span>
+			<input class="bsh-field__input" type="number" min="0" name="safety_stock" value="<?php echo esc_attr( $bsh_val( 'safety_stock' ) ); ?>">
+			<?php $bsh_hint( 'safety_stock', __( 'این تعداد از هر کالا در باسلام نمایش داده نمی‌شود تا اگر هم‌زمان در سایت و باسلام فروش رفت، بیش‌فروشی نشود. مثلاً موجودی ۱۰ و اطمینان ۲ یعنی باسلام ۸ می‌بیند. برای هر محصول جدا هم در تب «انبار» محصول قابل تغییر است.', 'basalamhub' ) ); ?>
 		</label>
 	</section>
 
-	<section class="slh-card slh-section">
-		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'به‌روزرسانی خودکار', 'salamhub' ); ?></h2></div>
-		<label class="slh-checkbox">
-			<input type="checkbox" name="auto_update" value="1" <?php checked( (int) $slh_s['auto_update'], 1 ); ?>>
-			<?php esc_html_e( 'بعد از ذخیره‌ی محصول متصل در ووکامرس، همان محصول در باسلام به‌روز شود', 'salamhub' ); ?>
+	<section class="bsh-card bsh-section">
+		<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'به‌روزرسانی خودکار', 'basalamhub' ); ?></h2></div>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="auto_update" value="1" <?php checked( (int) $bsh_s['auto_update'], 1 ); ?>>
+			<?php esc_html_e( 'بعد از ذخیره‌ی محصول متصل در ووکامرس، همان محصول در باسلام به‌روز شود', 'basalamhub' ); ?>
 		</label>
-		<label class="slh-checkbox">
-			<input type="checkbox" name="auto_send_new" value="1" <?php checked( (int) $slh_s['auto_send_new'], 1 ); ?>>
-			<?php esc_html_e( 'محصولات جدید هنگام انتشار خودکار به باسلام ارسال شوند', 'salamhub' ); ?>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="auto_send_new" value="1" <?php checked( (int) $bsh_s['auto_send_new'], 1 ); ?>>
+			<?php esc_html_e( 'محصولات جدید هنگام انتشار خودکار به باسلام ارسال شوند', 'basalamhub' ); ?>
 		</label>
 
-		<fieldset class="slh-fieldset">
-			<legend class="slh-field__label"><?php esc_html_e( 'کدام فیلدها در به‌روزرسانی ارسال شوند؟', 'salamhub' ); ?></legend>
-			<div class="slh-checkbox-grid">
-				<?php foreach ( SLH_Settings::field_groups() as $slh_key => $slh_label ) : ?>
-					<label class="slh-checkbox">
-						<input type="checkbox" name="sync_fields[]" value="<?php echo esc_attr( $slh_key ); ?>" <?php checked( in_array( $slh_key, (array) $slh_s['sync_fields'], true ) ); ?>>
-						<?php echo esc_html( $slh_label ); ?>
+		<fieldset class="bsh-fieldset">
+			<legend class="bsh-field__label"><?php esc_html_e( 'کدام فیلدها در به‌روزرسانی ارسال شوند؟', 'basalamhub' ); ?></legend>
+			<div class="bsh-checkbox-grid">
+				<?php foreach ( BSH_Settings::field_groups() as $bsh_key => $bsh_label ) : ?>
+					<label class="bsh-checkbox">
+						<input type="checkbox" name="sync_fields[]" value="<?php echo esc_attr( $bsh_key ); ?>" <?php checked( in_array( $bsh_key, (array) $bsh_s['sync_fields'], true ) ); ?>>
+						<?php echo esc_html( $bsh_label ); ?>
 					</label>
 				<?php endforeach; ?>
 			</div>
-			<span class="slh-field__hint"><?php esc_html_e( 'فیلدی که تیک ندارد در باسلام دست نمی‌خورد؛ مثلاً اگر فقط قیمت و موجودی تیک داشته باشد، توضیحاتی که در باسلام نوشته‌ای حفظ می‌شود. موقع ساخت اولیه همه‌ی فیلدها ارسال می‌شوند.', 'salamhub' ); ?></span>
+			<span class="bsh-field__hint"><?php esc_html_e( 'فیلدی که تیک ندارد در باسلام دست نمی‌خورد؛ مثلاً اگر فقط قیمت و موجودی تیک داشته باشد، توضیحاتی که در باسلام نوشته‌ای حفظ می‌شود. موقع ساخت اولیه همه‌ی فیلدها ارسال می‌شوند.', 'basalamhub' ); ?></span>
 		</fieldset>
 
-		<label class="slh-field<?php echo esc_attr( $slh_err_class( 'log_retention_days' ) ); ?>">
-			<span class="slh-field__label"><?php esc_html_e( 'نگهداری لاگ (روز)', 'salamhub' ); ?></span>
-			<input class="slh-field__input" type="number" min="7" max="365" name="log_retention_days" value="<?php echo esc_attr( $slh_val( 'log_retention_days' ) ); ?>">
-			<?php $slh_hint( 'log_retention_days', __( 'لاگ‌های قدیمی‌تر روزانه پاک می‌شوند تا دیتابیس سبک بماند.', 'salamhub' ) ); ?>
+		<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'log_retention_days' ) ); ?>">
+			<span class="bsh-field__label"><?php esc_html_e( 'نگهداری لاگ (روز)', 'basalamhub' ); ?></span>
+			<input class="bsh-field__input" type="number" min="7" max="365" name="log_retention_days" value="<?php echo esc_attr( $bsh_val( 'log_retention_days' ) ); ?>">
+			<?php $bsh_hint( 'log_retention_days', __( 'لاگ‌های قدیمی‌تر روزانه پاک می‌شوند تا دیتابیس سبک بماند.', 'basalamhub' ) ); ?>
 		</label>
 
-		<div class="slh-card__foot">
-			<button type="submit" class="slh-btn"><?php esc_html_e( 'ذخیره‌ی تنظیمات', 'salamhub' ); ?></button>
+		<div class="bsh-card__foot">
+			<button type="submit" class="bsh-btn"><?php esc_html_e( 'ذخیره‌ی تنظیمات', 'basalamhub' ); ?></button>
 		</div>
 	</section>
 </form>

@@ -2,98 +2,98 @@
 /**
  * Bulk send page.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$slh_batch     = SLH_Bulk::current();
-$slh_running   = $slh_batch && 'running' === $slh_batch['status'];
-$slh_counts    = SLH_Bulk::count_candidates();
-$slh_unmapped  = SLH_Categories::unmapped_terms();
-$slh_default   = (int) SLH_Settings::get( 'default_category_id', 0 );
-$slh_connected = SLH_Settings::is_connected();
+$bsh_batch     = BSH_Bulk::current();
+$bsh_running   = $bsh_batch && 'running' === $bsh_batch['status'];
+$bsh_counts    = BSH_Bulk::count_candidates();
+$bsh_unmapped  = BSH_Categories::unmapped_terms();
+$bsh_default   = (int) BSH_Settings::get( 'default_category_id', 0 );
+$bsh_connected = BSH_Settings::is_connected();
 ?>
-<header class="slh-page-head">
-	<h1 class="slh-page-title"><?php esc_html_e( 'ارسال گروهی', 'salamhub' ); ?></h1>
-	<p class="slh-card__meta"><?php esc_html_e( 'محصولات در صف پس‌زمینه یکی‌یکی ارسال می‌شوند؛ لازم نیست مرورگر باز بماند.', 'salamhub' ); ?></p>
+<header class="bsh-page-head">
+	<h1 class="bsh-page-title"><?php esc_html_e( 'ارسال گروهی', 'basalamhub' ); ?></h1>
+	<p class="bsh-card__meta"><?php esc_html_e( 'محصولات در صف پس‌زمینه یکی‌یکی ارسال می‌شوند؛ لازم نیست مرورگر باز بماند.', 'basalamhub' ); ?></p>
 </header>
 
-<?php SLH_Admin::print_notice(); ?>
+<?php BSH_Admin::print_notice(); ?>
 
-<section class="slh-card slh-section" data-slh-bulk-progress <?php echo $slh_batch ? '' : 'hidden'; ?> data-running="<?php echo $slh_running ? '1' : '0'; ?>">
-	<div data-slh-bulk-html>
-		<?php SLH_Admin_Tools::progress_html( $slh_batch, SLH_Bulk::progress( $slh_batch ) ); ?>
+<section class="bsh-card bsh-section" data-bsh-bulk-progress <?php echo $bsh_batch ? '' : 'hidden'; ?> data-running="<?php echo $bsh_running ? '1' : '0'; ?>">
+	<div data-bsh-bulk-html>
+		<?php BSH_Admin_Tools::progress_html( $bsh_batch, BSH_Bulk::progress( $bsh_batch ) ); ?>
 	</div>
-	<div class="slh-card__foot" data-slh-bulk-running-actions <?php echo $slh_running ? '' : 'hidden'; ?>>
-		<button type="button" class="slh-btn slh-btn--danger" data-slh-bulk-cancel><?php esc_html_e( 'توقف ارسال گروهی', 'salamhub' ); ?></button>
-		<a class="slh-btn slh-btn--ghost" href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub-logs' ) ); ?>"><?php esc_html_e( 'مشاهده‌ی لاگ', 'salamhub' ); ?></a>
+	<div class="bsh-card__foot" data-bsh-bulk-running-actions <?php echo $bsh_running ? '' : 'hidden'; ?>>
+		<button type="button" class="bsh-btn bsh-btn--danger" data-bsh-bulk-cancel><?php esc_html_e( 'توقف ارسال گروهی', 'basalamhub' ); ?></button>
+		<a class="bsh-btn bsh-btn--ghost" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-logs' ) ); ?>"><?php esc_html_e( 'مشاهده‌ی لاگ', 'basalamhub' ); ?></a>
 	</div>
-	<p class="slh-field__hint" data-slh-bulk-message aria-live="polite"></p>
+	<p class="bsh-field__hint" data-bsh-bulk-message aria-live="polite"></p>
 </section>
 
-<?php if ( ! $slh_connected ) : ?>
-	<p class="slh-alert slh-alert--error">
-		<?php esc_html_e( 'هنوز به باسلام وصل نشده‌ای.', 'salamhub' ); ?>
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub-settings' ) ); ?>"><?php esc_html_e( 'اتصال در تنظیمات', 'salamhub' ); ?></a>
+<?php if ( ! $bsh_connected ) : ?>
+	<p class="bsh-alert bsh-alert--error">
+		<?php esc_html_e( 'هنوز به باسلام وصل نشده‌ای.', 'basalamhub' ); ?>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>"><?php esc_html_e( 'اتصال در تنظیمات', 'basalamhub' ); ?></a>
 	</p>
 <?php endif; ?>
 
-<?php if ( $slh_unmapped ) : ?>
-	<p class="slh-alert slh-alert--warning">
+<?php if ( $bsh_unmapped ) : ?>
+	<p class="bsh-alert bsh-alert--warning">
 		<?php
-		$slh_names = implode( '، ', array_map( function ( $t ) {
+		$bsh_names = implode( '، ', array_map( function ( $t ) {
 			return '«' . $t->name . '»';
-		}, array_slice( $slh_unmapped, 0, 5 ) ) ) . ( count( $slh_unmapped ) > 5 ? '، …' : '' );
+		}, array_slice( $bsh_unmapped, 0, 5 ) ) ) . ( count( $bsh_unmapped ) > 5 ? '، …' : '' );
 		echo esc_html(
-			$slh_default
+			$bsh_default
 				/* translators: 1: count, 2: names */
-				? sprintf( __( '%1$s دسته‌ی ووکامرس نگاشت نشده‌اند (%2$s). محصولاتشان با دسته‌ی پیش‌فرض تنظیمات ارسال می‌شوند.', 'salamhub' ), slh_fa_number( count( $slh_unmapped ) ), $slh_names )
+				? sprintf( __( '%1$s دسته‌ی ووکامرس نگاشت نشده‌اند (%2$s). محصولاتشان با دسته‌ی پیش‌فرض تنظیمات ارسال می‌شوند.', 'basalamhub' ), bsh_fa_number( count( $bsh_unmapped ) ), $bsh_names )
 				/* translators: 1: count, 2: names */
-				: sprintf( __( '%1$s دسته‌ی ووکامرس نگاشت نشده‌اند (%2$s). محصولات این دسته‌ها ارسال نمی‌شوند و در لاگ با دلیل ثبت می‌شوند.', 'salamhub' ), slh_fa_number( count( $slh_unmapped ) ), $slh_names )
+				: sprintf( __( '%1$s دسته‌ی ووکامرس نگاشت نشده‌اند (%2$s). محصولات این دسته‌ها ارسال نمی‌شوند و در لاگ با دلیل ثبت می‌شوند.', 'basalamhub' ), bsh_fa_number( count( $bsh_unmapped ) ), $bsh_names )
 		);
 		?>
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub-categories' ) ); ?>"><?php esc_html_e( 'نگاشت دسته‌ها', 'salamhub' ); ?></a>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-categories' ) ); ?>"><?php esc_html_e( 'نگاشت دسته‌ها', 'basalamhub' ); ?></a>
 	</p>
 <?php endif; ?>
 
-<section class="slh-card slh-section">
-	<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'ارسال جدید', 'salamhub' ); ?></h2></div>
-	<form data-slh-bulk-form>
-		<fieldset class="slh-fieldset">
-			<legend class="slh-field__label"><?php esc_html_e( 'کدام محصولات؟', 'salamhub' ); ?></legend>
-			<label class="slh-checkbox">
+<section class="bsh-card bsh-section">
+	<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'ارسال جدید', 'basalamhub' ); ?></h2></div>
+	<form data-bsh-bulk-form>
+		<fieldset class="bsh-fieldset">
+			<legend class="bsh-field__label"><?php esc_html_e( 'کدام محصولات؟', 'basalamhub' ); ?></legend>
+			<label class="bsh-checkbox">
 				<input type="radio" name="scope" value="unsent" checked>
 				<span>
-					<?php esc_html_e( 'فقط محصولاتی که هنوز در باسلام نیستند', 'salamhub' ); ?>
-					(<strong data-slh-count="unsent"><?php echo esc_html( slh_fa_number( $slh_counts['unsent'] ) ); ?></strong>)
+					<?php esc_html_e( 'فقط محصولاتی که هنوز در باسلام نیستند', 'basalamhub' ); ?>
+					(<strong data-bsh-count="unsent"><?php echo esc_html( bsh_fa_number( $bsh_counts['unsent'] ) ); ?></strong>)
 				</span>
 			</label>
-			<label class="slh-checkbox">
+			<label class="bsh-checkbox">
 				<input type="radio" name="scope" value="all">
 				<span>
-					<?php esc_html_e( 'همه‌ی محصولات؛ محصولات متصل به‌روز می‌شوند', 'salamhub' ); ?>
-					(<strong data-slh-count="all"><?php echo esc_html( slh_fa_number( $slh_counts['all'] ) ); ?></strong>)
+					<?php esc_html_e( 'همه‌ی محصولات؛ محصولات متصل به‌روز می‌شوند', 'basalamhub' ); ?>
+					(<strong data-bsh-count="all"><?php echo esc_html( bsh_fa_number( $bsh_counts['all'] ) ); ?></strong>)
 				</span>
 			</label>
 		</fieldset>
 
-		<label class="slh-field">
-			<span class="slh-field__label"><?php esc_html_e( 'دسته‌ی ووکامرس', 'salamhub' ); ?></span>
-			<select class="slh-field__select" name="term_id" data-slh-bulk-term>
-				<option value="0"><?php esc_html_e( 'همه‌ی دسته‌ها', 'salamhub' ); ?></option>
-				<?php foreach ( SLH_Admin_Tools::wc_category_tree() as $slh_row ) : ?>
-					<option value="<?php echo esc_attr( $slh_row[0]->term_id ); ?>"><?php echo esc_html( str_repeat( '— ', $slh_row[1] ) . $slh_row[0]->name ); ?></option>
+		<label class="bsh-field">
+			<span class="bsh-field__label"><?php esc_html_e( 'دسته‌ی ووکامرس', 'basalamhub' ); ?></span>
+			<select class="bsh-field__select" name="term_id" data-bsh-bulk-term>
+				<option value="0"><?php esc_html_e( 'همه‌ی دسته‌ها', 'basalamhub' ); ?></option>
+				<?php foreach ( BSH_Admin_Tools::wc_category_tree() as $bsh_row ) : ?>
+					<option value="<?php echo esc_attr( $bsh_row[0]->term_id ); ?>"><?php echo esc_html( str_repeat( '— ', $bsh_row[1] ) . $bsh_row[0]->name ); ?></option>
 				<?php endforeach; ?>
 			</select>
-			<span class="slh-field__hint"><?php esc_html_e( 'زیردسته‌ها هم شامل می‌شوند. محصولات ساده و متغیرِ منتشرشده ارسال می‌شوند.', 'salamhub' ); ?></span>
+			<span class="bsh-field__hint"><?php esc_html_e( 'زیردسته‌ها هم شامل می‌شوند. محصولات ساده و متغیرِ منتشرشده ارسال می‌شوند.', 'basalamhub' ); ?></span>
 		</label>
 
-		<div class="slh-card__foot">
-			<button type="submit" class="slh-btn slh-btn--primary" data-slh-bulk-start <?php disabled( ! $slh_connected || $slh_running ); ?>><?php esc_html_e( 'شروع ارسال', 'salamhub' ); ?></button>
+		<div class="bsh-card__foot">
+			<button type="submit" class="bsh-btn bsh-btn--primary" data-bsh-bulk-start <?php disabled( ! $bsh_connected || $bsh_running ); ?>><?php esc_html_e( 'شروع ارسال', 'basalamhub' ); ?></button>
 		</div>
-		<p class="slh-field__hint">
-			<?php esc_html_e( 'از لیست محصولات ووکامرس هم می‌توانی چند محصول را تیک بزنی و از «کارهای دسته‌جمعی» گزینه‌ی «ارسال به باسلام» را انتخاب کنی.', 'salamhub' ); ?>
+		<p class="bsh-field__hint">
+			<?php esc_html_e( 'از لیست محصولات ووکامرس هم می‌توانی چند محصول را تیک بزنی و از «کارهای دسته‌جمعی» گزینه‌ی «ارسال به باسلام» را انتخاب کنی.', 'basalamhub' ); ?>
 		</p>
 	</form>
 </section>

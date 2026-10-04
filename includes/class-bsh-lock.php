@@ -6,12 +6,12 @@
  * acquiring atomic on every MySQL/MariaDB host without needing GET_LOCK or Redis.
  * Locks expire on their own so a crashed PHP process can never block the queue forever.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Lock {
+class BSH_Lock {
 
 	/**
 	 * @param string $name Lock name.
@@ -19,7 +19,7 @@ class SLH_Lock {
 	 * @return string|false Owner token on success.
 	 */
 	public static function acquire( $name, $ttl = 120 ) {
-		$option = 'slh_lock_' . $name;
+		$option = 'bsh_lock_' . $name;
 		$owner  = wp_generate_password( 12, false );
 		$value  = ( time() + $ttl ) . '|' . $owner;
 
@@ -55,7 +55,7 @@ class SLH_Lock {
 	 */
 	public static function release( $name, $owner ) {
 		global $wpdb;
-		$option = 'slh_lock_' . $name;
+		$option = 'bsh_lock_' . $name;
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value LIKE %s",

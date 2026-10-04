@@ -5,28 +5,28 @@
  * Mapping is set once per WooCommerce category and applies to every product in it.
  * A mapping on a parent category also covers its child categories, unless a child has its
  * own mapping. Resolution order for a product:
- *   1. the per-product override in the SalamHub box,
+ *   1. the per-product override in the BasalamHub box,
  *   2. the deepest mapped WooCommerce category of the product (or of its ancestors),
  *   3. the default category from settings.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Categories {
+class BSH_Categories {
 
-	const CACHE_OPTION = 'slh_basalam_categories';
-	const MAP_OPTION   = 'slh_category_map';
-	const ATTR_OPTION  = 'slh_category_attributes';
+	const CACHE_OPTION = 'bsh_basalam_categories';
+	const MAP_OPTION   = 'bsh_category_map';
+	const ATTR_OPTION  = 'bsh_category_attributes';
 	const ATTR_TTL     = WEEK_IN_SECONDS;
 
 	/**
 	 * Hooks into the mapper.
 	 */
 	public static function init() {
-		add_filter( 'slh_basalam_category', array( __CLASS__, 'filter_category' ), 10, 2 );
-		add_filter( 'slh_product_payload', array( __CLASS__, 'filter_payload' ), 10, 2 );
+		add_filter( 'bsh_basalam_category', array( __CLASS__, 'filter_category' ), 10, 2 );
+		add_filter( 'bsh_product_payload', array( __CLASS__, 'filter_payload' ), 10, 2 );
 	}
 
 	/* ---------------------------------------------------------------------
@@ -37,24 +37,24 @@ class SLH_Categories {
 	 * Downloads the Basalam category tree and caches a flat list.
 	 *
 	 * @return int Number of categories.
-	 * @throws SLH_Api_Error On API failure.
+	 * @throws BSH_Api_Error On API failure.
 	 */
 	public static function refresh() {
-		$tree  = SLH_Plugin::api()->categories();
+		$tree  = BSH_Plugin::api()->categories();
 		$items = array();
 		self::flatten( $tree, 0, array(), $items );
 		if ( ! $items ) {
-			throw new SLH_Api_Error(
-				__( 'فهرست دسته‌های باسلام خالی برگشت.', 'salamhub' ),
+			throw new BSH_Api_Error(
+				__( 'فهرست دسته‌های باسلام خالی برگشت.', 'basalamhub' ),
 				'server',
 				array(
 					'retryable'  => true,
-					'reason'     => __( 'باسلام دسته‌ای برنگرداند.', 'salamhub' ),
-					'suggestion' => __( 'چند دقیقه‌ی بعد دوباره «به‌روزرسانی فهرست» را بزن.', 'salamhub' ),
+					'reason'     => __( 'باسلام دسته‌ای برنگرداند.', 'basalamhub' ),
+					'suggestion' => __( 'چند دقیقه‌ی بعد دوباره «به‌روزرسانی فهرست» را بزن.', 'basalamhub' ),
 				)
 			);
 		}
-		update_option( self::CACHE_OPTION, array( 'fetched_at' => slh_now(), 'items' => $items ), false );
+		update_option( self::CACHE_OPTION, array( 'fetched_at' => bsh_now(), 'items' => $items ), false );
 		return count( $items );
 	}
 
@@ -149,16 +149,16 @@ class SLH_Categories {
 				continue;
 			}
 			if ( ! ctype_digit( $raw ) ) {
-				$errors[ $term_id ] = __( 'دسته را از فهرست پیشنهادی انتخاب کن یا شناسه‌ی عددی‌اش را بنویس.', 'salamhub' );
+				$errors[ $term_id ] = __( 'دسته را از فهرست پیشنهادی انتخاب کن یا شناسه‌ی عددی‌اش را بنویس.', 'basalamhub' );
 				continue;
 			}
 			$cat_id = (int) $raw;
 			if ( $items && ! isset( $items[ $cat_id ] ) ) {
-				$errors[ $term_id ] = __( 'این شناسه در فهرست دسته‌های باسلام نیست.', 'salamhub' );
+				$errors[ $term_id ] = __( 'این شناسه در فهرست دسته‌های باسلام نیست.', 'basalamhub' );
 				continue;
 			}
 			if ( $items && ! $items[ $cat_id ]['leaf'] ) {
-				$errors[ $term_id ] = __( 'این دسته زیرمجموعه دارد؛ باسلام محصول را فقط در دسته‌ی آخر (بدون زیرمجموعه) می‌پذیرد.', 'salamhub' );
+				$errors[ $term_id ] = __( 'این دسته زیرمجموعه دارد؛ باسلام محصول را فقط در دسته‌ی آخر (بدون زیرمجموعه) می‌پذیرد.', 'basalamhub' );
 				continue;
 			}
 			$attrs = array();
@@ -204,7 +204,7 @@ class SLH_Categories {
 	}
 
 	/**
-	 * slh_basalam_category filter: fill in from the mapping when the product has no override.
+	 * bsh_basalam_category filter: fill in from the mapping when the product has no override.
 	 *
 	 * @param int        $cat     Current value.
 	 * @param WC_Product $product Product.
@@ -253,7 +253,7 @@ class SLH_Categories {
 	 * @param int  $category_id Basalam category.
 	 * @param bool $fetch       Whether to call the API when not cached.
 	 * @return array[]|null Null when not cached and $fetch is false.
-	 * @throws SLH_Api_Error When fetching fails.
+	 * @throws BSH_Api_Error When fetching fails.
 	 */
 	public static function attributes( $category_id, $fetch = true ) {
 		$category_id = (int) $category_id;
@@ -266,7 +266,7 @@ class SLH_Categories {
 			return null;
 		}
 		$attrs = array();
-		foreach ( SLH_Plugin::api()->category_attributes( $category_id ) as $group ) {
+		foreach ( BSH_Plugin::api()->category_attributes( $category_id ) as $group ) {
 			foreach ( isset( $group['attributes'] ) && is_array( $group['attributes'] ) ? $group['attributes'] : array() as $a ) {
 				if ( empty( $a['id'] ) ) {
 					continue;
@@ -290,7 +290,7 @@ class SLH_Categories {
 		if ( count( $all ) >= 200 ) {
 			$all = array_slice( $all, -150, null, true );
 		}
-		$all[ $category_id ] = array( 'at' => slh_now(), 'attrs' => $attrs );
+		$all[ $category_id ] = array( 'at' => bsh_now(), 'attrs' => $attrs );
 		update_option( self::ATTR_OPTION, $all, false );
 		return $attrs;
 	}
@@ -308,7 +308,7 @@ class SLH_Categories {
 		$out = array( 'payload' => array(), 'missing' => array() );
 		try {
 			$attrs = self::attributes( $category_id, true );
-		} catch ( SLH_Api_Error $e ) {
+		} catch ( BSH_Api_Error $e ) {
 			return $out; // Attributes are best-effort; Basalam's own validation still applies.
 		}
 		if ( ! $attrs ) {
@@ -343,14 +343,14 @@ class SLH_Categories {
 	}
 
 	/**
-	 * slh_product_payload filter: adds category attributes.
+	 * bsh_product_payload filter: adds category attributes.
 	 *
 	 * @param array      $payload Payload.
 	 * @param WC_Product $product Product.
 	 * @return array
 	 */
 	public static function filter_payload( $payload, $product ) {
-		if ( empty( $payload['category_id'] ) || ! SLH_Settings::is_connected() ) {
+		if ( empty( $payload['category_id'] ) || ! BSH_Settings::is_connected() ) {
 			return $payload;
 		}
 		$resolved = self::resolve( $product );
@@ -360,7 +360,7 @@ class SLH_Categories {
 			$payload['product_attribute'] = $attrs['payload'];
 		}
 		if ( $attrs['missing'] ) {
-			$payload['_slh_missing_attributes'] = $attrs['missing'];
+			$payload['_bsh_missing_attributes'] = $attrs['missing'];
 		}
 		return $payload;
 	}

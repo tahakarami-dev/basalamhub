@@ -6,12 +6,12 @@
  * payload and reports blocking problems in Persian. That keeps it easy to test and lets
  * later phases (price rules, category mapping, safety stock) plug in through filters.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Product_Mapper {
+class BSH_Product_Mapper {
 
 	/** Which Basalam fields belong to which user-selectable group. */
 	const GROUP_FIELDS = array(
@@ -35,8 +35,8 @@ class SLH_Product_Mapper {
 		if ( ! $product->is_type( 'simple' ) && ! $product->is_type( 'variable' ) ) {
 			$problems[] = array(
 				'field'      => 'type',
-				'message'    => __( 'فقط محصولات ساده و متغیر قابل ارسال هستند.', 'salamhub' ),
-				'suggestion' => __( 'محصولات گروهی و خارجی در باسلام معادل ندارند.', 'salamhub' ),
+				'message'    => __( 'فقط محصولات ساده و متغیر قابل ارسال هستند.', 'basalamhub' ),
+				'suggestion' => __( 'محصولات گروهی و خارجی در باسلام معادل ندارند.', 'basalamhub' ),
 			);
 		}
 
@@ -49,13 +49,13 @@ class SLH_Product_Mapper {
 			'category_id'          => $this->category( $product, $problems ),
 			'preparation_days'     => $this->preparation_days( $product ),
 			'sku'                  => self::sku_for( $product ),
-			'status'               => (int) SLH_Settings::get( 'create_status', SLH_Settings::BASALAM_STATUS_PUBLISHED ),
+			'status'               => (int) BSH_Settings::get( 'create_status', BSH_Settings::BASALAM_STATUS_PUBLISHED ),
 			'is_wholesale'         => false,
 		);
 
 		$weight                    = $this->weight_grams( $product );
 		$payload['weight']         = $weight;
-		$payload['package_weight'] = (int) round( $weight + (int) SLH_Settings::get( 'packaging_weight', 0 ) );
+		$payload['package_weight'] = (int) round( $weight + (int) BSH_Settings::get( 'packaging_weight', 0 ) );
 
 		$dimensions = $this->dimensions( $product );
 		if ( $dimensions ) {
@@ -65,8 +65,8 @@ class SLH_Product_Mapper {
 		if ( '' === $payload['name'] ) {
 			$problems[] = array(
 				'field'      => 'name',
-				'message'    => __( 'محصول نام ندارد.', 'salamhub' ),
-				'suggestion' => __( 'برای محصول نام بنویس.', 'salamhub' ),
+				'message'    => __( 'محصول نام ندارد.', 'basalamhub' ),
+				'suggestion' => __( 'برای محصول نام بنویس.', 'basalamhub' ),
 			);
 		}
 
@@ -93,8 +93,8 @@ class SLH_Product_Mapper {
 		if ( ! $image_ids ) {
 			$problems[] = array(
 				'field'      => 'photo',
-				'message'    => __( 'محصول تصویر ندارد.', 'salamhub' ),
-				'suggestion' => __( 'باسلام محصول بدون عکس را نمایش نمی‌دهد؛ حداقل یک تصویر شاخص اضافه کن.', 'salamhub' ),
+				'message'    => __( 'محصول تصویر ندارد.', 'basalamhub' ),
+				'suggestion' => __( 'باسلام محصول بدون عکس را نمایش نمی‌دهد؛ حداقل یک تصویر شاخص اضافه کن.', 'basalamhub' ),
 			);
 		}
 
@@ -104,7 +104,7 @@ class SLH_Product_Mapper {
 		 * @param array      $payload Basalam payload.
 		 * @param WC_Product $product Product.
 		 */
-		$payload = apply_filters( 'slh_product_payload', $payload, $product );
+		$payload = apply_filters( 'bsh_product_payload', $payload, $product );
 
 		return array(
 			'payload'    => $payload,
@@ -134,12 +134,18 @@ class SLH_Product_Mapper {
 			$label = array();
 			foreach ( $v->get_variation_attributes( false ) as $taxonomy => $value ) {
 				$name = wc_attribute_label( $taxonomy, $product );
+				if ( $name === $taxonomy && 0 === strpos( $taxonomy, 'pa_' ) ) {
+					// Stale attribute cache (object caches, attribute just created): read the label directly.
+					global $wpdb;
+					$label = $wpdb->get_var( $wpdb->prepare( "SELECT attribute_label FROM {$wpdb->prefix}woocommerce_attribute_taxonomies WHERE attribute_name = %s", substr( $taxonomy, 3 ) ) );
+					$name  = $label ? (string) $label : $name;
+				}
 				if ( '' === (string) $value ) {
 					$problems[] = array(
 						'field'      => 'variants',
 						/* translators: 1: variation id, 2: attribute */
-						'message'    => sprintf( __( 'تنوع #%1$s برای «%2$s» مقدار مشخص ندارد («هرکدام»).', 'salamhub' ), $child_id, $name ),
-						'suggestion' => __( 'در تب «متغیرها»ی محصول برای هر تنوع مقدار دقیق انتخاب کن؛ باسلام تنوع «هرکدام» ندارد.', 'salamhub' ),
+						'message'    => sprintf( __( 'تنوع #%1$s برای «%2$s» مقدار مشخص ندارد («هرکدام»).', 'basalamhub' ), $child_id, $name ),
+						'suggestion' => __( 'در تب «متغیرها»ی محصول برای هر تنوع مقدار دقیق انتخاب کن؛ باسلام تنوع «هرکدام» ندارد.', 'basalamhub' ),
 					);
 					continue 2;
 				}
@@ -155,8 +161,8 @@ class SLH_Product_Mapper {
 				$problems[] = array(
 					'field'      => 'variants',
 					/* translators: %s: variation label */
-					'message'    => sprintf( __( 'دو تنوع با ویژگی‌های یکسان («%s») وجود دارد.', 'salamhub' ), implode( '، ', $label ) ),
-					'suggestion' => __( 'تنوع تکراری را حذف یا غیرفعال کن.', 'salamhub' ),
+					'message'    => sprintf( __( 'دو تنوع با ویژگی‌های یکسان («%s») وجود دارد.', 'basalamhub' ), implode( '، ', $label ) ),
+					'suggestion' => __( 'تنوع تکراری را حذف یا غیرفعال کن.', 'basalamhub' ),
 				);
 				continue;
 			}
@@ -168,8 +174,8 @@ class SLH_Product_Mapper {
 				$problems[] = array(
 					'field'      => 'variants',
 					/* translators: %s: variation label */
-					'message'    => sprintf( __( 'تنوع «%s» قیمت ندارد یا قیمتش صفر است.', 'salamhub' ), implode( '، ', $label ) ),
-					'suggestion' => __( 'قیمت همه‌ی تنوع‌های فعال را وارد کن، یا تنوع را غیرفعال کن.', 'salamhub' ),
+					'message'    => sprintf( __( 'تنوع «%s» قیمت ندارد یا قیمتش صفر است.', 'basalamhub' ), implode( '، ', $label ) ),
+					'suggestion' => __( 'قیمت همه‌ی تنوع‌های فعال را وارد کن، یا تنوع را غیرفعال کن.', 'basalamhub' ),
 				);
 				continue;
 			}
@@ -188,8 +194,8 @@ class SLH_Product_Mapper {
 		} ) ) {
 			$problems[] = array(
 				'field'      => 'variants',
-				'message'    => __( 'محصول متغیر هیچ تنوع فعالی ندارد.', 'salamhub' ),
-				'suggestion' => __( 'حداقل یک تنوع با قیمت بساز و فعالش کن.', 'salamhub' ),
+				'message'    => __( 'محصول متغیر هیچ تنوع فعالی ندارد.', 'basalamhub' ),
+				'suggestion' => __( 'حداقل یک تنوع با قیمت بساز و فعالش کن.', 'basalamhub' ),
 			);
 		}
 		return $out;
@@ -236,7 +242,7 @@ class SLH_Product_Mapper {
 	 */
 	public static function sku_for( WC_Product $product ) {
 		$sku = trim( (string) $product->get_sku() );
-		return '' !== $sku ? $sku : 'SLH-' . $product->get_id();
+		return '' !== $sku ? $sku : 'BSH-' . $product->get_id();
 	}
 
 	/**
@@ -269,7 +275,7 @@ class SLH_Product_Mapper {
 	 * @return int|null Null when the currency cannot be converted.
 	 */
 	public static function rial_multiplier() {
-		$unit = SLH_Settings::get( 'price_unit', 'auto' );
+		$unit = BSH_Settings::get( 'price_unit', 'auto' );
 		if ( 'irr' === $unit ) {
 			return 1;
 		}
@@ -299,8 +305,8 @@ class SLH_Product_Mapper {
 			$problems[] = array(
 				'field'      => 'primary_price',
 				/* translators: %s: currency code */
-				'message'    => sprintf( __( 'واحد پول فروشگاه (%s) قابل تبدیل به ریال نیست.', 'salamhub' ), get_woocommerce_currency() ),
-				'suggestion' => __( 'در باسلام‌هاب › تنظیمات، واحد قیمت‌های سایت را دستی روی «تومان» یا «ریال» بگذار.', 'salamhub' ),
+				'message'    => sprintf( __( 'واحد پول فروشگاه (%s) قابل تبدیل به ریال نیست.', 'basalamhub' ), get_woocommerce_currency() ),
+				'suggestion' => __( 'در باسلام‌هاب › تنظیمات، واحد قیمت‌های سایت را دستی روی «تومان» یا «ریال» بگذار.', 'basalamhub' ),
 			);
 			return 0;
 		}
@@ -315,13 +321,13 @@ class SLH_Product_Mapper {
 		 * @param int        $rial    Price in Rial.
 		 * @param WC_Product $product Product.
 		 */
-		$rial = (int) apply_filters( 'slh_basalam_price', $rial, $product );
+		$rial = (int) apply_filters( 'bsh_basalam_price', $rial, $product );
 
 		if ( $rial <= 0 ) {
 			$problems[] = array(
 				'field'      => 'primary_price',
-				'message'    => __( 'قیمت محصول صفر یا خالی است.', 'salamhub' ),
-				'suggestion' => __( 'باسلام‌هاب هیچ‌وقت قیمت صفر به باسلام نمی‌فرستد. قیمت محصول را وارد کن.', 'salamhub' ),
+				'message'    => __( 'قیمت محصول صفر یا خالی است.', 'basalamhub' ),
+				'suggestion' => __( 'باسلام‌هاب هیچ‌وقت قیمت صفر به باسلام نمی‌فرستد. قیمت محصول را وارد کن.', 'basalamhub' ),
 			);
 			return 0;
 		}
@@ -338,7 +344,7 @@ class SLH_Product_Mapper {
 		} elseif ( 'outofstock' === $product->get_stock_status() ) {
 			$stock = 0;
 		} else {
-			$stock = (int) SLH_Settings::get( 'unmanaged_stock', 1 );
+			$stock = (int) BSH_Settings::get( 'unmanaged_stock', 1 );
 		}
 		/**
 		 * Safety stock (hide N units from Basalam) plugs in here.
@@ -346,7 +352,7 @@ class SLH_Product_Mapper {
 		 * @param int        $stock   Stock to publish.
 		 * @param WC_Product $product Product.
 		 */
-		return max( 0, (int) apply_filters( 'slh_basalam_stock', $stock, $product ) );
+		return max( 0, (int) apply_filters( 'bsh_basalam_stock', $stock, $product ) );
 	}
 
 	/**
@@ -355,16 +361,16 @@ class SLH_Product_Mapper {
 	 * @return int
 	 */
 	private function category( WC_Product $product, array &$problems ) {
-		$cat = (int) $product->get_meta( '_slh_category_id', true );
+		$cat = (int) $product->get_meta( '_bsh_category_id', true );
 		/**
 		 * Category mapping (WooCommerce category → Basalam category) plugs in here.
 		 *
 		 * @param int        $cat     Basalam category ID (0 = none yet).
 		 * @param WC_Product $product Product.
 		 */
-		$cat = (int) apply_filters( 'slh_basalam_category', $cat, $product );
+		$cat = (int) apply_filters( 'bsh_basalam_category', $cat, $product );
 		if ( $cat <= 0 ) {
-			$cat = (int) SLH_Settings::get( 'default_category_id', 0 );
+			$cat = (int) BSH_Settings::get( 'default_category_id', 0 );
 		}
 		if ( $cat <= 0 ) {
 			$names = array();
@@ -378,9 +384,9 @@ class SLH_Product_Mapper {
 				'field'      => 'category_id',
 				'message'    => $names
 					/* translators: %s: WooCommerce category names */
-					? sprintf( __( 'دسته‌ی %s به هیچ دسته‌ی باسلام نگاشت نشده.', 'salamhub' ), implode( '، ', $names ) )
-					: __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'salamhub' ),
-				'suggestion' => __( 'در باسلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر باسلام‌هاب همین محصول بنویس.)', 'salamhub' ),
+					? sprintf( __( 'دسته‌ی %s به هیچ دسته‌ی باسلام نگاشت نشده.', 'basalamhub' ), implode( '، ', $names ) )
+					: __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'basalamhub' ),
+				'suggestion' => __( 'در باسلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر باسلام‌هاب همین محصول بنویس.)', 'basalamhub' ),
 			);
 		}
 		return $cat;
@@ -391,8 +397,8 @@ class SLH_Product_Mapper {
 	 * @return int
 	 */
 	private function preparation_days( WC_Product $product ) {
-		$own = $product->get_meta( '_slh_preparation_days', true );
-		return '' !== $own && null !== $own ? max( 0, (int) $own ) : (int) SLH_Settings::get( 'preparation_days', 3 );
+		$own = $product->get_meta( '_bsh_preparation_days', true );
+		return '' !== $own && null !== $own ? max( 0, (int) $own ) : (int) BSH_Settings::get( 'preparation_days', 3 );
 	}
 
 	/**
@@ -406,7 +412,7 @@ class SLH_Product_Mapper {
 		if ( $w > 0 ) {
 			return max( 1, (int) round( wc_get_weight( $w, 'g' ) ) );
 		}
-		return (int) SLH_Settings::get( 'default_weight', 500 );
+		return (int) BSH_Settings::get( 'default_weight', 500 );
 	}
 
 	/**

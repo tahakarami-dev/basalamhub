@@ -3,19 +3,19 @@
  * The links table: WooCommerce ID ⇄ Basalam ID. This is what makes every operation
  * idempotent — a product that already has a Basalam ID is always updated, never re-created.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Links {
+class BSH_Links {
 
 	/**
 	 * @return string
 	 */
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'slh_links';
+		return $wpdb->prefix . 'bsh_links';
 	}
 
 	/**
@@ -47,7 +47,7 @@ class SLH_Links {
 	 */
 	public static function upsert( $type, $wc_id, array $data ) {
 		global $wpdb;
-		$data['updated_at'] = slh_now();
+		$data['updated_at'] = bsh_now();
 		$existing           = self::get( $type, $wc_id );
 		if ( $existing ) {
 			$wpdb->update( self::table(), $data, array( 'id' => $existing->id ) );

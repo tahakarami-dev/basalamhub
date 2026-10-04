@@ -3,16 +3,16 @@
  * A small fake of Basalam's Open API for local end-to-end tests.
  *
  *   php -S 127.0.0.1:8099 tests/mock-basalam/router.php
- *   define( 'SLH_API_BASE', 'http://127.0.0.1:8099' ); // in wp-config.php
+ *   define( 'BSH_API_BASE', 'http://127.0.0.1:8099' ); // in wp-config.php
  *
  * Valid token: "good-token". "novendor-token" = account without a booth.
  * Fault injection: write {"fail": {"POST /v1/vendors/*\/products": {"status": 504, "times": 1, "create": true}}}
  * into the state file; "create": true makes the product anyway (lost response).
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
-$state_file = getenv( 'SLH_MOCK_STATE' ) ?: sys_get_temp_dir() . '/slh-mock-state.json';
+$state_file = getenv( 'BSH_MOCK_STATE' ) ?: sys_get_temp_dir() . '/bsh-mock-state.json';
 $state      = file_exists( $state_file ) ? json_decode( file_get_contents( $state_file ), true ) : array();
 $state     += array( 'products' => array(), 'files' => array(), 'next_id' => 9000, 'requests' => array(), 'fail' => array() );
 

@@ -5,15 +5,15 @@
  * host down for hours, a failed import, an order deleted by mistake — is reported and queued
  * for import. The regular poll looks at recent pages only; this is the safety net.
  *
- * @package SalamHub
+ * @package BasalamHub
  */
 
 defined( 'ABSPATH' ) || exit;
 
-class SLH_Reconcile {
+class BSH_Reconcile {
 
-	const HOOK   = 'slh_reconcile_orders';
-	const OPTION = 'slh_reconcile_last';
+	const HOOK   = 'bsh_reconcile_orders';
+	const OPTION = 'bsh_reconcile_last';
 	const DAYS   = 7;
 
 	/**
@@ -31,15 +31,15 @@ class SLH_Reconcile {
 		if ( ! function_exists( 'as_next_scheduled_action' ) ) {
 			return;
 		}
-		$next = as_next_scheduled_action( self::HOOK, array( 'manual' => 0 ), SLH_Queue::GROUP );
-		if ( ! SLH_Order_Sync::enabled() ) {
+		$next = as_next_scheduled_action( self::HOOK, array( 'manual' => 0 ), BSH_Queue::GROUP );
+		if ( ! BSH_Order_Sync::enabled() ) {
 			if ( $next ) {
-				as_unschedule_all_actions( self::HOOK, array( 'manual' => 0 ), SLH_Queue::GROUP );
+				as_unschedule_all_actions( self::HOOK, array( 'manual' => 0 ), BSH_Queue::GROUP );
 			}
 			return;
 		}
 		if ( ! $next ) {
-			as_schedule_recurring_action( self::next_night(), DAY_IN_SECONDS, self::HOOK, array( 'manual' => 0 ), SLH_Queue::GROUP );
+			as_schedule_recurring_action( self::next_night(), DAY_IN_SECONDS, self::HOOK, array( 'manual' => 0 ), BSH_Queue::GROUP );
 		}
 	}
 
@@ -61,8 +61,8 @@ class SLH_Reconcile {
 	 * «تطبیق الان» button.
 	 */
 	public static function run_now() {
-		if ( ! as_has_scheduled_action( self::HOOK, array( 'manual' => 1 ), SLH_Queue::GROUP ) ) {
-			as_enqueue_async_action( self::HOOK, array( 'manual' => 1 ), SLH_Queue::GROUP );
+		if ( ! as_has_scheduled_action( self::HOOK, array( 'manual' => 1 ), BSH_Queue::GROUP ) ) {
+			as_enqueue_async_action( self::HOOK, array( 'manual' => 1 ), BSH_Queue::GROUP );
 		}
 	}
 
@@ -72,32 +72,32 @@ class SLH_Reconcile {
 	 * @param int $manual Started by the button.
 	 */
 	public static function handle( $manual = 0 ) {
-		if ( ! SLH_Order_Sync::enabled() ) {
+		if ( ! BSH_Order_Sync::enabled() ) {
 			return;
 		}
-		SLH_Queue::run_exclusive(
+		BSH_Queue::run_exclusive(
 			self::HOOK,
 			array( 'manual' => (int) $manual ),
 			function () use ( $manual ) {
 				try {
 					self::run();
-					SLH_Queue::reset_attempts( 'reconcile' );
-				} catch ( SLH_Api_Error $e ) {
+					BSH_Queue::reset_attempts( 'reconcile' );
+				} catch ( BSH_Api_Error $e ) {
 					if ( 'rate_limit' === $e->kind ) {
-						SLH_Queue::pause( $e->retry_after );
+						BSH_Queue::pause( $e->retry_after );
 					}
 					// The recurring job comes back tomorrow anyway; retry a few times tonight.
-					if ( $e->retryable && false !== SLH_Queue::retry_later( self::HOOK, array( 'manual' => 1 ), 'reconcile', $e->retry_after ) ) {
+					if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK, array( 'manual' => 1 ), 'reconcile', $e->retry_after ) ) {
 						return;
 					}
-					update_option( self::OPTION, array( 'at' => slh_now(), 'checked' => 0, 'missing' => 0, 'ids' => array(), 'error' => $e->getMessage() ), false );
-					SLH_Logger::log(
+					update_option( self::OPTION, array( 'at' => bsh_now(), 'checked' => 0, 'missing' => 0, 'ids' => array(), 'error' => $e->getMessage() ), false );
+					BSH_Logger::log(
 						array_merge(
 							array(
 								'level'       => 'error',
 								'event'       => 'reconcile_failed',
 								'object_type' => 'system',
-								'title'       => __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ),
+								'title'       => __( 'تطبیق شبانه‌ی سفارش‌ها', 'basalamhub' ),
 								'retry_hook'  => self::HOOK,
 								'retry_args'  => array( 'manual' => 1 ),
 							),
@@ -113,7 +113,7 @@ class SLH_Reconcile {
 	 * One pass over the last 7 days.
 	 *
 	 * @return array{checked:int, missing:int, ids:int[]}
-	 * @throws SLH_Api_Error On API failure.
+	 * @throws BSH_Api_Error On API failure.
 	 */
 	public static function run() {
 		$since   = time() - self::DAYS * DAY_IN_SECONDS;
@@ -121,7 +121,7 @@ class SLH_Reconcile {
 		$missing = array();
 		$cursor  = null;
 		for ( $page = 0; $page < 60; $page++ ) {
-			$res   = SLH_Plugin::api()->vendor_parcels( array( 'cursor' => $cursor, 'per_page' => 30 ) );
+			$res   = BSH_Plugin::api()->vendor_parcels( array( 'cursor' => $cursor, 'per_page' => 30 ) );
 			$older = false;
 			foreach ( $res['data'] as $parcel ) {
 				if ( empty( $parcel['id'] ) ) {
@@ -134,16 +134,16 @@ class SLH_Reconcile {
 				}
 				++$checked;
 				$id = (int) $parcel['id'];
-				if ( SLH_Order_Sync::find_order( $id ) || SLH_Order_Sync::is_skipped( $id ) ) {
+				if ( BSH_Order_Sync::find_order( $id ) || BSH_Order_Sync::is_skipped( $id ) ) {
 					continue;
 				}
 				$status = isset( $parcel['status']['id'] ) ? (int) $parcel['status']['id'] : 0;
-				if ( in_array( $status, array( SLH_Order_Sync::ST_CANCEL, SLH_Order_Sync::ST_VENDOR_CANCEL ), true ) ) {
+				if ( in_array( $status, array( BSH_Order_Sync::ST_CANCEL, BSH_Order_Sync::ST_VENDOR_CANCEL ), true ) ) {
 					continue; // Cancelled before it ever reached us: nothing to fulfil.
 				}
 				$missing[] = $id;
-				SLH_Queue::reset_attempts( 'parcel_' . $id );
-				SLH_Order_Sync::queue_import( $id );
+				BSH_Queue::reset_attempts( 'parcel_' . $id );
+				BSH_Order_Sync::queue_import( $id );
 			}
 			if ( $older || ! $res['next_cursor'] || ! $res['data'] ) {
 				break;
@@ -151,33 +151,33 @@ class SLH_Reconcile {
 			$cursor = $res['next_cursor'];
 		}
 
-		$result = array( 'at' => slh_now(), 'checked' => $checked, 'missing' => count( $missing ), 'ids' => array_slice( $missing, 0, 50 ), 'error' => '' );
+		$result = array( 'at' => bsh_now(), 'checked' => $checked, 'missing' => count( $missing ), 'ids' => array_slice( $missing, 0, 50 ), 'error' => '' );
 		update_option( self::OPTION, $result, false );
 
 		if ( $missing ) {
-			SLH_Logger::log(
+			BSH_Logger::log(
 				array(
 					'level'       => 'warning',
 					'event'       => 'reconcile_missing',
 					'object_type' => 'system',
-					'title'       => __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ),
+					'title'       => __( 'تطبیق شبانه‌ی سفارش‌ها', 'basalamhub' ),
 					/* translators: 1: missing, 2: checked */
-					'message'     => sprintf( __( '%1$s سفارش باسلام در سایت نبود (از %2$s سفارش ۷ روز اخیر) و در صف ثبت قرار گرفت.', 'salamhub' ), slh_fa_number( count( $missing ) ), slh_fa_number( $checked ) ),
+					'message'     => sprintf( __( '%1$s سفارش باسلام در سایت نبود (از %2$s سفارش ۷ روز اخیر) و در صف ثبت قرار گرفت.', 'basalamhub' ), bsh_fa_number( count( $missing ) ), bsh_fa_number( $checked ) ),
 					/* translators: %s: parcel ids */
-					'reason'      => sprintf( __( 'شماره‌های باسلام: %s. معمولاً یعنی سایت مدتی در دسترس نبوده یا ثبتی ناموفق بوده.', 'salamhub' ), implode( '، ', array_slice( $missing, 0, 20 ) ) ),
-					'suggestion'  => __( 'لازم نیست کاری کنی؛ چند دقیقه‌ی دیگر در سفارش‌های ووکامرس می‌آیند. اگر نیامدند، دلیلش در صفحه‌ی «سفارش‌ها» است.', 'salamhub' ),
+					'reason'      => sprintf( __( 'شماره‌های باسلام: %s. معمولاً یعنی سایت مدتی در دسترس نبوده یا ثبتی ناموفق بوده.', 'basalamhub' ), implode( '، ', array_slice( $missing, 0, 20 ) ) ),
+					'suggestion'  => __( 'لازم نیست کاری کنی؛ چند دقیقه‌ی دیگر در سفارش‌های ووکامرس می‌آیند. اگر نیامدند، دلیلش در صفحه‌ی «سفارش‌ها» است.', 'basalamhub' ),
 					'context'     => array( 'parcel_ids' => $missing ),
 				)
 			);
 		} else {
-			SLH_Logger::log(
+			BSH_Logger::log(
 				array(
 					'level'       => 'info',
 					'event'       => 'reconcile_ok',
 					'object_type' => 'system',
-					'title'       => __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ),
+					'title'       => __( 'تطبیق شبانه‌ی سفارش‌ها', 'basalamhub' ),
 					/* translators: %s: checked */
-					'message'     => sprintf( __( 'همه‌ی %s سفارش ۷ روز اخیر باسلام در سایت هست.', 'salamhub' ), slh_fa_number( $checked ) ),
+					'message'     => sprintf( __( 'همه‌ی %s سفارش ۷ روز اخیر باسلام در سایت هست.', 'basalamhub' ), bsh_fa_number( $checked ) ),
 				)
 			);
 		}
