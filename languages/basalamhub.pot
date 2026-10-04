@@ -1,0 +1,3608 @@
+# Copyright (C) 2026 طاها کرمی
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: باسلام‌هاب – همگام‌سازی ووکامرس و باسلام 0.7.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/basalamhub\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-04T20:39:17+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: basalamhub\n"
+
+#. Plugin Name of the plugin
+#: basalamhub.php
+msgid "باسلام‌هاب – همگام‌سازی ووکامرس و باسلام"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: basalamhub.php
+msgid "https://github.com/tahakarami-dev/salamhub"
+msgstr ""
+
+#. Description of the plugin
+#: basalamhub.php
+msgid "فروشگاه ووکامرس و غرفه‌ی باسلام را دوطرفه همگام نگه می‌دارد: محصول یک بار ثبت می‌شود، در دو جا فروخته می‌شود و هیچ سفارشی گم نمی‌شود."
+msgstr ""
+
+#. Author of the plugin
+#: basalamhub.php
+msgid "طاها کرمی"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:37
+#: includes/admin/class-bsh-app.php:52
+#: includes/admin/views/bulk.php:18
+#: includes/class-bsh-bulk.php:173
+#: includes/class-bsh-bulk.php:289
+#: includes/class-bsh-bulk.php:324
+msgid "ارسال گروهی"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:38
+#: includes/admin/class-bsh-app.php:53
+#: includes/admin/views/link.php:52
+#: includes/class-bsh-linker.php:159
+#: includes/class-bsh-linker.php:325
+msgid "اتصال محصولات غرفه"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:39
+#: includes/admin/class-bsh-app.php:55
+#: includes/admin/class-bsh-app.php:327
+#: includes/admin/class-bsh-app.php:329
+#: includes/admin/class-bsh-app.php:331
+#: includes/admin/views/bulk.php:62
+#: includes/admin/views/categories.php:49
+msgid "نگاشت دسته‌ها"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:40
+#: includes/admin/class-bsh-app.php:56
+#: includes/admin/views/pricing.php:53
+msgid "قوانین قیمت"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:112
+#: includes/admin/class-bsh-admin-tools.php:146
+#: includes/admin/class-bsh-admin.php:181
+#: includes/admin/class-bsh-admin.php:238
+#: includes/admin/class-bsh-app.php:71
+#: includes/admin/class-bsh-import-ui.php:199
+#: includes/admin/class-bsh-order-ui.php:253
+#: includes/admin/class-bsh-order-ui.php:317
+#: includes/admin/class-bsh-order-ui.php:332
+msgid "دسترسی کافی نداری."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:128
+msgid "بعضی ردیف‌ها ذخیره نشدند. پیام کنار هر ردیف را ببین."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:133
+msgid "نگاشت دسته‌ها ذخیره شد. از ارسال بعدی هر محصول اعمال می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:162
+msgid "بعضی قانون‌ها درست نبودند و ذخیره نشدند. پیام کنار هر ردیف را ببین."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:167
+msgid "قوانین قیمت ذخیره شد. پیش‌نمایش پایین صفحه را ببین. روی محصولات متصل از به‌روزرسانی بعدی‌شان اعمال می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:185
+#: includes/admin/class-bsh-product-ui.php:56
+msgid "ارسال به باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:213
+#, php-format
+msgid "%s محصول در صف ارسال قرار گرفت. پیشرفت را همین‌جا ببین؛ می‌توانی صفحه را ببندی."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:229
+#: includes/admin/class-bsh-admin.php:354
+#: includes/admin/class-bsh-app.php:430
+#: includes/admin/class-bsh-import-ui.php:59
+#: includes/admin/class-bsh-product-ui.php:203
+#: includes/admin/class-bsh-product-ui.php:207
+msgid "نشست کاری منقضی شده. صفحه را تازه کن و دوباره امتحان کن."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:265
+#, php-format
+msgid "متوقف شد؛ %s محصول از صف خارج شد. محصولاتی که ارسال شده بودند در باسلام می‌مانند."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:311
+msgid "ارسال گروهی به باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:312
+msgid "ارسال گروهی تمام شد"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:313
+msgid "ارسال گروهی متوقف شد"
+msgstr ""
+
+#. translators: 1: processed, 2: total
+#. translators: 1: done, 2: total
+#: includes/admin/class-bsh-admin-tools.php:323
+#: includes/admin/class-bsh-import-ui.php:158
+#, php-format
+msgid "%1$s از %2$s"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:332
+#, php-format
+msgid "%s ارسال شد"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:335
+#, php-format
+msgid "%s خطا"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:337
+msgid "۰ خطا"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:341
+#, php-format
+msgid "%s در صف"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:345
+#, php-format
+msgid "%s ارسال نشد (متوقف یا حذف‌شده)"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:348
+msgid "شروع پردازش ممکن است تا یک دقیقه طول بکشد. می‌توانی این صفحه را ببندی."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:350
+msgid "می‌توانی این صفحه را ببندی؛ ارسال در پس‌زمینه ادامه دارد."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:402
+#, php-format
+msgid "در حال دریافت محصولات غرفه از باسلام… %s محصول تا الان"
+msgstr ""
+
+#. translators: 1: matched, 2: total
+#: includes/admin/class-bsh-admin-tools.php:406
+#, php-format
+msgid "در حال تطبیق با محصولات سایت… %1$s از %2$s"
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:414
+msgid "می‌توانی این صفحه را ببندی؛ کار در پس‌زمینه ادامه دارد. تا تأیید تو چیزی متصل نمی‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:438
+msgid "هیچ جفتی انتخاب نشده."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:442
+#, php-format
+msgid "%s محصول متصل شد."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin-tools.php:462
+#, php-format
+msgid "%s دسته‌ی باسلام دریافت شد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:477
+msgid "اول دسته‌ی باسلام را انتخاب کن."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:505
+msgid "این دسته ویژگی اجباری ندارد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:508
+msgid "ویژگی‌های اجباری این دسته. اگر محصول ویژگی ووکامرسی با همین نام داشته باشد، مقدار خود محصول استفاده می‌شود؛ وگرنه این مقدار پیش‌فرض."
+msgstr ""
+
+#: includes/admin/class-bsh-admin-tools.php:516
+msgid "— از خود محصول —"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:37
+#: includes/admin/class-bsh-app.php:74
+#: includes/admin/class-bsh-app.php:87
+#: includes/admin/class-bsh-app.php:114
+#: includes/class-bsh-migrate.php:148
+msgid "باسلام‌هاب"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:38
+msgid "داشبورد و سلامت"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:38
+#: includes/admin/class-bsh-app.php:49
+msgid "داشبورد"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:39
+#: includes/admin/class-bsh-app.php:50
+#: includes/admin/views/products.php:31
+msgid "محصولات"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:42
+#: includes/admin/views/orders.php:30
+#: includes/admin/views/settings.php:166
+#: includes/orders/class-bsh-order-sync.php:135
+msgid "سفارش‌های باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:42
+#: includes/admin/class-bsh-app.php:51
+msgid "سفارش‌ها"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:48
+#: includes/admin/views/logs.php:34
+msgid "لاگ همگام‌سازی"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:48
+#: includes/admin/class-bsh-app.php:57
+msgid "لاگ"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:50
+#: includes/admin/views/settings.php:44
+msgid "تنظیمات باسلام‌هاب"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:50
+#: includes/admin/class-bsh-admin.php:58
+#: includes/admin/class-bsh-app.php:59
+msgid "تنظیمات"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:86
+msgid "در حال تست اتصال…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:87
+#: includes/admin/class-bsh-admin.php:88
+msgid "در حال افزودن به صف…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:89
+msgid "در صف قرار گرفت. نتیجه همین‌جا نمایش داده می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:90
+msgid "درخواست به سایت خودت نرسید. اینترنت یا ورودت به پیشخوان را بررسی کن و دوباره امتحان کن."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:91
+msgid "در حال شروع…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:92
+msgid "در حال دریافت از باسلام…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:93
+msgid "در حال دریافت…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:94
+#: includes/admin/views/categories.php:151
+msgid "بررسی ویژگی‌های اجباری"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:95
+msgid "پوسته: خودکار (مطابق سیستم)"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:96
+msgid "پوسته: روشن"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:97
+msgid "پوسته: تیره"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:98
+#: includes/admin/views/dashboard.php:156
+#: includes/admin/views/dashboard.php:203
+msgid "ارسال موفق"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:99
+#: includes/admin/class-bsh-app.php:363
+#: includes/admin/class-bsh-import-ui.php:148
+#: includes/admin/views/dashboard.php:157
+#: includes/admin/views/dashboard.php:203
+#: includes/admin/views/logs.php:26
+#: includes/functions.php:137
+msgid "خطا"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:100
+#: includes/admin/class-bsh-app.php:361
+#: includes/admin/views/dashboard.php:113
+#: includes/functions.php:135
+msgid "در صف"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:101
+msgid "در حال اتصال…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:102
+msgid "هیچ ردیفی انتخاب نشده."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:103
+msgid "همه‌ی جفت‌های قطعی متصل شوند؟ تا وقتی گزینه‌ی ارسال تیک نخورده، چیزی در باسلام تغییر نمی‌کند."
+msgstr ""
+
+#. translators: %s: number of selected products
+#: includes/admin/class-bsh-admin.php:105
+#, php-format
+msgid "%s محصول انتخاب شده"
+msgstr ""
+
+#. translators: %s: product count
+#: includes/admin/class-bsh-admin.php:107
+#, php-format
+msgid "%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:108
+msgid "ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:109
+msgid "در حال ثبت در باسلام…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:110
+msgid "ارسال این سفارش در باسلام ثبت شود؟ بعد از ثبت، مشتری کد رهگیری را می‌بیند و این کار برگشت‌پذیر نیست."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:111
+msgid "کپی شد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:112
+msgid "در حال فرستادن…"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:113
+msgid "در حال جستجو…"
+msgstr ""
+
+#. translators: %s: number of products
+#: includes/admin/class-bsh-admin.php:115
+#, php-format
+msgid "%s محصول از باسلام وارد سایت می‌شود. ادامه می‌دهی؟"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:116
+msgid "ایمپورت متوقف شود؟ محصولاتی که تا الان وارد شده‌اند در سایت می‌مانند."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:117
+msgid "اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:189
+msgid "تنظیمات ذخیره شد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:197
+msgid "توکن خالی است. توکن را از پنل توسعه‌دهندگان باسلام کپی کن و اینجا بچسبان."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:202
+msgid "این سرور امکان رمزنگاری ندارد، پس توکن ذخیره نشد. از هاستینگ بخواه افزونه‌ی sodium یا openssl در PHP را فعال کند."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:223
+#: includes/admin/class-bsh-import-ui.php:206
+msgid "بعضی فیلدها درست نبودند و ذخیره نشدند. پیام کنار هر فیلد را ببین."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:248
+#: includes/admin/class-bsh-admin.php:304
+#: includes/admin/class-bsh-admin.php:331
+msgid "اتصال باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:249
+msgid "اتصال قطع و توکن پاک شد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:256
+msgid "اتصال قطع شد. محصولات در باسلام دست نخوردند."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:279
+msgid "این حساب باسلام غرفه ندارد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:284
+msgid "توکن درست است، ولی این حساب باسلام غرفه ندارد."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:285
+msgid "با حسابی توکن بساز که صاحب غرفه است."
+msgstr ""
+
+#. translators: 1: booth title, 2: booth id
+#: includes/admin/class-bsh-admin.php:306
+#, php-format
+msgid "به غرفه‌ی «%1$s» (شناسه %2$s) وصل شد."
+msgstr ""
+
+#. translators: 1: booth title, 2: booth id
+#: includes/admin/class-bsh-admin.php:312
+#, php-format
+msgid "وصل شدی! غرفه‌ی «%1$s» با شناسه‌ی %2$s."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:377
+msgid "این مورد قابل تلاش مجدد نیست."
+msgstr ""
+
+#: includes/admin/class-bsh-admin.php:379
+msgid "دوباره در صف قرار گرفت."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin.php:398
+#, php-format
+msgid "%s مورد دوباره در صف قرار گرفت."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-admin.php:398
+msgid "خطای بازی برای تلاش مجدد نبود."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:54
+#: includes/admin/class-bsh-import-ui.php:30
+#: includes/class-bsh-importer.php:250
+msgid "ایمپورت غرفه"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:58
+#: includes/admin/class-bsh-app.php:306
+#: includes/admin/class-bsh-app.php:320
+#: includes/admin/class-bsh-import-ui.php:37
+#: includes/admin/views/notify.php:26
+msgid "اعلان‌ها"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:84
+msgid "منوی باسلام‌هاب"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:96
+#: includes/admin/class-bsh-app.php:126
+msgid "وصل نیست"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:97
+msgid "غرفه‌ی متصل باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:97
+msgid "از تنظیمات وصل شو"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:102
+msgid "بازگشت به پیشخوان وردپرس"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:110
+msgid "باز کردن منو"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:121
+msgid "جستجوی محصول با نام یا SKU"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:121
+msgid "جستجوی محصول"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:126
+msgid "متصل به باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:128
+msgid "تغییر پوسته: خودکار، روشن، تیره"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:128
+msgid "پوسته"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:131
+msgid "نمایه"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:155
+msgid "فروشگاه"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:156
+msgid "همگام‌سازی"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:157
+msgid "سیستم"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/class-bsh-app.php:260
+#: includes/admin/class-bsh-app.php:262
+#: includes/admin/class-bsh-app.php:264
+#: includes/admin/class-bsh-app.php:267
+msgid "توکن باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:260
+msgid "وارد نشده."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:262
+msgid "قابل خواندن نیست؛ دوباره واردش کن."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:264
+msgid "هنوز تست نشده."
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/class-bsh-app.php:267
+#, php-format
+msgid "معتبر · بررسی %s"
+msgstr ""
+
+#. translators: %s: count
+#. translators: 1: pending, 2: running
+#: includes/admin/class-bsh-app.php:271
+#: includes/admin/class-bsh-app.php:274
+#: includes/admin/class-bsh-app.php:277
+#: includes/class-bsh-queue.php:80
+#: includes/sync/class-bsh-product-sync.php:538
+msgid "صف پس‌زمینه"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:271
+msgid "Action Scheduler در دسترس نیست."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-app.php:274
+#, php-format
+msgid "%s کار بیش از ۱۰ دقیقه منتظر مانده؛ احتمالاً WP-Cron خاموش است. از هاستینگ بخواه Cron Job برای wp-cron.php هر ۵ دقیقه بسازد."
+msgstr ""
+
+#. translators: 1: pending, 2: running
+#: includes/admin/class-bsh-app.php:277
+#, php-format
+msgid "فعال · %1$s در انتظار، %2$s در حال اجرا"
+msgstr ""
+
+#. translators: %s: seconds
+#: includes/admin/class-bsh-app.php:282
+msgid "محدودیت درخواست"
+msgstr ""
+
+#. translators: %s: seconds
+#: includes/admin/class-bsh-app.php:282
+#, php-format
+msgid "صف به درخواست باسلام %s ثانیه مکث کرده و خودکار ادامه می‌دهد."
+msgstr ""
+
+#. translators: 1: relative time, 2: checked, 3: missing
+#: includes/admin/class-bsh-app.php:289
+#: includes/admin/class-bsh-app.php:291
+#: includes/admin/class-bsh-app.php:293
+#: includes/admin/class-bsh-app.php:296
+#: includes/orders/class-bsh-reconcile.php:110
+#: includes/orders/class-bsh-reconcile.php:184
+#: includes/orders/class-bsh-reconcile.php:199
+msgid "تطبیق شبانه‌ی سفارش‌ها"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:289
+msgid "هنوز اجرا نشده؛ هر شب حدود ساعت ۳ خودکار اجرا می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:293
+msgid "بیش از دو روز است اجرا نشده؛ احتمالاً WP-Cron خاموش است."
+msgstr ""
+
+#. translators: 1: relative time, 2: checked, 3: missing
+#: includes/admin/class-bsh-app.php:296
+#, php-format
+msgid "%1$s · %2$s سفارش بررسی شد، %3$s جاافتاده"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:308
+#, php-format
+msgid "فعال در %s"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:320
+msgid "خاموش؛ سفارش جدید و خطاها را در بله یا تلگرام بگیر."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-app.php:327
+#, php-format
+msgid "%s دسته نگاشت نشده؛ با دسته‌ی پیش‌فرض ارسال می‌شوند."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-app.php:329
+#, php-format
+msgid "%s دسته‌ی دارای محصول نگاشت نشده؛ محصولاتشان ارسال نمی‌شوند."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:331
+msgid "همه‌ی دسته‌های دارای محصول نگاشت شده‌اند."
+msgstr ""
+
+#. translators: %s: currency
+#: includes/admin/class-bsh-app.php:337
+#: includes/admin/class-bsh-app.php:338
+msgid "واحد پول"
+msgstr ""
+
+#. translators: %s: currency
+#: includes/admin/class-bsh-app.php:337
+#, php-format
+msgid "واحد %s قابل تبدیل به ریال نیست."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:338
+msgid "ریال (بدون تبدیل)"
+msgstr ""
+
+#. translators: %s: multiplier
+#: includes/admin/class-bsh-app.php:338
+#, php-format
+msgid "قیمت‌ها ×%s به ریال تبدیل می‌شوند"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:341
+#: includes/admin/class-bsh-app.php:342
+msgid "رمزنگاری توکن"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:342
+msgid "نه sodium هست نه openssl."
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:343
+msgid "PHP و ووکامرس"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:359
+#: includes/admin/views/logs.php:25
+msgid "همه"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:360
+#: includes/functions.php:134
+msgid "همگام"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:362
+#: includes/functions.php:136
+msgid "همگام نیست"
+msgstr ""
+
+#: includes/admin/class-bsh-app.php:364
+msgid "ارسال‌نشده"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/class-bsh-app.php:445
+#, php-format
+msgid "%s محصول در صف ارسال قرار گرفت. پیشرفت را در «ارسال گروهی» ببین."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:127
+msgid "در حال واردکردن محصولات غرفه…"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:129
+msgid "ایمپورت متوقف شد"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:131
+msgid "آخرین ایمپورت"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:136
+msgid "توقف"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:145
+msgid "ساخته شد"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:146
+msgid "به‌روز شد"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:147
+msgid "رد شد"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:159
+msgid "پیشرفت"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:163
+msgid "می‌توانی این صفحه را ببندی؛ کار در پس‌زمینه ادامه پیدا می‌کند."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:166
+msgid "دلیل موارد ردشده و خطاها در لاگ"
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:183
+#: includes/admin/class-bsh-order-ui.php:320
+msgid "دریافت سفارش‌ها در تنظیمات خاموش است یا به باسلام وصل نیستی."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:186
+msgid "در صف قرار گرفت؛ نتیجه تا یکی دو دقیقه‌ی دیگر همین‌جا و در لاگ می‌آید."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:208
+msgid "تنظیمات اعلان ذخیره شد. با «پیام آزمایشی» مطمئن شو پیام می‌رسد."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:221
+msgid "پیام‌رسان نامعتبر است."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:232
+msgid "پیام آزمایشی باسلام‌هاب: اعلان‌ها درست کار می‌کنند."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:234
+msgid "پیام فرستاده شد. در پیام‌رسان نگاه کن."
+msgstr ""
+
+#: includes/admin/class-bsh-import-ui.php:251
+#, php-format
+msgid "پیدا شد: %2$s (%1$s) — ذخیره شد."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:86
+msgid "باسلام‌هاب · سفارش باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:97
+#: includes/admin/class-bsh-order-ui.php:260
+msgid "این سفارش از باسلام نیامده است."
+msgstr ""
+
+#. translators: %s: parcel id
+#: includes/admin/class-bsh-order-ui.php:108
+#, php-format
+msgid "شماره‌ی محموله در باسلام: %s"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/class-bsh-order-ui.php:111
+#, php-format
+msgid "آخرین بررسی: %s"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:119
+msgid "تأیید سفارش در باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:121
+msgid "وضعیت در باسلام «در حال آماده‌سازی» می‌شود و مشتری مطلع می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:126
+msgid "روش ارسال"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:128
+msgid "انتخاب کن…"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:135
+msgid "کد رهگیری"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:137
+msgid "برای پیک می‌تواند خالی بماند."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:140
+msgid "ثبت ارسال در باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:142
+msgid "یا سفارش را «تکمیل‌شده» کن؛ ارسال با همین روش و کد خودکار ثبت می‌شود."
+msgstr ""
+
+#. translators: %s: tracking code
+#: includes/admin/class-bsh-order-ui.php:145
+#, php-format
+msgid "کد رهگیری: %s"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:160
+msgid "نامشخص"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:177
+msgid "سفارش جدید"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:178
+msgid "در حال آماده‌سازی"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:179
+msgid "ارسال‌شده"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:180
+msgid "کد رهگیری نادرست"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:181
+msgid "تحویل نشده"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:182
+msgid "مشکل گزارش‌شده"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:183
+msgid "درخواست لغو مشتری"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:184
+msgid "درخواست تمدید زمان ارسال"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:185
+msgid "تحویل و رضایت"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:186
+msgid "مرجوع و بازپرداخت"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:187
+msgid "لغوشده"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:188
+msgid "درخواست لغو غرفه‌دار"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:274
+msgid "روش ارسال را انتخاب کن."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:277
+msgid "برای این روش ارسال، کد رهگیری لازم است."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:284
+msgid "ارسال در باسلام ثبت شد."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:291
+msgid "در باسلام ثبت شد."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:306
+msgid "در باسلام ثبت نشد؛ جزئیات در لاگ."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:323
+msgid "در صف قرار گرفت؛ سفارش‌های تازه تا چند ثانیه‌ی دیگر اینجا می‌آیند."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:335
+msgid "مرجع موجودی «سایت» است؛ دریافت موجودی از باسلام فقط وقتی مرجع «باسلام» باشد انجام می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:338
+msgid "در صف قرار گرفت؛ نتیجه در لاگ ثبت می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:355
+#: includes/admin/class-bsh-order-ui.php:359
+#: includes/admin/class-bsh-product-ui.php:164
+#: includes/admin/class-bsh-product-ui.php:168
+#: includes/admin/views/orders.php:78
+#: includes/admin/views/products.php:90
+#: includes/admin/views/settings.php:199
+msgid "باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:414
+#: includes/admin/class-bsh-order-ui.php:452
+msgid "موجودی اطمینان باسلام"
+msgstr ""
+
+#. translators: %s: global safety stock
+#: includes/admin/class-bsh-order-ui.php:416
+#, php-format
+msgid "پیش‌فرض: %s"
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:418
+msgid "این تعداد از موجودی در باسلام نمایش داده نمی‌شود تا فروش هم‌زمان در دو جا باعث بیش‌فروشی نشود. خالی = مقدار تنظیمات باسلام‌هاب."
+msgstr ""
+
+#: includes/admin/class-bsh-order-ui.php:453
+msgid "مثل محصول اصلی"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:28
+msgid "باسلام‌هاب · باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:49
+#: includes/admin/views/bulk.php:37
+#: includes/api/class-bsh-api-client.php:56
+msgid "هنوز به باسلام وصل نشده‌ای."
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:50
+#: includes/admin/views/bulk.php:38
+msgid "اتصال در تنظیمات"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:56
+msgid "به‌روزرسانی در باسلام"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:63
+msgid "شناسه‌ی دسته‌ی باسلام"
+msgstr ""
+
+#. translators: %s: Basalam category
+#: includes/admin/class-bsh-product-ui.php:70
+#, php-format
+msgid "خالی بماند، از نگاشت دسته‌ها: %s"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:71
+msgid "خالی بماند، از «نگاشت دسته‌ها» یا دسته‌ی پیش‌فرض استفاده می‌شود."
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:77
+#: includes/admin/views/settings.php:113
+msgid "زمان آماده‌سازی (روز)"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:93
+msgid "هنوز به باسلام ارسال نشده."
+msgstr ""
+
+#. translators: %s: Basalam product id
+#: includes/admin/class-bsh-product-ui.php:106
+#, php-format
+msgid "شناسه در باسلام: %s"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/class-bsh-product-ui.php:110
+#, php-format
+msgid "آخرین همگام‌سازی: %s"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:113
+msgid "جزئیات و راه‌حل"
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:218
+#: includes/class-bsh-bulk.php:138
+#: includes/class-bsh-importer.php:99
+#: includes/class-bsh-linker.php:87
+msgid "اول در باسلام‌هاب › تنظیمات به باسلام وصل شو."
+msgstr ""
+
+#: includes/admin/class-bsh-product-ui.php:224
+msgid "در صف قرار گرفت. نتیجه همین‌جا نمایش داده می‌شود؛ می‌توانی صفحه را هم ببندی."
+msgstr ""
+
+#: includes/admin/views/bulk.php:19
+msgid "محصولات در صف پس‌زمینه یکی‌یکی ارسال می‌شوند؛ لازم نیست مرورگر باز بماند."
+msgstr ""
+
+#: includes/admin/views/bulk.php:29
+msgid "توقف ارسال گروهی"
+msgstr ""
+
+#: includes/admin/views/bulk.php:30
+msgid "مشاهده‌ی لاگ"
+msgstr ""
+
+#. translators: 1: count, 2: names
+#: includes/admin/views/bulk.php:57
+#, php-format
+msgid "%1$s دسته‌ی ووکامرس نگاشت نشده‌اند (%2$s). محصولاتشان با دسته‌ی پیش‌فرض تنظیمات ارسال می‌شوند."
+msgstr ""
+
+#. translators: 1: count, 2: names
+#: includes/admin/views/bulk.php:59
+#, php-format
+msgid "%1$s دسته‌ی ووکامرس نگاشت نشده‌اند (%2$s). محصولات این دسته‌ها ارسال نمی‌شوند و در لاگ با دلیل ثبت می‌شوند."
+msgstr ""
+
+#: includes/admin/views/bulk.php:67
+msgid "ارسال جدید"
+msgstr ""
+
+#: includes/admin/views/bulk.php:70
+msgid "کدام محصولات؟"
+msgstr ""
+
+#: includes/admin/views/bulk.php:74
+msgid "فقط محصولاتی که هنوز در باسلام نیستند"
+msgstr ""
+
+#: includes/admin/views/bulk.php:81
+msgid "همه‌ی محصولات؛ محصولات متصل به‌روز می‌شوند"
+msgstr ""
+
+#: includes/admin/views/bulk.php:88
+#: includes/admin/views/categories.php:114
+msgid "دسته‌ی ووکامرس"
+msgstr ""
+
+#: includes/admin/views/bulk.php:90
+msgid "همه‌ی دسته‌ها"
+msgstr ""
+
+#: includes/admin/views/bulk.php:95
+msgid "زیردسته‌ها هم شامل می‌شوند. محصولات ساده و متغیرِ منتشرشده ارسال می‌شوند."
+msgstr ""
+
+#: includes/admin/views/bulk.php:99
+msgid "شروع ارسال"
+msgstr ""
+
+#: includes/admin/views/bulk.php:102
+msgid "از لیست محصولات ووکامرس هم می‌توانی چند محصول را تیک بزنی و از «کارهای دسته‌جمعی» گزینه‌ی «ارسال به باسلام» را انتخاب کنی."
+msgstr ""
+
+#: includes/admin/views/categories.php:50
+msgid "برای هر دسته‌ی ووکامرس یک بار دسته‌ی باسلام را انتخاب کن؛ برای همه‌ی محصولات آن دسته و زیردسته‌هایش اعمال می‌شود."
+msgstr ""
+
+#: includes/admin/views/categories.php:57
+msgid "فهرست دسته‌های باسلام"
+msgstr ""
+
+#. translators: 1: count, 2: relative time
+#: includes/admin/views/categories.php:65
+#, php-format
+msgid "%1$s دسته · دریافت‌شده %2$s"
+msgstr ""
+
+#: includes/admin/views/categories.php:66
+msgid "هنوز دریافت نشده. برای جستجوی دسته با نام، فهرست را از باسلام بگیر."
+msgstr ""
+
+#: includes/admin/views/categories.php:73
+msgid "به‌روزرسانی فهرست"
+msgstr ""
+
+#: includes/admin/views/categories.php:73
+msgid "دریافت فهرست از باسلام"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/categories.php:85
+#, php-format
+msgid "%s دسته‌ی دارای محصول نگاشت نشده‌اند؛ محصولاتشان با دسته‌ی پیش‌فرض تنظیمات ارسال می‌شوند."
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/categories.php:87
+#, php-format
+msgid "%s دسته‌ی دارای محصول نگاشت نشده‌اند؛ محصولاتشان ارسال نمی‌شوند و دلیلش در لاگ می‌آید."
+msgstr ""
+
+#: includes/admin/views/categories.php:94
+msgid "فروشگاه هنوز دسته‌بندی محصول ندارد."
+msgstr ""
+
+#: includes/admin/views/categories.php:115
+msgid "دسته‌ی باسلام"
+msgstr ""
+
+#: includes/admin/views/categories.php:116
+#: includes/admin/views/log-table.php:22
+msgid "وضعیت"
+msgstr ""
+
+#. translators: %s: product count
+#: includes/admin/views/categories.php:134
+#, php-format
+msgid "%s محصول"
+msgstr ""
+
+#: includes/admin/views/categories.php:140
+msgid "از دسته‌ی والد"
+msgstr ""
+
+#: includes/admin/views/categories.php:140
+msgid "نام دسته را تایپ کن…"
+msgstr ""
+
+#: includes/admin/views/categories.php:140
+msgid "شناسه‌ی دسته"
+msgstr ""
+
+#. translators: %s: category name
+#: includes/admin/views/categories.php:141
+#, php-format
+msgid "دسته‌ی باسلام برای %s"
+msgstr ""
+
+#: includes/admin/views/categories.php:159
+msgid "نگاشت شده"
+msgstr ""
+
+#. translators: %s: parent category
+#: includes/admin/views/categories.php:162
+#, php-format
+msgid "از «%s»"
+msgstr ""
+
+#: includes/admin/views/categories.php:164
+msgid "نگاشت نشده"
+msgstr ""
+
+#: includes/admin/views/categories.php:176
+msgid "ذخیره‌ی نگاشت"
+msgstr ""
+
+#: includes/admin/views/categories.php:177
+msgid "برای حذف نگاشت یک دسته، کادرش را خالی کن."
+msgstr ""
+
+#. translators: %s: user name
+#: includes/admin/views/dashboard.php:62
+#, php-format
+msgid "سلام %s"
+msgstr ""
+
+#. translators: 1: booth, 2: relative time
+#: includes/admin/views/dashboard.php:68
+#, php-format
+msgid "غرفه‌ی «%1$s» · آخرین همگام‌سازی %2$s"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:69
+msgid "هنوز به باسلام وصل نشده‌ای. چند دقیقه بیشتر طول نمی‌کشد."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:76
+msgid "ارسال محصولات"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:79
+#: includes/admin/views/settings.php:51
+msgid "اتصال به باسلام"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:85
+msgid "راه‌اندازی در چهار قدم"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:87
+msgid "توکن بساز"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:87
+msgid "در پنل توسعه‌دهندگان باسلام، با دسترسی محصولات و سفارش‌های غرفه."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:88
+msgid "وصل شو"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:88
+msgid "توکن را در تنظیمات بچسبان و تست اتصال بزن."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:89
+msgid "دسته‌ها را نگاشت کن"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:89
+msgid "برای هر دسته‌ی ووکامرس، دسته‌ی باسلام."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:90
+msgid "بفرست"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:90
+msgid "اول یک محصول، بعد بقیه با ارسال گروهی."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:99
+msgid "جزئیات ارسال گروهی"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:104
+#: includes/admin/views/orders.php:59
+msgid "خلاصه"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:106
+msgid "محصول متصل"
+msgstr ""
+
+#. translators: %s: total products
+#: includes/admin/views/dashboard.php:109
+#, php-format
+msgid "از %s محصول منتشرشده"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:115
+msgid "در حال پردازش…"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:115
+msgid "کار در پس‌زمینه"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:118
+msgid "خطای باز در ۲۴ ساعت"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:122
+msgid "دلیل و راه‌حل در لاگ"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:124
+msgid "همه‌چیز تحت کنترل است"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:130
+#: includes/admin/views/orders.php:66
+msgid "سفارش جاافتاده"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:135
+msgid "دریافت سفارش‌ها خاموش است"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:137
+msgid "در ووکامرس ثبت نشده‌اند"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/dashboard.php:140
+#, php-format
+msgid "%s سفارش باسلام در سایت"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:151
+msgid "فعالیت همگام‌سازی محصولات"
+msgstr ""
+
+#. translators: 1: successes, 2: errors
+#: includes/admin/views/dashboard.php:153
+#, php-format
+msgid "۱۴ روز اخیر · %1$s ارسال موفق، %2$s خطا"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:155
+msgid "راهنمای نمودار"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:163
+msgid "هنوز فعالیتی ثبت نشده. بعد از اولین ارسال، نمودار اینجا پر می‌شود."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:166
+msgid "نمودار ستونی ارسال‌های موفق و خطاها در ۱۴ روز اخیر؛ جدول داده پایین نمودار است."
+msgstr ""
+
+#: includes/admin/views/dashboard.php:193
+msgid "امروز"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:201
+msgid "نمایش جدول داده"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:203
+msgid "روز"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:216
+msgid "سلامت سیستم"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/dashboard.php:219
+#, php-format
+msgid "%s مورد نیاز به توجه"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:221
+msgid "سالم"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:243
+msgid "آخرین رویدادها"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:244
+msgid "همه‌ی لاگ"
+msgstr ""
+
+#: includes/admin/views/dashboard.php:247
+msgid "هنوز رویدادی ثبت نشده."
+msgstr ""
+
+#: includes/admin/views/import.php:19
+msgid "ایمپورت غرفه به ووکامرس"
+msgstr ""
+
+#: includes/admin/views/import.php:20
+msgid "محصولات غرفه‌ی باسلام با عکس، قیمت، موجودی، دسته و تنوع‌ها در سایت ساخته می‌شوند. اجرای دوباره هیچ محصولی را تکراری نمی‌سازد؛ فقط به‌روز می‌کند."
+msgstr ""
+
+#: includes/admin/views/import.php:24
+msgid "دریافت دوباره‌ی فهرست غرفه"
+msgstr ""
+
+#: includes/admin/views/import.php:24
+msgid "دریافت فهرست غرفه"
+msgstr ""
+
+#: includes/admin/views/import.php:29
+msgid "اول از تنظیمات به باسلام وصل شو."
+msgstr ""
+
+#: includes/admin/views/import.php:46
+msgid "اول «دریافت فهرست غرفه» را بزن. محصولات غرفه در پس‌زمینه خوانده و با محصولات سایت مقایسه می‌شوند؛ هنوز چیزی ساخته نمی‌شود."
+msgstr ""
+
+#: includes/admin/views/import.php:52
+msgid "پیش‌نمایش"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/views/import.php:54
+#, php-format
+msgid "فهرست غرفه: %s"
+msgstr ""
+
+#: includes/admin/views/import.php:59
+msgid "ساخته می‌شود"
+msgstr ""
+
+#: includes/admin/views/import.php:61
+msgid "در سایت جفتی ندارند"
+msgstr ""
+
+#: includes/admin/views/import.php:64
+msgid "به‌روز می‌شود"
+msgstr ""
+
+#: includes/admin/views/import.php:66
+msgid "از قبل متصل‌اند (اختیاری)"
+msgstr ""
+
+#: includes/admin/views/import.php:69
+msgid "منتظر بررسی تو"
+msgstr ""
+
+#: includes/admin/views/import.php:71
+msgid "شبیه محصولی در سایت‌اند؛ اول وصلشان کن"
+msgstr ""
+
+#: includes/admin/views/import.php:71
+msgid "موردی نیست"
+msgstr ""
+
+#: includes/admin/views/import.php:75
+msgid "این محصولات وارد نمی‌شوند، چون احتمالاً در سایت هستند و ساختنشان تکراری می‌سازد. در «اتصال محصولات غرفه» تأییدشان کن؛ بعد از اتصال، ایمپورت آن‌ها را به‌روز می‌کند."
+msgstr ""
+
+#: includes/admin/views/import.php:79
+msgid "تنظیمات ایمپورت"
+msgstr ""
+
+#: includes/admin/views/import.php:82
+msgid "موجودی (و قیمت) محصولات متصل هم از باسلام به‌روز شود"
+msgstr ""
+
+#: includes/admin/views/import.php:85
+msgid "وضعیت محصولات جدید در سایت"
+msgstr ""
+
+#: includes/admin/views/import.php:87
+#: includes/admin/views/settings.php:121
+msgid "منتشرشده"
+msgstr ""
+
+#: includes/admin/views/import.php:88
+msgid "پیش‌نویس (اول خودم بررسی می‌کنم)"
+msgstr ""
+
+#: includes/admin/views/import.php:93
+msgid "قانون قیمت فعال است. قیمت محصولات جدید همان قیمت باسلام وارد می‌شود و قیمت محصولات متصل دست نمی‌خورد؛ وگرنه قانون دو بار اعمال می‌شد. بعد از ایمپورت قیمت‌های سایت را بررسی کن."
+msgstr ""
+
+#: includes/admin/views/import.php:96
+msgid "عکس‌ها در کتابخانه‌ی رسانه ذخیره می‌شوند و بعداً دوباره در باسلام آپلود نمی‌شوند."
+msgstr ""
+
+#: includes/admin/views/import.php:97
+msgid "دسته‌ی باسلام به دسته‌ی نگاشت‌شده می‌رود؛ اگر نگاشتی نیست، دسته‌ای با همان نام ساخته و نگاشت می‌شود."
+msgstr ""
+
+#: includes/admin/views/import.php:98
+msgid "موجودی سایت = موجودی باسلام + موجودی اطمینان. هر محصول بلافاصله به محصول باسلام وصل می‌شود."
+msgstr ""
+
+#: includes/admin/views/import.php:99
+msgid "محصولی که SKU آن در سایت هست، ساخته نمی‌شود و دلیلش در لاگ می‌آید."
+msgstr ""
+
+#: includes/admin/views/import.php:103
+msgid "شروع ایمپورت"
+msgstr ""
+
+#: includes/admin/views/link.php:15
+msgid "قطعی"
+msgstr ""
+
+#: includes/admin/views/link.php:16
+msgid "مشکوک"
+msgstr ""
+
+#: includes/admin/views/link.php:17
+msgid "بدون جفت"
+msgstr ""
+
+#: includes/admin/views/link.php:18
+msgid "متصل‌شده"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/link.php:45
+#: includes/admin/views/link.php:176
+#, php-format
+msgid "%s تنوع"
+msgstr ""
+
+#: includes/admin/views/link.php:53
+msgid "محصولاتی که از قبل در غرفه‌ی باسلام داری را به محصولات سایت وصل کن تا دوباره ساخته نشوند. اول پیش‌نمایش می‌بینی؛ تا تأیید نکنی چیزی متصل نمی‌شود."
+msgstr ""
+
+#: includes/admin/views/link.php:57
+msgid "دریافت و تطبیق دوباره"
+msgstr ""
+
+#: includes/admin/views/link.php:57
+msgid "دریافت محصولات غرفه و تطبیق"
+msgstr ""
+
+#: includes/admin/views/link.php:76
+msgid "غرفه‌ی باسلام هنوز محصولی ندارد؛ چیزی برای اتصال نیست. محصولات سایت را از «ارسال گروهی» بفرست."
+msgstr ""
+
+#: includes/admin/views/link.php:78
+msgid "هنوز محصولات غرفه دریافت نشده. دکمه‌ی بالا را بزن؛ تطبیق با SKU و بعد با نام انجام می‌شود و نتیجه در سه دسته‌ی قطعی، مشکوک و بدون جفت نمایش داده می‌شود."
+msgstr ""
+
+#. translators: %s: time
+#: includes/admin/views/link.php:86
+#, php-format
+msgid "آخرین تطبیق: %s"
+msgstr ""
+
+#: includes/admin/views/link.php:89
+msgid "نتیجه‌ی تطبیق"
+msgstr ""
+
+#: includes/admin/views/link.php:100
+msgid "SKU این محصولات در باسلام و سایت یکی است. با اطمینان می‌توانی همه را تأیید کنی."
+msgstr ""
+
+#: includes/admin/views/link.php:101
+msgid "جفت پیشنهادی بر اساس نام است یا تعارض دارد. هر ردیف را نگاه کن؛ اگر جفت درست نیست، از فهرست گزینه‌ی دیگری انتخاب کن."
+msgstr ""
+
+#: includes/admin/views/link.php:102
+msgid "برای این محصولات جفتی در سایت پیدا نشد. می‌توانی بعداً آن‌ها را از باسلام به سایت ایمپورت کنی (نسخه‌ی بعدی)."
+msgstr ""
+
+#: includes/admin/views/link.php:103
+msgid "این محصولات به سایت متصل‌اند و از این به بعد همگام می‌شوند."
+msgstr ""
+
+#: includes/admin/views/link.php:110
+msgid "بعد از اتصال، اطلاعات سایت (قیمت، موجودی و…) به باسلام فرستاده شود"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/link.php:114
+#, php-format
+msgid "تأیید و اتصال همه‌ی قطعی‌ها (%s)"
+msgstr ""
+
+#: includes/admin/views/link.php:115
+#: includes/admin/views/link.php:117
+msgid "اتصال انتخاب‌شده‌ها"
+msgstr ""
+
+#: includes/admin/views/link.php:124
+msgid "موردی در این دسته نیست."
+msgstr ""
+
+#: includes/admin/views/link.php:131
+#: includes/admin/views/products.php:86
+msgid "انتخاب همه"
+msgstr ""
+
+#: includes/admin/views/link.php:133
+msgid "در باسلام"
+msgstr ""
+
+#: includes/admin/views/link.php:135
+msgid "در سایت"
+msgstr ""
+
+#: includes/admin/views/link.php:136
+msgid "چرا"
+msgstr ""
+
+#: includes/admin/views/link.php:144
+#: includes/admin/views/pricing.php:191
+#: includes/admin/views/pricing.php:194
+#: includes/admin/views/settings.php:136
+msgid "تومان"
+msgstr ""
+
+#. translators: %s: stock
+#: includes/admin/views/link.php:172
+#, php-format
+msgid "موجودی %s"
+msgstr ""
+
+#: includes/admin/views/link.php:187
+msgid "محصول سایت"
+msgstr ""
+
+#: includes/admin/views/link.php:214
+#: includes/admin/views/products.php:180
+msgid "صفحه‌بندی"
+msgstr ""
+
+#: includes/admin/views/link.php:223
+#: includes/admin/views/logs.php:99
+#: includes/admin/views/products.php:189
+msgid "قبلی"
+msgstr ""
+
+#: includes/admin/views/link.php:224
+#: includes/admin/views/logs.php:100
+#: includes/admin/views/products.php:190
+msgid "بعدی"
+msgstr ""
+
+#: includes/admin/views/log-table.php:20
+msgid "زمان"
+msgstr ""
+
+#: includes/admin/views/log-table.php:21
+msgid "مورد"
+msgstr ""
+
+#: includes/admin/views/log-table.php:23
+#: includes/admin/views/products.php:92
+msgid "اقدام"
+msgstr ""
+
+#: includes/admin/views/log-table.php:51
+msgid "جزئیات فنی"
+msgstr ""
+
+#: includes/admin/views/log-table.php:61
+#: includes/admin/views/logs.php:29
+msgid "اطلاع"
+msgstr ""
+
+#: includes/admin/views/log-table.php:64
+msgid "برطرف شد"
+msgstr ""
+
+#: includes/admin/views/log-table.php:70
+#: includes/admin/views/orders.php:99
+msgid "تلاش مجدد"
+msgstr ""
+
+#: includes/admin/views/logs.php:27
+msgid "تلاش دوباره"
+msgstr ""
+
+#: includes/admin/views/logs.php:28
+msgid "موفق"
+msgstr ""
+
+#: includes/admin/views/logs.php:35
+msgid "هر رویداد: چه چیزی، چه شد، چرا و چه کار کنی. جدیدترین بالا."
+msgstr ""
+
+#: includes/admin/views/logs.php:47
+msgid "نوع"
+msgstr ""
+
+#: includes/admin/views/logs.php:55
+msgid "جستجو"
+msgstr ""
+
+#: includes/admin/views/logs.php:56
+msgid "نام محصول یا متن خطا"
+msgstr ""
+
+#: includes/admin/views/logs.php:60
+msgid "فقط موارد حل‌نشده"
+msgstr ""
+
+#: includes/admin/views/logs.php:62
+msgid "اعمال فیلتر"
+msgstr ""
+
+#. translators: %s: count
+#: includes/admin/views/logs.php:68
+#, php-format
+msgid "تلاش مجدد همه‌ی خطاها (%s)"
+msgstr ""
+
+#. translators: %s: product name
+#: includes/admin/views/logs.php:79
+#, php-format
+msgid "فقط رویدادهای «%s»"
+msgstr ""
+
+#: includes/admin/views/logs.php:81
+msgid "نمایش همه"
+msgstr ""
+
+#: includes/admin/views/logs.php:86
+msgid "رویدادی با این فیلتر پیدا نشد."
+msgstr ""
+
+#: includes/admin/views/logs.php:90
+msgid "صفحه‌بندی لاگ"
+msgstr ""
+
+#: includes/admin/views/notify.php:20
+msgid "در بله به @botfather پیام بده، «/newbot» را بزن و توکن ربات را کپی کن. بعد ربات خودت را باز کن و «/start» بفرست."
+msgstr ""
+
+#: includes/admin/views/notify.php:21
+msgid "در تلگرام به @BotFather پیام بده، «/newbot» را بزن و توکن را کپی کن. توجه: بیشتر هاست‌های ایران به تلگرام دسترسی ندارند؛ اگر پیام آزمایشی نرسید، از بله استفاده کن."
+msgstr ""
+
+#: includes/admin/views/notify.php:27
+msgid "سفارش جدید باسلام، خطاهای مهم و نتیجه‌ی تطبیق شبانه را در بله یا تلگرام بگیر. پیام‌ها از صف پس‌زمینه فرستاده می‌شوند و سایت را کند نمی‌کنند."
+msgstr ""
+
+#: includes/admin/views/notify.php:46
+msgid "فعال"
+msgstr ""
+
+#: includes/admin/views/notify.php:48
+msgid "خاموش"
+msgstr ""
+
+#. translators: %s: messenger
+#: includes/admin/views/notify.php:57
+#, php-format
+msgid "اعلان در %s روشن باشد"
+msgstr ""
+
+#: includes/admin/views/notify.php:61
+msgid "توکن ربات"
+msgstr ""
+
+#: includes/admin/views/notify.php:64
+msgid "ذخیره شده و رمزنگاری‌شده. برای عوض کردن، توکن جدید را وارد کن."
+msgstr ""
+
+#: includes/admin/views/notify.php:64
+msgid "رمزنگاری‌شده ذخیره می‌شود."
+msgstr ""
+
+#: includes/admin/views/notify.php:67
+msgid "شناسه‌ی گفتگو"
+msgstr ""
+
+#. translators: %s: chat name
+#: includes/admin/views/notify.php:74
+#, php-format
+msgid "گفتگو: %s"
+msgstr ""
+
+#: includes/admin/views/notify.php:75
+msgid "بعد از ذخیره‌ی توکن، به ربات پیام بده و «پیدا کردن شناسه» را بزن."
+msgstr ""
+
+#: includes/admin/views/notify.php:81
+msgid "آدرس واسط API (اختیاری)"
+msgstr ""
+
+#: includes/admin/views/notify.php:83
+msgid "فقط اگر هاستت در ایران است و یک واسط (relay) امن برای Bot API تلگرام داری. خالی = آدرس اصلی تلگرام."
+msgstr ""
+
+#: includes/admin/views/notify.php:87
+msgid "پیدا کردن شناسه"
+msgstr ""
+
+#: includes/admin/views/notify.php:88
+msgid "پیام آزمایشی"
+msgstr ""
+
+#: includes/admin/views/notify.php:96
+msgid "برای چه چیزهایی پیام بیاید؟"
+msgstr ""
+
+#: includes/admin/views/notify.php:99
+msgid "سفارش جدید باسلام (اقلام، مبلغ، گیرنده و لینک سفارش)"
+msgstr ""
+
+#: includes/admin/views/notify.php:103
+msgid "خطاهای مهم (هر خطا حداکثر هر ۶ ساعت یک بار؛ حداکثر ۱۰ پیام خطا در ساعت)"
+msgstr ""
+
+#: includes/admin/views/notify.php:107
+msgid "تطبیق شبانه سفارش جاافتاده‌ای پیدا کرد"
+msgstr ""
+
+#: includes/admin/views/notify.php:110
+msgid "ذخیره"
+msgstr ""
+
+#: includes/admin/views/orders.php:31
+msgid "هر سفارش باسلام یک بار و فقط یک بار در ووکامرس ثبت می‌شود؛ با برچسب و شماره‌ی باسلام، و موجودی سایت هم کم می‌شود."
+msgstr ""
+
+#: includes/admin/views/orders.php:36
+msgid "دریافت سفارش‌ها الان"
+msgstr ""
+
+#: includes/admin/views/orders.php:44
+msgid "اول از تنظیمات به باسلام وصل شو. توکن باید دسترسی «سفارش‌های غرفه» هم داشته باشد."
+msgstr ""
+
+#: includes/admin/views/orders.php:47
+msgid "دریافت سفارش‌ها خاموش است."
+msgstr ""
+
+#: includes/admin/views/orders.php:48
+msgid "روشن کردن در تنظیمات"
+msgstr ""
+
+#. translators: %s: error
+#: includes/admin/views/orders.php:54
+#, php-format
+msgid "آخرین دریافت سفارش‌ها ناموفق بود: %s خودکار دوباره تلاش می‌شود؛ جزئیات در لاگ."
+msgstr ""
+
+#: includes/admin/views/orders.php:61
+msgid "سفارش باسلام در سایت"
+msgstr ""
+
+#: includes/admin/views/orders.php:63
+msgid "با برچسب «باسلام» در سفارش‌های ووکامرس"
+msgstr ""
+
+#: includes/admin/views/orders.php:68
+msgid "پایین همین صفحه، با دلیل و تلاش مجدد"
+msgstr ""
+
+#: includes/admin/views/orders.php:68
+msgid "هیچ سفارشی جا نیفتاده"
+msgstr ""
+
+#: includes/admin/views/orders.php:71
+msgid "آخرین بررسی"
+msgstr ""
+
+#: includes/admin/views/orders.php:72
+msgid "هنوز نه"
+msgstr ""
+
+#. translators: %s: minutes
+#: includes/admin/views/orders.php:74
+#, php-format
+msgid "هر %s دقیقه، خودکار"
+msgstr ""
+
+#: includes/admin/views/orders.php:77
+#: includes/admin/views/settings.php:192
+msgid "مرجع موجودی"
+msgstr ""
+
+#: includes/admin/views/orders.php:78
+msgid "سایت"
+msgstr ""
+
+#. translators: %s: safety stock
+#: includes/admin/views/orders.php:80
+#, php-format
+msgid "موجودی اطمینان: %s"
+msgstr ""
+
+#: includes/admin/views/orders.php:86
+msgid "سفارش‌هایی که ثبت نشدند"
+msgstr ""
+
+#: includes/admin/views/orders.php:90
+msgid "سفارش باسلام"
+msgstr ""
+
+#: includes/admin/views/orders.php:91
+msgid "چه شد و چه کنم"
+msgstr ""
+
+#: includes/admin/views/orders.php:92
+msgid "عملیات"
+msgstr ""
+
+#: includes/admin/views/orders.php:109
+msgid "آخرین سفارش‌ها"
+msgstr ""
+
+#: includes/admin/views/orders.php:113
+msgid "هنوز سفارشی از باسلام نیامده. سفارش بعدی خودکار اینجا و در سفارش‌های ووکامرس ظاهر می‌شود."
+msgstr ""
+
+#: includes/admin/views/orders.php:113
+msgid "با روشن کردن دریافت سفارش‌ها، سفارش‌های باسلام اینجا می‌آیند."
+msgstr ""
+
+#: includes/admin/views/orders.php:119
+msgid "سفارش ووکامرس"
+msgstr ""
+
+#: includes/admin/views/orders.php:120
+msgid "مشتری"
+msgstr ""
+
+#: includes/admin/views/orders.php:121
+msgid "مبلغ"
+msgstr ""
+
+#: includes/admin/views/orders.php:122
+msgid "وضعیت در باسلام"
+msgstr ""
+
+#: includes/admin/views/orders.php:123
+msgid "وضعیت در سایت"
+msgstr ""
+
+#. translators: %s: parcel id
+#: includes/admin/views/orders.php:137
+#, php-format
+msgid "باسلام #%s"
+msgstr ""
+
+#: includes/admin/views/orders.php:160
+msgid "تطبیق شبانه"
+msgstr ""
+
+#: includes/admin/views/orders.php:161
+msgid "هر شب حدود ساعت ۳، همه‌ی سفارش‌های ۷ روز اخیر باسلام با سفارش‌های سایت مقایسه می‌شوند و هر سفارش جاافتاده ثبت و گزارش می‌شود؛ حتی اگر سایت ساعت‌ها قطع بوده باشد."
+msgstr ""
+
+#: includes/admin/views/orders.php:165
+msgid "هنوز اجرا نشده"
+msgstr ""
+
+#: includes/admin/views/orders.php:167
+msgid "ناموفق"
+msgstr ""
+
+#: includes/admin/views/orders.php:169
+msgid "جاافتاده پیدا شد"
+msgstr ""
+
+#: includes/admin/views/orders.php:171
+msgid "همه‌چیز سر جایش"
+msgstr ""
+
+#. translators: 1: relative time, 2: error
+#: includes/admin/views/orders.php:181
+#, php-format
+msgid "آخرین اجرا %1$s: %2$s"
+msgstr ""
+
+#. translators: 1: relative time, 2: checked, 3: missing
+#: includes/admin/views/orders.php:183
+#, php-format
+msgid "آخرین اجرا %1$s: %2$s سفارش بررسی شد، %3$s سفارش جاافتاده پیدا و در صف ثبت قرار گرفت."
+msgstr ""
+
+#: includes/admin/views/orders.php:189
+msgid "تطبیق الان"
+msgstr ""
+
+#: includes/admin/views/orders.php:194
+msgid "سریع‌تر با وب‌هوک (اختیاری)"
+msgstr ""
+
+#: includes/admin/views/orders.php:195
+msgid "بدون وب‌هوک هم هیچ سفارشی گم نمی‌شود؛ فقط تا چند دقیقه دیرتر می‌رسد. اگر در پنل توسعه‌دهندگان باسلام وب‌هوک سفارش ساختی، این آدرس را بده. باسلام‌هاب به محتوای وب‌هوک اعتماد نمی‌کند و فقط با آن زودتر سفارش‌ها را از API می‌خواند."
+msgstr ""
+
+#: includes/admin/views/orders.php:197
+msgid "آدرس وب‌هوک"
+msgstr ""
+
+#: includes/admin/views/orders.php:198
+msgid "کپی"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/views/orders.php:202
+#, php-format
+msgid "آخرین وب‌هوک: %s"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/views/orders.php:202
+msgid "هنوز وب‌هوکی نرسیده."
+msgstr ""
+
+#: includes/admin/views/orders.php:207
+#: includes/class-bsh-inventory.php:183
+msgid "موجودی از باسلام"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/views/orders.php:209
+#, php-format
+msgid "آخرین یکی‌سازی: %s · هر ساعت خودکار"
+msgstr ""
+
+#. translators: %s: relative time
+#: includes/admin/views/orders.php:209
+msgid "هنوز انجام نشده · هر ساعت خودکار"
+msgstr ""
+
+#: includes/admin/views/orders.php:211
+msgid "یکی‌سازی موجودی الان"
+msgstr ""
+
+#: includes/admin/views/pricing.php:23
+msgid "نوع تغییر"
+msgstr ""
+
+#: includes/admin/views/pricing.php:24
+#: includes/class-bsh-price-rules.php:247
+msgid "بدون تغییر"
+msgstr ""
+
+#: includes/admin/views/pricing.php:25
+msgid "درصدی"
+msgstr ""
+
+#: includes/admin/views/pricing.php:26
+msgid "مبلغ ثابت (تومان)"
+msgstr ""
+
+#: includes/admin/views/pricing.php:28
+msgid "جهت"
+msgstr ""
+
+#: includes/admin/views/pricing.php:29
+#: includes/class-bsh-price-rules.php:249
+msgid "افزایش"
+msgstr ""
+
+#: includes/admin/views/pricing.php:30
+#: includes/class-bsh-price-rules.php:249
+msgid "کاهش"
+msgstr ""
+
+#: includes/admin/views/pricing.php:32
+msgid "مقدار"
+msgstr ""
+
+#: includes/admin/views/pricing.php:54
+msgid "قیمت محصول در باسلام می‌تواند با سایت فرق داشته باشد؛ مثلاً برای پوشش کارمزد باسلام. قیمت سایت دست نمی‌خورد."
+msgstr ""
+
+#: includes/admin/views/pricing.php:64
+msgid "قانون سراسری"
+msgstr ""
+
+#: includes/admin/views/pricing.php:65
+msgid "روی همه‌ی محصولات اعمال می‌شود، مگر دسته‌ای که قانون جدا دارد."
+msgstr ""
+
+#: includes/admin/views/pricing.php:70
+msgid "گردکردن"
+msgstr ""
+
+#: includes/admin/views/pricing.php:72
+msgid "واحد گردکردن"
+msgstr ""
+
+#: includes/admin/views/pricing.php:73
+msgid "گرد نشود"
+msgstr ""
+
+#: includes/admin/views/pricing.php:74
+msgid "به ۱۰۰ تومان"
+msgstr ""
+
+#: includes/admin/views/pricing.php:75
+msgid "به ۱٬۰۰۰ تومان"
+msgstr ""
+
+#: includes/admin/views/pricing.php:76
+msgid "به ۱۰٬۰۰۰ تومان"
+msgstr ""
+
+#: includes/admin/views/pricing.php:78
+msgid "جهت گردکردن"
+msgstr ""
+
+#: includes/admin/views/pricing.php:79
+msgid "رو به بالا"
+msgstr ""
+
+#: includes/admin/views/pricing.php:80
+msgid "نزدیک‌ترین"
+msgstr ""
+
+#: includes/admin/views/pricing.php:81
+msgid "رو به پایین"
+msgstr ""
+
+#: includes/admin/views/pricing.php:84
+msgid "بعد از اعمال قانون انجام می‌شود. قیمت صفر یا منفی در هر حالت ارسال نمی‌شود."
+msgstr ""
+
+#: includes/admin/views/pricing.php:113
+msgid "قانون جدا برای دسته‌ها"
+msgstr ""
+
+#: includes/admin/views/pricing.php:115
+msgid "قانون دسته بر قانون سراسری اولویت دارد و زیردسته‌ها هم از آن پیروی می‌کنند."
+msgstr ""
+
+#: includes/admin/views/pricing.php:118
+#: includes/admin/views/pricing.php:131
+msgid "دسته"
+msgstr ""
+
+#: includes/admin/views/pricing.php:118
+#: includes/admin/views/pricing.php:179
+msgid "قانون"
+msgstr ""
+
+#: includes/admin/views/pricing.php:118
+#: includes/admin/views/pricing.php:124
+#: includes/admin/views/pricing.php:155
+msgid "حذف"
+msgstr ""
+
+#: includes/admin/views/pricing.php:132
+msgid "یک دسته انتخاب کن…"
+msgstr ""
+
+#: includes/admin/views/pricing.php:137
+msgid "افزودن قانون برای این دسته"
+msgstr ""
+
+#: includes/admin/views/pricing.php:162
+msgid "ذخیره‌ی قوانین"
+msgstr ""
+
+#: includes/admin/views/pricing.php:167
+msgid "پیش‌نمایش با قوانین ذخیره‌شده"
+msgstr ""
+
+#: includes/admin/views/pricing.php:169
+msgid "واحد پول فروشگاه قابل تبدیل نیست؛ در تنظیمات واحد قیمت را انتخاب کن."
+msgstr ""
+
+#: includes/admin/views/pricing.php:171
+msgid "محصول ساده‌ی منتشرشده‌ای برای پیش‌نمایش نیست."
+msgstr ""
+
+#: includes/admin/views/pricing.php:176
+#: includes/admin/views/products.php:87
+msgid "محصول"
+msgstr ""
+
+#: includes/admin/views/pricing.php:177
+msgid "قیمت سایت"
+msgstr ""
+
+#: includes/admin/views/pricing.php:178
+msgid "قیمت در باسلام"
+msgstr ""
+
+#: includes/admin/views/pricing.php:196
+msgid "ارسال نمی‌شود"
+msgstr ""
+
+#. translators: %s: category
+#: includes/admin/views/pricing.php:204
+#, php-format
+msgid "دسته‌ی «%s»"
+msgstr ""
+
+#: includes/admin/views/products.php:32
+msgid "وضعیت هر محصول ووکامرس در باسلام. برای ویرایش خود محصول، روی نامش بزن."
+msgstr ""
+
+#: includes/admin/views/products.php:34
+msgid "محصول جدید"
+msgstr ""
+
+#: includes/admin/views/products.php:37
+msgid "فیلتر وضعیت"
+msgstr ""
+
+#. translators: %s: search
+#: includes/admin/views/products.php:65
+#, php-format
+msgid "نتایج جستجوی «%s»"
+msgstr ""
+
+#: includes/admin/views/products.php:66
+msgid "پاک کردن جستجو"
+msgstr ""
+
+#: includes/admin/views/products.php:72
+msgid "ارسال انتخاب‌شده‌ها به باسلام"
+msgstr ""
+
+#: includes/admin/views/products.php:79
+msgid "محصولی با این فیلتر نیست."
+msgstr ""
+
+#: includes/admin/views/products.php:88
+#: includes/class-bsh-settings.php:31
+msgid "قیمت"
+msgstr ""
+
+#: includes/admin/views/products.php:89
+#: includes/class-bsh-settings.php:32
+msgid "موجودی"
+msgstr ""
+
+#: includes/admin/views/products.php:91
+msgid "آخرین همگام‌سازی"
+msgstr ""
+
+#. translators: %s: product
+#: includes/admin/views/products.php:108
+#, php-format
+msgid "انتخاب %s"
+msgstr ""
+
+#. translators: %s: variation count
+#: includes/admin/views/products.php:124
+#, php-format
+msgid "متغیر · %s تنوع"
+msgstr ""
+
+#: includes/admin/views/products.php:126
+msgid "نوع پشتیبانی‌نشده"
+msgstr ""
+
+#: includes/admin/views/products.php:129
+msgid "منتشرنشده"
+msgstr ""
+
+#: includes/admin/views/products.php:143
+msgid "ناموجود"
+msgstr ""
+
+#: includes/admin/views/products.php:143
+msgid "موجود"
+msgstr ""
+
+#: includes/admin/views/products.php:162
+msgid "ارسال نشده"
+msgstr ""
+
+#: includes/admin/views/products.php:170
+msgid "به‌روزرسانی"
+msgstr ""
+
+#: includes/admin/views/products.php:170
+msgid "ارسال"
+msgstr ""
+
+#. translators: 1: booth title, 2: booth id, 3: relative time
+#: includes/admin/views/settings.php:58
+#, php-format
+msgid "غرفه‌ی «%1$s» · شناسه %2$s · آخرین بررسی %3$s"
+msgstr ""
+
+#: includes/admin/views/settings.php:62
+msgid "توکن ذخیره‌شده قابل خواندن نیست، چون کلیدهای امنیتی وردپرس عوض شده‌اند. توکن را دوباره وارد کن."
+msgstr ""
+
+#: includes/admin/views/settings.php:72
+msgid "توکن دسترسی باسلام"
+msgstr ""
+
+#: includes/admin/views/settings.php:76
+msgid "از پنل توسعه‌دهندگان باسلام › توکن‌ها، یک توکن شخصی با دسترسی «محصولات غرفه» و «سفارش‌های غرفه» بساز. رمزنگاری‌شده ذخیره می‌شود و دیگر کامل نمایش داده نمی‌شود."
+msgstr ""
+
+#: includes/admin/views/settings.php:77
+msgid "رفتن به پنل"
+msgstr ""
+
+#: includes/admin/views/settings.php:81
+msgid "ذخیره‌ی توکن جدید و تست اتصال"
+msgstr ""
+
+#: includes/admin/views/settings.php:81
+msgid "ذخیره و تست اتصال"
+msgstr ""
+
+#: includes/admin/views/settings.php:83
+msgid "تست اتصال"
+msgstr ""
+
+#: includes/admin/views/settings.php:93
+msgid "قطع اتصال"
+msgstr ""
+
+#: includes/admin/views/settings.php:104
+msgid "ارسال محصول"
+msgstr ""
+
+#: includes/admin/views/settings.php:107
+msgid "دسته‌ی پیش‌فرض باسلام (شناسه)"
+msgstr ""
+
+#: includes/admin/views/settings.php:109
+msgid "اختیاری. فقط برای محصولی که دسته‌اش در «نگاشت دسته‌ها» نگاشت نشده. خالی بماند، چنین محصولی ارسال نمی‌شود و دلیلش در لاگ می‌آید."
+msgstr ""
+
+#: includes/admin/views/settings.php:115
+msgid "چند روز طول می‌کشد سفارش را آماده‌ی ارسال کنی."
+msgstr ""
+
+#: includes/admin/views/settings.php:119
+msgid "وضعیت محصول جدید در باسلام"
+msgstr ""
+
+#: includes/admin/views/settings.php:122
+msgid "منتشرنشده (پیش‌نویس)"
+msgstr ""
+
+#: includes/admin/views/settings.php:124
+msgid "فقط موقع ساخت اعمال می‌شود؛ وضعیت انتشار محصولات موجود در باسلام دست نمی‌خورد."
+msgstr ""
+
+#: includes/admin/views/settings.php:128
+msgid "واحد قیمت‌های سایت"
+msgstr ""
+
+#. translators: %s: currency code
+#: includes/admin/views/settings.php:133
+#, php-format
+msgid "خودکار از ووکامرس (%s)"
+msgstr ""
+
+#: includes/admin/views/settings.php:137
+msgid "ریال"
+msgstr ""
+
+#: includes/admin/views/settings.php:139
+msgid "قیمت در باسلام به ریال ثبت می‌شود؛ قیمت تومانی خودکار ×۱۰ می‌شود."
+msgstr ""
+
+#: includes/admin/views/settings.php:145
+msgid "وزن و موجودی"
+msgstr ""
+
+#: includes/admin/views/settings.php:148
+msgid "وزن پیش‌فرض (گرم)"
+msgstr ""
+
+#: includes/admin/views/settings.php:150
+msgid "برای محصولی که در ووکامرس وزن ندارد. باسلام هزینه‌ی ارسال را با وزن حساب می‌کند."
+msgstr ""
+
+#: includes/admin/views/settings.php:153
+msgid "وزن بسته‌بندی (گرم)"
+msgstr ""
+
+#: includes/admin/views/settings.php:155
+msgid "به وزن هر محصول اضافه می‌شود تا «وزن با بسته‌بندی» باسلام ساخته شود."
+msgstr ""
+
+#: includes/admin/views/settings.php:158
+msgid "موجودی برای محصولات بدون مدیریت موجودی"
+msgstr ""
+
+#: includes/admin/views/settings.php:160
+msgid "باسلام عدد موجودی می‌خواهد. عدد کم امن‌تر است: جلوی فروش کالای ناموجود را می‌گیرد."
+msgstr ""
+
+#: includes/admin/views/settings.php:169
+msgid "سفارش‌های باسلام خودکار در ووکامرس ثبت شوند"
+msgstr ""
+
+#: includes/admin/views/settings.php:173
+msgid "سفارش جدید بلافاصله در باسلام «تأیید» شود (وضعیت: در حال آماده‌سازی)"
+msgstr ""
+
+#: includes/admin/views/settings.php:177
+msgid "بررسی سفارش‌ها هر چند دقیقه"
+msgstr ""
+
+#: includes/admin/views/settings.php:179
+msgid "هر بار سفارش‌های تازه و تغییر وضعیت سفارش‌های باز خوانده می‌شود. ۵ دقیقه برای بیشتر فروشگاه‌ها مناسب است."
+msgstr ""
+
+#: includes/admin/views/settings.php:182
+msgid "سفارش‌های چند روز گذشته وارد شوند"
+msgstr ""
+
+#: includes/admin/views/settings.php:184
+msgid "فقط در اولین دریافت اعمال می‌شود. صفر یعنی فقط سفارش‌هایی که از این به بعد می‌آیند."
+msgstr ""
+
+#: includes/admin/views/settings.php:190
+msgid "موجودی دوطرفه"
+msgstr ""
+
+#: includes/admin/views/settings.php:195
+msgid "سایت (پیشنهادی)"
+msgstr ""
+
+#: includes/admin/views/settings.php:195
+msgid "موجودی را در ووکامرس مدیریت می‌کنی. هر فروش در سایت یا باسلام از موجودی سایت کم می‌شود و عدد جدید به باسلام می‌رود."
+msgstr ""
+
+#: includes/admin/views/settings.php:199
+msgid "موجودی را در پنل باسلام مدیریت می‌کنی. هر ساعت موجودی باسلام در سایت نوشته می‌شود و فروش سایت از موجودی باسلام کم می‌شود."
+msgstr ""
+
+#: includes/admin/views/settings.php:203
+msgid "موجودی اطمینان"
+msgstr ""
+
+#: includes/admin/views/settings.php:205
+msgid "این تعداد از هر کالا در باسلام نمایش داده نمی‌شود تا اگر هم‌زمان در سایت و باسلام فروش رفت، بیش‌فروشی نشود. مثلاً موجودی ۱۰ و اطمینان ۲ یعنی باسلام ۸ می‌بیند. برای هر محصول جدا هم در تب «انبار» محصول قابل تغییر است."
+msgstr ""
+
+#: includes/admin/views/settings.php:210
+msgid "به‌روزرسانی خودکار"
+msgstr ""
+
+#: includes/admin/views/settings.php:213
+msgid "بعد از ذخیره‌ی محصول متصل در ووکامرس، همان محصول در باسلام به‌روز شود"
+msgstr ""
+
+#: includes/admin/views/settings.php:217
+msgid "محصولات جدید هنگام انتشار خودکار به باسلام ارسال شوند"
+msgstr ""
+
+#: includes/admin/views/settings.php:221
+msgid "کدام فیلدها در به‌روزرسانی ارسال شوند؟"
+msgstr ""
+
+#: includes/admin/views/settings.php:230
+msgid "فیلدی که تیک ندارد در باسلام دست نمی‌خورد؛ مثلاً اگر فقط قیمت و موجودی تیک داشته باشد، توضیحاتی که در باسلام نوشته‌ای حفظ می‌شود. موقع ساخت اولیه همه‌ی فیلدها ارسال می‌شوند."
+msgstr ""
+
+#: includes/admin/views/settings.php:234
+msgid "نگهداری لاگ (روز)"
+msgstr ""
+
+#: includes/admin/views/settings.php:236
+msgid "لاگ‌های قدیمی‌تر روزانه پاک می‌شوند تا دیتابیس سبک بماند."
+msgstr ""
+
+#: includes/admin/views/settings.php:240
+msgid "ذخیره‌ی تنظیمات"
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:46
+msgid "توکن ذخیره‌شده قابل خواندن نیست."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:49
+msgid "کلیدهای امنیتی وردپرس (wp-config.php) عوض شده‌اند و توکن رمزنگاری‌شده دیگر باز نمی‌شود."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:50
+msgid "توکن باسلام را دوباره در باسلام‌هاب › تنظیمات وارد کن."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:59
+msgid "توکن دسترسی باسلام وارد نشده است."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:60
+msgid "در باسلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:119
+msgid "پاسخ باسلام قابل خواندن نبود."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:123
+msgid "باسلام به‌جای داده‌ی معتبر، پاسخ ناقص یا صفحه‌ی HTML برگرداند."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:124
+#: includes/sync/class-bsh-image-sync.php:116
+msgid "لازم نیست کاری کنی؛ خودکار دوباره تلاش می‌شود."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:350
+msgid "فایل تصویر روی سرور پیدا نشد."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:353
+msgid "تصویر در کتابخانه‌ی رسانه ثبت شده ولی فایلش روی هاست نیست."
+msgstr ""
+
+#: includes/api/class-bsh-api-client.php:354
+msgid "تصویر را دوباره در محصول بارگذاری کن."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:83
+msgid "ارتباط با باسلام برقرار نشد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:88
+msgid "باسلام در زمان مقرر جواب نداد (Timeout)."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:89
+msgid "سرور سایتت نتوانست به سرور باسلام وصل شود."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:90
+msgid "لازم نیست کاری کنی؛ چند دقیقه‌ی بعد خودکار دوباره تلاش می‌شود. اگر بارها تکرار شد، از پشتیبانی هاستت بپرس دسترسی خروجی به openapi.basalam.com باز است یا نه."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:111
+msgid "باسلام توکن را نپذیرفت."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:115
+msgid "توکن دسترسی منقضی شده، باطل شده یا اشتباه کپی شده است."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:116
+msgid "از پنل توسعه‌دهندگان باسلام یک توکن تازه بساز و در باسلام‌هاب › تنظیمات وارد کن."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:123
+msgid "باسلام اجازه‌ی این کار را نداد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:127
+msgid "توکن فعلی دسترسی لازم (مثلاً مدیریت محصولات غرفه) را ندارد، یا غرفه غیرفعال است."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:128
+msgid "هنگام ساخت توکن، دسترسی‌های «محصولات غرفه» را هم تیک بزن و توکن جدید را وارد کن. اگر غرفه بسته است، اول آن را در باسلام فعال کن."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:135
+msgid "مورد خواسته‌شده در باسلام پیدا نشد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:139
+msgid "احتمالاً این مورد در باسلام حذف شده است."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:140
+msgid "اگر محصول را در باسلام حذف کرده‌ای، «تلاش مجدد» آن را از نو می‌سازد."
+msgstr ""
+
+#. translators: %s: comma separated list of field names
+#: includes/api/class-bsh-api-error.php:149
+#, php-format
+msgid "این فیلدها را نپذیرفت: %s."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:150
+msgid "اطلاعات ارسالی با قوانین باسلام جور نبود."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:152
+msgid "باسلام اطلاعات محصول را نپذیرفت."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:157
+msgid "همین فیلدها را در صفحه‌ی ویرایش محصول درست کن و ذخیره کن؛ دوباره خودکار ارسال می‌شود. جزئیات فنی پایین همین ردیف است."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:165
+msgid "باسلام موقتاً درخواست‌ها را محدود کرد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:171
+msgid "تعداد درخواست‌ها در زمان کوتاه از سقف مجاز باسلام بیشتر شد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:172
+msgid "لازم نیست کاری کنی؛ صف کمی صبر می‌کند و ادامه می‌دهد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:179
+msgid "سرور باسلام خطا داد."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:184
+msgid "مشکل از سمت باسلام است، نه سایت تو."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:185
+msgid "لازم نیست کاری کنی؛ چند دقیقه‌ی بعد خودکار دوباره تلاش می‌شود."
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/api/class-bsh-api-error.php:192
+#, php-format
+msgid "باسلام پاسخ غیرمنتظره داد (کد %d)."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:196
+msgid "پاسخ باسلام قابل تشخیص نبود."
+msgstr ""
+
+#: includes/api/class-bsh-api-error.php:197
+msgid "یک بار «تلاش مجدد» بزن. اگر تکرار شد، جزئیات فنی همین ردیف را برای پشتیبانی باسلام‌هاب بفرست."
+msgstr ""
+
+#: includes/class-bsh-bulk.php:141
+msgid "یک ارسال گروهی دیگر در حال اجراست. صبر کن تمام شود یا متوقفش کن؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند."
+msgstr ""
+
+#: includes/class-bsh-bulk.php:149
+msgid "محصولی برای ارسال پیدا نشد. فقط محصولات ساده‌ی منتشرشده ارسال می‌شوند."
+msgstr ""
+
+#. translators: %s: count
+#: includes/class-bsh-bulk.php:175
+#, php-format
+msgid "ارسال گروهی %s محصول شروع شد."
+msgstr ""
+
+#. translators: 1: done, 2: failed
+#: includes/class-bsh-bulk.php:291
+#, php-format
+msgid "ارسال گروهی تمام شد: %1$s موفق، %2$s خطا."
+msgstr ""
+
+#: includes/class-bsh-bulk.php:292
+msgid "خطاها را در لاگ ببین و بعد از رفع، «تلاش مجدد همه‌ی خطاها» را بزن."
+msgstr ""
+
+#. translators: %s: count
+#: includes/class-bsh-bulk.php:326
+#, php-format
+msgid "ارسال گروهی متوقف شد؛ %s محصول از صف خارج شد."
+msgstr ""
+
+#: includes/class-bsh-categories.php:51
+msgid "فهرست دسته‌های باسلام خالی برگشت."
+msgstr ""
+
+#: includes/class-bsh-categories.php:55
+msgid "باسلام دسته‌ای برنگرداند."
+msgstr ""
+
+#: includes/class-bsh-categories.php:56
+msgid "چند دقیقه‌ی بعد دوباره «به‌روزرسانی فهرست» را بزن."
+msgstr ""
+
+#: includes/class-bsh-categories.php:177
+msgid "دسته را از فهرست پیشنهادی انتخاب کن یا شناسه‌ی عددی‌اش را بنویس."
+msgstr ""
+
+#: includes/class-bsh-categories.php:182
+msgid "این شناسه در فهرست دسته‌های باسلام نیست."
+msgstr ""
+
+#: includes/class-bsh-categories.php:186
+msgid "این دسته زیرمجموعه دارد؛ باسلام محصول را فقط در دسته‌ی آخر (بدون زیرمجموعه) می‌پذیرد."
+msgstr ""
+
+#: includes/class-bsh-importer.php:102
+#: includes/class-bsh-linker.php:90
+msgid "یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند."
+msgstr ""
+
+#: includes/class-bsh-importer.php:106
+msgid "اول «دریافت فهرست غرفه» را بزن تا محصولات غرفه خوانده و با سایت مقایسه شوند."
+msgstr ""
+
+#: includes/class-bsh-importer.php:111
+msgid "محصولی برای واردکردن نیست؛ همه‌ی محصولات غرفه یا متصل‌اند یا منتظر بررسی در «اتصال محصولات غرفه»."
+msgstr ""
+
+#. translators: 1: created, 2: updated, 3: skipped, 4: failed
+#: includes/class-bsh-importer.php:252
+#, php-format
+msgid "تمام شد: %1$s محصول ساخته شد، %2$s به‌روز شد، %3$s رد شد، %4$s خطا."
+msgstr ""
+
+#: includes/class-bsh-importer.php:253
+msgid "خطاها با دلیل در همین لاگ آمده‌اند و هرکدام «تلاش مجدد» دارد."
+msgstr ""
+
+#: includes/class-bsh-importer.php:321
+msgid "وارد نشد تا تکراری ساخته نشود."
+msgstr ""
+
+#. translators: %s: SKU
+#: includes/class-bsh-importer.php:323
+#, php-format
+msgid "محصولی با SKU «%s» در سایت هست."
+msgstr ""
+
+#: includes/class-bsh-importer.php:324
+msgid "این دو را در «اتصال محصولات غرفه» به هم وصل کن."
+msgstr ""
+
+#: includes/class-bsh-importer.php:356
+msgid "ساخت محصول در ووکامرس با خطای داخلی متوقف شد."
+msgstr ""
+
+#: includes/class-bsh-importer.php:357
+msgid "«تلاش مجدد» را بزن. اگر تکرار شد، جزئیات فنی را برای پشتیبانی بفرست."
+msgstr ""
+
+#: includes/class-bsh-importer.php:363
+msgid "خطای داخلی."
+msgstr ""
+
+#. translators: %s: Basalam product id
+#: includes/class-bsh-importer.php:386
+#, php-format
+msgid "محصول باسلام #%s"
+msgstr ""
+
+#: includes/class-bsh-importer.php:391
+msgid "در ووکامرس ساخته نشد."
+msgstr ""
+
+#: includes/class-bsh-importer.php:431
+#: includes/orders/class-bsh-order-sync.php:398
+msgid "واحد پول فروشگاه قابل تبدیل از ریال نیست."
+msgstr ""
+
+#: includes/class-bsh-importer.php:434
+msgid "قیمت‌های باسلام به ریال است و باسلام‌هاب نمی‌داند به چه واحدی تبدیلش کند."
+msgstr ""
+
+#: includes/class-bsh-importer.php:435
+#: includes/orders/class-bsh-order-sync.php:402
+msgid "در باسلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن."
+msgstr ""
+
+#. translators: %s: Basalam product id
+#: includes/class-bsh-importer.php:571
+#, php-format
+msgid "از باسلام وارد شد (#%s)."
+msgstr ""
+
+#: includes/class-bsh-importer.php:573
+msgid "تصویرهای جاافتاده را دستی به محصول اضافه کن؛ بقیه‌ی اطلاعات کامل وارد شده."
+msgstr ""
+
+#: includes/class-bsh-importer.php:809
+msgid "دانلود بعضی تصویرها از باسلام انجام نشد."
+msgstr ""
+
+#: includes/class-bsh-importer.php:827
+msgid "بعضی تصویرها در کتابخانه‌ی رسانه ذخیره نشدند."
+msgstr ""
+
+#. translators: %s: count
+#: includes/class-bsh-inventory.php:185
+#, php-format
+msgid "موجودی %s کالا در سایت با باسلام یکی شد."
+msgstr ""
+
+#: includes/class-bsh-inventory.php:211
+msgid "دریافت موجودی از باسلام"
+msgstr ""
+
+#: includes/class-bsh-inventory.php:429
+msgid "فروش سایت از موجودی باسلام کم نشد."
+msgstr ""
+
+#: includes/class-bsh-inventory.php:430
+msgid "موجودی این محصول را در پنل باسلام دستی اصلاح کن تا بیش‌فروشی نشود."
+msgstr ""
+
+#. translators: 1: total, 2: certain, 3: suspect, 4: none
+#: includes/class-bsh-linker.php:327
+#, php-format
+msgid "%1$s محصول غرفه بررسی شد: %2$s قطعی، %3$s مشکوک، %4$s بدون جفت. تا تأیید تو چیزی متصل نمی‌شود."
+msgstr ""
+
+#: includes/class-bsh-linker.php:390
+msgid "قبلاً متصل شده."
+msgstr ""
+
+#. translators: %s: Basalam id
+#: includes/class-bsh-linker.php:423
+#, php-format
+msgid "SKU یکی است، ولی این محصول سایت قبلاً به محصول دیگری در باسلام (#%s) متصل است."
+msgstr ""
+
+#: includes/class-bsh-linker.php:432
+#, php-format
+msgid "SKU یکسان: %s"
+msgstr ""
+
+#: includes/class-bsh-linker.php:441
+msgid "SKUهای این محصول به چند محصول مختلف سایت می‌خورند."
+msgstr ""
+
+#. translators: %s: similarity percent
+#: includes/class-bsh-linker.php:505
+msgid "نام دقیقاً یکی است (SKU ندارد یا فرق دارد)."
+msgstr ""
+
+#. translators: %s: similarity percent
+#: includes/class-bsh-linker.php:505
+#, php-format
+msgid "نام شبیه است (%s٪)."
+msgstr ""
+
+#: includes/class-bsh-linker.php:507
+msgid "چند گزینه‌ی مشابه هست؛ درستش را انتخاب کن."
+msgstr ""
+
+#: includes/class-bsh-linker.php:510
+msgid "این محصول سایت قبلاً به محصول دیگری متصل است."
+msgstr ""
+
+#: includes/class-bsh-linker.php:531
+msgid "چند محصول باسلام با یک SKU به همین محصول سایت می‌خورند؛ فقط یکی را متصل کن."
+msgstr ""
+
+#. translators: %s: Basalam id
+#: includes/class-bsh-linker.php:667
+#, php-format
+msgid "#%s: محصول سایت پیدا نشد یا نوعش پشتیبانی نمی‌شود."
+msgstr ""
+
+#. translators: %s: Basalam id
+#: includes/class-bsh-linker.php:673
+#, php-format
+msgid "#%s: این محصول باسلام قبلاً به محصول دیگری متصل شده."
+msgstr ""
+
+#. translators: 1: product, 2: Basalam id
+#: includes/class-bsh-linker.php:679
+#, php-format
+msgid "«%1$s» قبلاً به محصول باسلام #%2$s متصل است."
+msgstr ""
+
+#. translators: %s: Basalam id
+#: includes/class-bsh-linker.php:737
+#, php-format
+msgid "به محصول موجود باسلام #%s متصل شد."
+msgstr ""
+
+#. translators: %s: count
+#: includes/class-bsh-linker.php:740
+#, php-format
+msgid "%s تنوع جفت نشد؛ در اولین ارسال، فهرست کامل تنوع‌ها از سایت فرستاده می‌شود."
+msgstr ""
+
+#: includes/class-bsh-migrate.php:149
+msgid "اطلاعات نسخه‌ی قبلی (سلام‌هاب) منتقل شد: اتصال، محصولات متصل، سفارش‌ها، لاگ و تنظیمات."
+msgstr ""
+
+#: includes/class-bsh-migrate.php:150
+msgid "افزونه‌ی قدیمی غیرفعال شد و می‌توانی حذفش کنی؛ حذفش به داده‌های باسلام‌هاب دست نمی‌زند."
+msgstr ""
+
+#: includes/class-bsh-migrate.php:201
+msgid "سلام‌هاب حالا «باسلام‌هاب» است. همه‌ی اطلاعات (اتصال، محصولات متصل، سفارش‌ها، لاگ و تنظیمات) منتقل شد و نسخه‌ی قدیمی غیرفعال شد. می‌توانی افزونه‌ی قدیمی را حذف کنی."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:37
+msgid "بله"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:42
+msgid "تلگرام"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:117
+msgid "توکن ربات این شکلی است: 123456789:AAH…  از پیام BotFather کامل کپی کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:146
+msgid "شناسه‌ی گفتگو عدد است (برای گروه با منفی شروع می‌شود) یا نام کانال با @. دکمه‌ی «پیدا کردن شناسه» را بزن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:155
+msgid "آدرس واسط باید یک آدرس کامل https باشد."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:190
+msgid "تطبیق شبانه‌ی باسلام‌هاب"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:192
+msgid "خطا در باسلام‌هاب"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:194
+msgid "راه‌حل:"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:253
+msgid "سفارش جدید باسلام"
+msgstr ""
+
+#. translators: 1: order number, 2: parcel id
+#: includes/class-bsh-notifier.php:255
+#, php-format
+msgid "سفارش %1$s (باسلام #%2$s)"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:259
+msgid "مبلغ:"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:262
+msgid "گیرنده:"
+msgstr ""
+
+#. translators: %s: channel
+#: includes/class-bsh-notifier.php:303
+#, php-format
+msgid "اعلان %s"
+msgstr ""
+
+#: includes/class-bsh-notifier.php:304
+msgid "پیام اعلان فرستاده نشد."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:322
+msgid "توکن ربات یا شناسه‌ی گفتگو وارد نشده."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:323
+msgid "در باسلام‌هاب › اعلان‌ها کامل کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:366
+msgid "هنوز پیامی به ربات نرسیده."
+msgstr ""
+
+#. translators: %s: channel
+#: includes/class-bsh-notifier.php:368
+#, php-format
+msgid "در %s ربات خودت را باز کن، «/start» یا هر پیامی بفرست (برای گروه: ربات را عضو گروه کن و در گروه پیام بده)، بعد دوباره این دکمه را بزن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:428
+msgid "توکن ربات وارد نشده یا قابل خواندن نیست."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:429
+msgid "توکن را دوباره وارد و ذخیره کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:434
+msgid "سرور سایت به تلگرام دسترسی ندارد."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:434
+msgid "سرور سایت به بله وصل نشد."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:436
+msgid "روی بیشتر هاست‌های ایران تلگرام باز نیست. از بله استفاده کن، یا آدرس یک واسط (relay) را در «آدرس واسط API» وارد کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:437
+msgid "چند دقیقه‌ی دیگر خودکار دوباره تلاش می‌شود. اگر ادامه داشت، از هاستینگ بپرس آیا دسترسی خروجی به tapi.bale.ai باز است."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:445
+msgid "توکن ربات درست نیست."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:446
+msgid "توکن را دوباره از BotFather کپی کن و ذخیره کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:452
+msgid "ربات نمی‌تواند به این گفتگو پیام بدهد."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:453
+msgid "شناسه‌ی گفتگو را با «پیدا کردن شناسه» دوباره بگیر. اگر ربات را بلاک کرده‌ای یا از گروه حذف شده، دوباره اضافه‌اش کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:459
+msgid "پیام‌رسان گفت کمی صبر کن."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:460
+#: includes/class-bsh-notifier.php:466
+msgid "خودکار دوباره تلاش می‌شود."
+msgstr ""
+
+#: includes/class-bsh-notifier.php:465
+msgid "پیام‌رسان پاسخ نامعلومی داد."
+msgstr ""
+
+#: includes/class-bsh-plugin.php:142
+msgid "باسلام‌هاب برای کار به ووکامرس نیاز دارد. اول ووکامرس را نصب و فعال کن."
+msgstr ""
+
+#: includes/class-bsh-price-rules.php:139
+msgid "مقدار باید عددی بزرگ‌تر از صفر باشد."
+msgstr ""
+
+#: includes/class-bsh-price-rules.php:144
+msgid "کاهش ۱۰۰ درصد یا بیشتر قیمت را صفر می‌کند."
+msgstr ""
+
+#: includes/class-bsh-price-rules.php:148
+msgid "درصد بیش از ۱۰۰۰ احتمالاً اشتباه تایپی است."
+msgstr ""
+
+#. translators: 1: percent, 2: increase/decrease
+#: includes/class-bsh-price-rules.php:252
+#, php-format
+msgid "%1$s٪ %2$s"
+msgstr ""
+
+#. translators: 1: amount in Toman, 2: increase/decrease
+#: includes/class-bsh-price-rules.php:255
+#, php-format
+msgid "%1$s تومان %2$s"
+msgstr ""
+
+#. translators: %s: count
+#: includes/class-bsh-queue.php:82
+#, php-format
+msgid "%s محصول که کارشان نیمه‌کاره متوقف شده بود دوباره در صف قرار گرفتند."
+msgstr ""
+
+#: includes/class-bsh-queue.php:83
+msgid "احتمالاً یک خطای سیستمی (مثلاً از افزونه‌ی دیگر یا قطعی هاست) کار قبلی را نیمه‌کاره گذاشته بود."
+msgstr ""
+
+#: includes/class-bsh-settings.php:28
+msgid "نام محصول"
+msgstr ""
+
+#: includes/class-bsh-settings.php:29
+msgid "توضیحات"
+msgstr ""
+
+#: includes/class-bsh-settings.php:30
+msgid "تصاویر"
+msgstr ""
+
+#: includes/class-bsh-settings.php:33
+msgid "وزن، ابعاد و زمان آماده‌سازی"
+msgstr ""
+
+#: includes/class-bsh-settings.php:34
+msgid "دسته‌بندی"
+msgstr ""
+
+#: includes/class-bsh-settings.php:106
+msgid "شناسه‌ی دسته فقط عدد است؛ مثلاً 1287."
+msgstr ""
+
+#: includes/class-bsh-settings.php:112
+msgid "زمان آماده‌سازی باید بین ۰ تا ۶۰ روز باشد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:113
+msgid "وزن پیش‌فرض باید بیشتر از صفر گرم باشد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:114
+msgid "وزن بسته‌بندی باید صفر یا بیشتر باشد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:115
+msgid "موجودی پیش‌فرض باید صفر یا بیشتر باشد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:116
+msgid "نگهداری لاگ باید بین ۷ تا ۳۶۵ روز باشد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:117
+msgid "فاصله‌ی دریافت سفارش باید بین ۲ تا ۶۰ دقیقه باشد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:118
+msgid "سفارش‌های گذشته را بین ۰ تا ۳۰ روز می‌شود وارد کرد."
+msgstr ""
+
+#: includes/class-bsh-settings.php:119
+msgid "موجودی اطمینان باید صفر یا بیشتر باشد."
+msgstr ""
+
+#: includes/functions.php:109
+msgid "هنوز انجام نشده"
+msgstr ""
+
+#: includes/functions.php:113
+msgid "همین حالا"
+msgstr ""
+
+#. translators: %s: minutes
+#: includes/functions.php:117
+#, php-format
+msgid "%s دقیقه پیش"
+msgstr ""
+
+#. translators: %s: hours
+#: includes/functions.php:121
+#, php-format
+msgid "%s ساعت پیش"
+msgstr ""
+
+#. translators: %s: days
+#: includes/functions.php:124
+#, php-format
+msgid "%s روز پیش"
+msgstr ""
+
+#. translators: %s: count
+#: includes/orders/class-bsh-order-sync.php:137
+#, php-format
+msgid "%s سفارش تازه پیدا شد و در صف ثبت قرار گرفت."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:153
+msgid "دریافت سفارش‌های باسلام"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:338
+msgid "ساخت سفارش در ووکامرس با خطای داخلی متوقف شد."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:341
+#: includes/sync/class-bsh-product-sync.php:60
+msgid "یک خطای پیش‌بینی‌نشده در سایت رخ داد (احتمالاً تداخل با افزونه‌ی دیگر)."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:342
+msgid "«تلاش مجدد» را بزن. اگر تکرار شد، جزئیات فنی را برای پشتیبانی بفرست. سفارش در باسلام سالم است."
+msgstr ""
+
+#. translators: %s: parcel id
+#. translators: %s: parcel
+#: includes/orders/class-bsh-order-sync.php:376
+#: includes/orders/class-bsh-order-sync.php:829
+#: includes/orders/class-bsh-order-sync.php:875
+#, php-format
+msgid "سفارش باسلام #%s"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:381
+msgid "در ووکامرس ثبت نشد."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:401
+msgid "مبلغ سفارش‌های باسلام به ریال است و باسلام‌هاب نمی‌داند به چه واحدی تبدیلش کند."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:419
+msgid "ووکامرس سفارش را نساخت."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:450
+msgid "محصول باسلام"
+msgstr ""
+
+#. translators: %s: shipping method
+#: includes/orders/class-bsh-order-sync.php:464
+#, php-format
+msgid "ارسال باسلام (%s)"
+msgstr ""
+
+#. translators: %s: shipping method
+#: includes/orders/class-bsh-order-sync.php:464
+msgid "ارسال باسلام"
+msgstr ""
+
+#. translators: %s: plate
+#: includes/orders/class-bsh-order-sync.php:480
+#, php-format
+msgid "پلاک %s"
+msgstr ""
+
+#. translators: %s: unit
+#: includes/orders/class-bsh-order-sync.php:481
+#, php-format
+msgid "واحد %s"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:504
+msgid "پرداخت در باسلام"
+msgstr ""
+
+#. translators: 1: parcel id, 2: Basalam status
+#: includes/orders/class-bsh-order-sync.php:537
+#, php-format
+msgid "سفارش باسلام #%1$s (وضعیت در باسلام: %2$s) توسط باسلام‌هاب ثبت شد."
+msgstr ""
+
+#. translators: %s: product names
+#: includes/orders/class-bsh-order-sync.php:540
+#, php-format
+msgid "این محصولات در سایت پیدا نشدند و بدون اتصال ثبت شدند (موجودی‌شان کم نشد): %s"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:546
+msgid "وضعیت از باسلام."
+msgstr ""
+
+#. translators: 1: parcel id, 2: order number
+#: includes/orders/class-bsh-order-sync.php:573
+#, php-format
+msgid "سفارش باسلام #%1$s → سفارش %2$s"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:574
+msgid "در ووکامرس ثبت شد."
+msgstr ""
+
+#. translators: %s: names
+#: includes/orders/class-bsh-order-sync.php:576
+#, php-format
+msgid "این محصولات در سایت پیدا نشدند: %s"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:577
+msgid "این محصولات را از «اتصال محصولات غرفه» به محصولات سایت وصل کن تا سفارش‌های بعدی موجودی را درست کم کنند."
+msgstr ""
+
+#. translators: %s: Basalam status
+#: includes/orders/class-bsh-order-sync.php:703
+#: includes/orders/class-bsh-order-sync.php:706
+#, php-format
+msgid "وضعیت در باسلام عوض شد: %s"
+msgstr ""
+
+#. translators: %s: order number
+#: includes/orders/class-bsh-order-sync.php:730
+#: includes/orders/class-bsh-order-sync.php:933
+#, php-format
+msgid "سفارش %s"
+msgstr ""
+
+#. translators: %s: status
+#: includes/orders/class-bsh-order-sync.php:732
+#, php-format
+msgid "وضعیت در باسلام: %s"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:733
+msgid "این وضعیت به رسیدگی تو در پنل باسلام نیاز دارد."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:791
+msgid "تأیید سفارش"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:792
+msgid "ثبت ارسال"
+msgstr ""
+
+#. translators: %s: action
+#: includes/orders/class-bsh-order-sync.php:810
+#: includes/orders/class-bsh-order-sync.php:831
+#, php-format
+msgid "«%s» در باسلام ثبت شد."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:851
+msgid "باسلام این تغییر وضعیت را نپذیرفت."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:852
+msgid "احتمالاً وضعیت فعلی سفارش در باسلام اجازه‌ی این تغییر را نمی‌دهد (مثلاً قبلاً ارسال یا لغو شده) یا کد رهگیری معتبر نیست."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:853
+msgid "وضعیت سفارش را در پنل باسلام ببین؛ باسلام‌هاب در دریافت بعدی وضعیت را خودش به‌روز می‌کند."
+msgstr ""
+
+#. translators: 1: action, 2: error
+#: includes/orders/class-bsh-order-sync.php:865
+#, php-format
+msgid "«%1$s» در باسلام ثبت نشد: %2$s"
+msgstr ""
+
+#. translators: %s: action
+#: includes/orders/class-bsh-order-sync.php:885
+#, php-format
+msgid "«%s» در باسلام ثبت نشد."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:913
+msgid "سفارش «تکمیل‌شده» شد ولی روش ارسال در کادر باسلام‌هاب انتخاب نشده؛ ارسال در باسلام ثبت نشد. روش ارسال و کد رهگیری را وارد کن و «ثبت ارسال در باسلام» را بزن."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:925
+msgid "این سفارش در سایت لغو شد، ولی API باسلام اجازه‌ی لغو از سمت غرفه‌دار را نمی‌دهد. درخواست لغو را در پنل باسلام ثبت کن؛ وضعیت بعد از آن خودکار همگام می‌شود."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:934
+msgid "در سایت لغو شد؛ در باسلام هنوز لغو نشده."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:935
+msgid "API باسلام لغو سفارش از سمت غرفه‌دار را پشتیبانی نمی‌کند."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:936
+msgid "در پنل غرفه‌ی باسلام «درخواست لغو» را ثبت کن."
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:949
+msgid "پیک"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:950
+msgid "پست پیشتاز"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:951
+msgid "پست سفارشی"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:952
+msgid "باربری"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:953
+msgid "تیپاکس"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:954
+msgid "ماهکس"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:955
+msgid "چاپار"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:956
+msgid "امداد پست"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:957
+msgid "دکا"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:958
+msgid "چیتا"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:959
+msgid "باکسیت"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:960
+msgid "سلام‌رسان"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:961
+msgid "دیجی‌اکسپرس"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:962
+msgid "تاپین"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:963
+msgid "پارسی"
+msgstr ""
+
+#: includes/orders/class-bsh-order-sync.php:964
+msgid "پینکس"
+msgstr ""
+
+#. translators: 1: missing, 2: checked
+#: includes/orders/class-bsh-reconcile.php:186
+#, php-format
+msgid "%1$s سفارش باسلام در سایت نبود (از %2$s سفارش ۷ روز اخیر) و در صف ثبت قرار گرفت."
+msgstr ""
+
+#. translators: %s: parcel ids
+#: includes/orders/class-bsh-reconcile.php:188
+#, php-format
+msgid "شماره‌های باسلام: %s. معمولاً یعنی سایت مدتی در دسترس نبوده یا ثبتی ناموفق بوده."
+msgstr ""
+
+#: includes/orders/class-bsh-reconcile.php:189
+msgid "لازم نیست کاری کنی؛ چند دقیقه‌ی دیگر در سفارش‌های ووکامرس می‌آیند. اگر نیامدند، دلیلش در صفحه‌ی «سفارش‌ها» است."
+msgstr ""
+
+#. translators: %s: checked
+#: includes/orders/class-bsh-reconcile.php:201
+#, php-format
+msgid "همه‌ی %s سفارش ۷ روز اخیر باسلام در سایت هست."
+msgstr ""
+
+#: includes/sync/class-bsh-image-sync.php:111
+msgid "آپلود تصویر در باسلام کامل نشد."
+msgstr ""
+
+#: includes/sync/class-bsh-image-sync.php:115
+msgid "باسلام شناسه‌ی فایل را برنگرداند."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:38
+msgid "فقط محصولات ساده و متغیر قابل ارسال هستند."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:39
+msgid "محصولات گروهی و خارجی در باسلام معادل ندارند."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:68
+msgid "محصول نام ندارد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:69
+msgid "برای محصول نام بنویس."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:101
+msgid "محصول تصویر ندارد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:102
+msgid "باسلام محصول بدون عکس را نمایش نمی‌دهد؛ حداقل یک تصویر شاخص اضافه کن."
+msgstr ""
+
+#. translators: 1: variation id, 2: attribute
+#: includes/sync/class-bsh-product-mapper.php:152
+#, php-format
+msgid "تنوع #%1$s برای «%2$s» مقدار مشخص ندارد («هرکدام»)."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:153
+msgid "در تب «متغیرها»ی محصول برای هر تنوع مقدار دقیق انتخاب کن؛ باسلام تنوع «هرکدام» ندارد."
+msgstr ""
+
+#. translators: %s: variation label
+#: includes/sync/class-bsh-product-mapper.php:172
+#, php-format
+msgid "دو تنوع با ویژگی‌های یکسان («%s») وجود دارد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:173
+msgid "تنوع تکراری را حذف یا غیرفعال کن."
+msgstr ""
+
+#. translators: %s: variation label
+#: includes/sync/class-bsh-product-mapper.php:185
+#, php-format
+msgid "تنوع «%s» قیمت ندارد یا قیمتش صفر است."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:186
+msgid "قیمت همه‌ی تنوع‌های فعال را وارد کن، یا تنوع را غیرفعال کن."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:208
+msgid "محصول متغیر هیچ تنوع فعالی ندارد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:209
+msgid "حداقل یک تنوع با قیمت بساز و فعالش کن."
+msgstr ""
+
+#. translators: %s: currency code
+#: includes/sync/class-bsh-product-mapper.php:319
+#, php-format
+msgid "واحد پول فروشگاه (%s) قابل تبدیل به ریال نیست."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:320
+msgid "در باسلام‌هاب › تنظیمات، واحد قیمت‌های سایت را دستی روی «تومان» یا «ریال» بگذار."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:340
+msgid "قیمت محصول صفر یا خالی است."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:341
+msgid "باسلام‌هاب هیچ‌وقت قیمت صفر به باسلام نمی‌فرستد. قیمت محصول را وارد کن."
+msgstr ""
+
+#. translators: %s: WooCommerce category names
+#: includes/sync/class-bsh-product-mapper.php:398
+#, php-format
+msgid "دسته‌ی %s به هیچ دسته‌ی باسلام نگاشت نشده."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:399
+msgid "دسته‌ی باسلام برای این محصول انتخاب نشده."
+msgstr ""
+
+#: includes/sync/class-bsh-product-mapper.php:400
+msgid "در باسلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر باسلام‌هاب همین محصول بنویس.)"
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:59
+msgid "ارسال به باسلام با خطای داخلی متوقف شد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:61
+msgid "یک بار «تلاش مجدد» بزن. اگر تکرار شد، جزئیات فنی همین ردیف را برای پشتیبانی بفرست."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:86
+msgid "ارسال نشد؛ باسلام‌هاب به باسلام وصل نیست."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:87
+msgid "توکن وارد نشده یا آخرین تست اتصال ناموفق بوده است."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:88
+msgid "در باسلام‌هاب › تنظیمات توکن را وارد کن و «تست اتصال» را بزن، بعد «تلاش مجدد»."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:101
+#: includes/sync/class-bsh-product-sync.php:115
+msgid "به باسلام ارسال نشد."
+msgstr ""
+
+#. translators: %s: attribute names
+#: includes/sync/class-bsh-product-sync.php:117
+#, php-format
+msgid "دسته‌ی باسلام این ویژگی‌های اجباری را می‌خواهد که مقدار ندارند: %s."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:118
+msgid "در باسلام‌هاب › نگاشت دسته‌ها مقدار پیش‌فرض این ویژگی‌ها را وارد کن، یا در محصول ویژگی ووکامرسی با همین نام بساز."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:172
+msgid "نتیجه‌ی ساخت محصول در باسلام معلوم نشد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:176
+msgid "باسلام شناسه‌ی محصول را برنگرداند."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:177
+msgid "لازم نیست کاری کنی؛ دوباره بررسی می‌شود و محصول تکراری ساخته نمی‌شود."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:216
+msgid "این محصول در باسلام حذف شده است."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:217
+msgid "اگر می‌خواهی دوباره در باسلام باشد، «تلاش مجدد» را بزن تا از نو ساخته شود."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:246
+msgid "در باسلام ساخته شد."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:246
+msgid "تغییرات در باسلام اعمال شد."
+msgstr ""
+
+#. translators: 1: remote count, 2: local count
+#: includes/sync/class-bsh-product-sync.php:351
+#, php-format
+msgid "تنوع‌های باسلام با سایت جور نیست: %1$s تنوع در باسلام، %2$s تنوع فعال در سایت."
+msgstr ""
+
+#. translators: %s: labels
+#: includes/sync/class-bsh-product-sync.php:353
+#, php-format
+msgid "تنوع تکراری: %s."
+msgstr ""
+
+#. translators: %s: labels
+#: includes/sync/class-bsh-product-sync.php:354
+#, php-format
+msgid "در باسلام پیدا نشد: %s."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:356
+msgid "تنوع‌های اضافه را در پنل باسلام حذف کن. باسلام‌هاب از این به بعد فقط جدیدترین تنوع هر ردیف را به‌روز می‌کند و تنوع تازه نمی‌سازد."
+msgstr ""
+
+#. translators: %s: variation label
+#: includes/sync/class-bsh-product-sync.php:421
+#, php-format
+msgid "تنوع «%s» در باسلام حذف شده است."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:422
+msgid "«تلاش مجدد» فهرست کامل تنوع‌ها را دوباره می‌فرستد."
+msgstr ""
+
+#. translators: %s: seconds
+#: includes/sync/class-bsh-product-sync.php:540
+#, php-format
+msgid "صف %s ثانیه مکث می‌کند و بعد از همان‌جا ادامه می‌دهد."
+msgstr ""
+
+#. translators: %s: minutes
+#: includes/sync/class-bsh-product-sync.php:569
+#, php-format
+msgid "حدود %s دقیقه‌ی دیگر خودکار دوباره تلاش می‌شود."
+msgstr ""
+
+#: includes/sync/class-bsh-product-sync.php:577
+msgid "چند بار خودکار تلاش شد و نشد. وقتی مشکل برطرف شد «تلاش مجدد» را بزن."
+msgstr ""

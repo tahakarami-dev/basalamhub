@@ -233,6 +233,19 @@ bsh_t_ok( 5 === $sp->get_stock_quantity(), 'Basalam shows 3 with safety 2 → si
 bsh_t_ok( 3 === ( new BSH_Product_Mapper() )->map( $sp )['payload']['stock'], 'and it maps back to 3 for Basalam' );
 BSH_Settings::save( array_merge( BSH_Settings::all(), array( 'safety_stock' => '0' ) ) );
 
+echo "I6b Import of new products only: every one is created (no skipping)\n";
+$bid_r = array();
+for ( $i = 0; $i < 5; $i++ ) {
+	$bid_r[] = bsh_t_booth_add( $state_file, array( 'name' => 'ردیف ' . $i . ' ' . $sfx, 'primary_price' => 1000000 + $i, 'stock' => 1 ) );
+}
+bsh_t_snapshot();
+bsh_t_import( array( 'update_linked' => 0 ) );
+$made = 0;
+foreach ( $bid_r as $b ) {
+	$made += count( bsh_t_imported( $b ) );
+}
+bsh_t_ok( 5 === $made && 5 === BSH_Importer::state()['created'], 'all 5 created in one run (regression: the old offset walk skipped every other one)' );
+
 echo "I7 Last guard: a SKU that appeared on the site meanwhile is not duplicated\n";
 $bid_e = bsh_t_booth_add( $state_file, array( 'name' => 'پسته اکبری ' . $sfx, 'sku' => 'BS-E-' . $sfx, 'primary_price' => 1000000, 'stock' => 1 ) );
 bsh_t_product( array( 'name' => 'محصول دیگر ' . $sfx, 'sku' => 'BS-E-' . $sfx, 'no_image' => 1 ) );

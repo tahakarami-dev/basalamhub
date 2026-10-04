@@ -8,6 +8,7 @@
  * Requires PHP:      7.4
  * Requires Plugins:  woocommerce
  * WC requires at least: 7.0
+ * WC tested up to:     10.2
  * Author:            طاها کرمی
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
