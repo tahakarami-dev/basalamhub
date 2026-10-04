@@ -300,7 +300,7 @@ class SLH_Product_Mapper {
 				'field'      => 'primary_price',
 				/* translators: %s: currency code */
 				'message'    => sprintf( __( 'واحد پول فروشگاه (%s) قابل تبدیل به ریال نیست.', 'salamhub' ), get_woocommerce_currency() ),
-				'suggestion' => __( 'در سلام‌هاب › تنظیمات، واحد قیمت‌های سایت را دستی روی «تومان» یا «ریال» بگذار.', 'salamhub' ),
+				'suggestion' => __( 'در باسلام‌هاب › تنظیمات، واحد قیمت‌های سایت را دستی روی «تومان» یا «ریال» بگذار.', 'salamhub' ),
 			);
 			return 0;
 		}
@@ -321,7 +321,7 @@ class SLH_Product_Mapper {
 			$problems[] = array(
 				'field'      => 'primary_price',
 				'message'    => __( 'قیمت محصول صفر یا خالی است.', 'salamhub' ),
-				'suggestion' => __( 'سلام‌هاب هیچ‌وقت قیمت صفر به باسلام نمی‌فرستد. قیمت محصول را وارد کن.', 'salamhub' ),
+				'suggestion' => __( 'باسلام‌هاب هیچ‌وقت قیمت صفر به باسلام نمی‌فرستد. قیمت محصول را وارد کن.', 'salamhub' ),
 			);
 			return 0;
 		}
@@ -380,7 +380,7 @@ class SLH_Product_Mapper {
 					/* translators: %s: WooCommerce category names */
 					? sprintf( __( 'دسته‌ی %s به هیچ دسته‌ی باسلام نگاشت نشده.', 'salamhub' ), implode( '، ', $names ) )
 					: __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'salamhub' ),
-				'suggestion' => __( 'در سلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر سلام‌هاب همین محصول بنویس.)', 'salamhub' ),
+				'suggestion' => __( 'در باسلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر باسلام‌هاب همین محصول بنویس.)', 'salamhub' ),
 			);
 		}
 		return $cat;

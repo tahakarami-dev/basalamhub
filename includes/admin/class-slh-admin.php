@@ -34,7 +34,7 @@ class SLH_Admin {
 	public static function menu() {
 		$icon = 'data:image/svg+xml;base64,' . base64_encode( '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M10 2a8 8 0 0 0-7.4 5h2.3A6 6 0 0 1 15.2 7H13l3 4 3-4h-1.6A8 8 0 0 0 10 2Zm-7 7-3 4h1.6A8 8 0 0 0 17.4 13h-2.3A6 6 0 0 1 4.8 13H7L4 9Z"/></svg>' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 
-		add_menu_page( __( 'سلام‌هاب', 'salamhub' ), __( 'سلام‌هاب', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
+		add_menu_page( __( 'باسلام‌هاب', 'salamhub' ), __( 'باسلام‌هاب', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
 		add_submenu_page( 'salamhub', __( 'داشبورد و سلامت', 'salamhub' ), __( 'داشبورد', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ) );
 		add_submenu_page( 'salamhub', __( 'محصولات', 'salamhub' ), __( 'محصولات', 'salamhub' ), self::CAP, 'salamhub-products', array( __CLASS__, 'page_products' ) );
 		$missing = SLH_Order_Sync::missing_count();
@@ -47,7 +47,7 @@ class SLH_Admin {
 		$badge  = $errors ? ' <span class="awaiting-mod">' . esc_html( slh_fa_digits( $errors ) ) . '</span>' : '';
 		add_submenu_page( 'salamhub', __( 'لاگ همگام‌سازی', 'salamhub' ), __( 'لاگ', 'salamhub' ) . $badge, self::CAP, 'salamhub-logs', array( __CLASS__, 'page_logs' ) );
 		SLH_Import_UI::add_notify_page();
-		add_submenu_page( 'salamhub', __( 'تنظیمات سلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
+		add_submenu_page( 'salamhub', __( 'تنظیمات باسلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
 	}
 
 	/**

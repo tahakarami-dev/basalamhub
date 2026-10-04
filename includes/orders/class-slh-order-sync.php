@@ -373,8 +373,8 @@ class SLH_Order_Sync {
 				__( 'واحد پول فروشگاه قابل تبدیل از ریال نیست.', 'salamhub' ),
 				'validation',
 				array(
-					'reason'     => __( 'مبلغ سفارش‌های باسلام به ریال است و سلام‌هاب نمی‌داند به چه واحدی تبدیلش کند.', 'salamhub' ),
-					'suggestion' => __( 'در سلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن.', 'salamhub' ),
+					'reason'     => __( 'مبلغ سفارش‌های باسلام به ریال است و باسلام‌هاب نمی‌داند به چه واحدی تبدیلش کند.', 'salamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن.', 'salamhub' ),
 				)
 			);
 		}
@@ -490,7 +490,7 @@ class SLH_Order_Sync {
 			);
 
 			/* translators: 1: parcel id, 2: Basalam status */
-			$note = sprintf( __( 'سفارش باسلام #%1$s (وضعیت در باسلام: %2$s) توسط سلام‌هاب ثبت شد.', 'salamhub' ), $parcel_id, isset( $parcel['status']['title'] ) ? $parcel['status']['title'] : '—' );
+			$note = sprintf( __( 'سفارش باسلام #%1$s (وضعیت در باسلام: %2$s) توسط باسلام‌هاب ثبت شد.', 'salamhub' ), $parcel_id, isset( $parcel['status']['title'] ) ? $parcel['status']['title'] : '—' );
 			if ( $missing ) {
 				/* translators: %s: product names */
 				$note .= ' ' . sprintf( __( 'این محصولات در سایت پیدا نشدند و بدون اتصال ثبت شدند (موجودی‌شان کم نشد): %s', 'salamhub' ), implode( '، ', $missing ) );
@@ -759,7 +759,7 @@ class SLH_Order_Sync {
 				// The generic 422 text talks about product data; say what it means for an order.
 				$message       = __( 'باسلام این تغییر وضعیت را نپذیرفت.', 'salamhub' );
 				$e->reason     = trim( __( 'احتمالاً وضعیت فعلی سفارش در باسلام اجازه‌ی این تغییر را نمی‌دهد (مثلاً قبلاً ارسال یا لغو شده) یا کد رهگیری معتبر نیست.', 'salamhub' ) . ' ' . $e->reason );
-				$e->suggestion = __( 'وضعیت سفارش را در پنل باسلام ببین؛ سلام‌هاب در دریافت بعدی وضعیت را خودش به‌روز می‌کند.', 'salamhub' );
+				$e->suggestion = __( 'وضعیت سفارش را در پنل باسلام ببین؛ باسلام‌هاب در دریافت بعدی وضعیت را خودش به‌روز می‌کند.', 'salamhub' );
 			}
 			if ( $order ) {
 				SLH_Links::upsert( 'order', $order->get_id(), array( 'sync_status' => 'error', 'last_error' => $message ) );
@@ -808,7 +808,7 @@ class SLH_Order_Sync {
 			$method   = (int) $order->get_meta( '_slh_shipping_method' );
 			$tracking = (string) $order->get_meta( '_slh_tracking_code' );
 			if ( ! $method ) {
-				$order->add_order_note( __( 'سفارش «تکمیل‌شده» شد ولی روش ارسال در کادر سلام‌هاب انتخاب نشده؛ ارسال در باسلام ثبت نشد. روش ارسال و کد رهگیری را وارد کن و «ثبت ارسال در باسلام» را بزن.', 'salamhub' ) );
+				$order->add_order_note( __( 'سفارش «تکمیل‌شده» شد ولی روش ارسال در کادر باسلام‌هاب انتخاب نشده؛ ارسال در باسلام ثبت نشد. روش ارسال و کد رهگیری را وارد کن و «ثبت ارسال در باسلام» را بزن.', 'salamhub' ) );
 				return;
 			}
 			self::queue_action( $parcel_id, 'posted', array( 'shipping_method' => $method, 'tracking_code' => $tracking ) );

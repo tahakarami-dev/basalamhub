@@ -41,7 +41,7 @@ $slh_err_class = function ( $key ) use ( $slh_errors ) {
 $slh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : '';
 ?>
 <header class="slh-page-head">
-	<h1 class="slh-page-title"><?php esc_html_e( 'تنظیمات سلام‌هاب', 'salamhub' ); ?></h1>
+	<h1 class="slh-page-title"><?php esc_html_e( 'تنظیمات باسلام‌هاب', 'salamhub' ); ?></h1>
 </header>
 
 <?php SLH_Admin::print_notice(); ?>

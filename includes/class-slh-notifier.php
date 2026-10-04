@@ -154,9 +154,9 @@ class SLH_Notifier {
 		if ( 'order_imported' === $event && $events['new_order'] ) {
 			$text = self::order_text( isset( $entry['object_id'] ) ? (int) $entry['object_id'] : 0 );
 		} elseif ( 'reconcile_missing' === $event && $events['reconcile'] ) {
-			$text = "🔁 " . __( 'تطبیق شبانه‌ی سلام‌هاب', 'salamhub' ) . "\n" . $entry['message'] . "\n" . ( isset( $entry['reason'] ) ? $entry['reason'] : '' );
+			$text = "🔁 " . __( 'تطبیق شبانه‌ی باسلام‌هاب', 'salamhub' ) . "\n" . $entry['message'] . "\n" . ( isset( $entry['reason'] ) ? $entry['reason'] : '' );
 		} elseif ( 'error' === $level && $events['errors'] && self::error_allowed( $entry ) ) {
-			$text = "⚠️ " . __( 'خطا در سلام‌هاب', 'salamhub' ) . "\n" . ( isset( $entry['title'] ) ? $entry['title'] : '' ) . "\n" . ( isset( $entry['message'] ) ? $entry['message'] : '' );
+			$text = "⚠️ " . __( 'خطا در باسلام‌هاب', 'salamhub' ) . "\n" . ( isset( $entry['title'] ) ? $entry['title'] : '' ) . "\n" . ( isset( $entry['message'] ) ? $entry['message'] : '' );
 			if ( ! empty( $entry['suggestion'] ) ) {
 				$text .= "\n" . __( 'راه‌حل:', 'salamhub' ) . ' ' . $entry['suggestion'];
 			}
@@ -269,7 +269,7 @@ class SLH_Notifier {
 	public static function send( $channel, $text ) {
 		$s = self::settings();
 		if ( ! isset( $s[ $channel ] ) || ! $s[ $channel ]['token'] || '' === (string) $s[ $channel ]['chat_id'] ) {
-			return array( 'message' => __( 'توکن ربات یا شناسه‌ی گفتگو وارد نشده.', 'salamhub' ), 'suggestion' => __( 'در سلام‌هاب › اعلان‌ها کامل کن.', 'salamhub' ), 'retryable' => false );
+			return array( 'message' => __( 'توکن ربات یا شناسه‌ی گفتگو وارد نشده.', 'salamhub' ), 'suggestion' => __( 'در باسلام‌هاب › اعلان‌ها کامل کن.', 'salamhub' ), 'retryable' => false );
 		}
 		$res = self::call( $channel, 'sendMessage', array( 'chat_id' => $s[ $channel ]['chat_id'], 'text' => $text, 'disable_web_page_preview' => true ) );
 		return is_array( $res ) && isset( $res['ok'] ) && true === $res['ok'] ? true : self::explain( $channel, $res );

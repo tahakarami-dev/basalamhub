@@ -110,7 +110,7 @@ class SLH_Api_Error extends Exception {
 				array(
 					'http_status' => $code,
 					'reason'      => __( 'توکن دسترسی منقضی شده، باطل شده یا اشتباه کپی شده است.', 'salamhub' ),
-					'suggestion'  => __( 'از پنل توسعه‌دهندگان باسلام یک توکن تازه بساز و در سلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
+					'suggestion'  => __( 'از پنل توسعه‌دهندگان باسلام یک توکن تازه بساز و در باسلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
 					'details'     => $details,
 				)
 			);
@@ -191,7 +191,7 @@ class SLH_Api_Error extends Exception {
 			array(
 				'http_status' => $code,
 				'reason'      => $server_msg ? $server_msg : __( 'پاسخ باسلام قابل تشخیص نبود.', 'salamhub' ),
-				'suggestion'  => __( 'یک بار «تلاش مجدد» بزن. اگر تکرار شد، جزئیات فنی همین ردیف را برای پشتیبانی سلام‌هاب بفرست.', 'salamhub' ),
+				'suggestion'  => __( 'یک بار «تلاش مجدد» بزن. اگر تکرار شد، جزئیات فنی همین ردیف را برای پشتیبانی باسلام‌هاب بفرست.', 'salamhub' ),
 				'details'     => $details,
 			)
 		);

@@ -94,7 +94,7 @@ class SLH_Importer {
 	 */
 	public static function start( array $options ) {
 		if ( ! SLH_Settings::is_connected() ) {
-			return new WP_Error( 'not_connected', __( 'اول در سلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) );
+			return new WP_Error( 'not_connected', __( 'اول در باسلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) );
 		}
 		if ( self::is_running() || SLH_Linker::is_running() || SLH_Bulk::is_running() ) {
 			return new WP_Error( 'busy', __( 'یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'salamhub' ) );
@@ -372,8 +372,8 @@ class SLH_Importer {
 				__( 'واحد پول فروشگاه قابل تبدیل از ریال نیست.', 'salamhub' ),
 				'validation',
 				array(
-					'reason'     => __( 'قیمت‌های باسلام به ریال است و سلام‌هاب نمی‌داند به چه واحدی تبدیلش کند.', 'salamhub' ),
-					'suggestion' => __( 'در سلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن.', 'salamhub' ),
+					'reason'     => __( 'قیمت‌های باسلام به ریال است و باسلام‌هاب نمی‌داند به چه واحدی تبدیلش کند.', 'salamhub' ),
+					'suggestion' => __( 'در باسلام‌هاب › تنظیمات واحد قیمت‌های سایت را روی «تومان» یا «ریال» بگذار و «تلاش مجدد» را بزن.', 'salamhub' ),
 				)
 			);
 		}
