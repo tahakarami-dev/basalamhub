@@ -133,7 +133,7 @@ class BSH_Importer {
 			self::HOOK,
 			array(
 				'run_id' => $run,
-				'offset' => 0,
+				'after'  => 0,
 			),
 			BSH_Queue::GROUP
 		);
@@ -168,12 +168,14 @@ class BSH_Importer {
 	}
 
 	/**
-	 * Queue callback: imports the product at $offset of the snapshot, then queues the next.
+	 * Queue callback: imports the next snapshot row after $after (row id), then queues the
+	 * one after it. Walking by id, not by position: an imported row leaves the «new» set,
+	 * so positions shift while the run goes on — an offset would skip every other product.
 	 *
 	 * @param string $run_id Run.
-	 * @param int    $offset Offset among the rows to import.
+	 * @param int    $after  Snapshot row id already handled (0 at the start).
 	 */
-	public static function handle_next( $run_id, $offset ) {
+	public static function handle_next( $run_id, $after ) {
 		$state = self::state();
 		if ( $state['run_id'] !== $run_id || 'running' !== $state['status'] ) {
 			return;
@@ -182,13 +184,13 @@ class BSH_Importer {
 			self::HOOK,
 			array(
 				'run_id' => $run_id,
-				'offset' => (int) $offset,
+				'after'  => (int) $after,
 			),
-			function () use ( $run_id, $offset ) {
+			function () use ( $run_id, $after ) {
 				global $wpdb;
 				$state    = self::state();
 				$statuses = $state['update_linked'] ? "'none','linked'" : "'none'";
-				$row      = $wpdb->get_row( $wpdb->prepare( 'SELECT basalam_id, match_status FROM ' . BSH_Linker::table() . " WHERE match_status IN ({$statuses}) ORDER BY id ASC LIMIT 1 OFFSET %d", (int) $offset ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$row      = $wpdb->get_row( $wpdb->prepare( 'SELECT id, basalam_id FROM ' . BSH_Linker::table() . " WHERE id > %d AND match_status IN ({$statuses}) ORDER BY id ASC LIMIT 1", (int) $after ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $statuses is one of two fixed lists.
 				if ( ! $row ) {
 					self::finish();
 					return;
@@ -200,7 +202,7 @@ class BSH_Importer {
 						self::HOOK,
 						array(
 							'run_id' => $run_id,
-							'offset' => (int) $offset,
+							'after'  => (int) $after,
 						),
 						'import_' . $row->basalam_id,
 						60
@@ -216,14 +218,14 @@ class BSH_Importer {
 				self::set_state(
 					array(
 						$result  => $state[ $result ] + 1,
-						'offset' => (int) $offset + 1,
+						'offset' => (int) $row->id,
 					)
 				);
 				as_enqueue_async_action(
 					self::HOOK,
 					array(
 						'run_id' => $run_id,
-						'offset' => (int) $offset + 1,
+						'after'  => (int) $row->id,
 					),
 					BSH_Queue::GROUP
 				);

@@ -45,27 +45,36 @@ function bsh_s_drain( array $recurring, $label ) {
 	$store = ActionScheduler::store();
 	$m     = array( 'jobs' => 0, 'ms' => array(), 'queries' => array(), 'forwards' => 0 );
 	$start = microtime( true );
+	// One-off runs of recurring hooks carry "now" or "manual":1; the schedules themselves are left alone.
+	$is_one_off = function ( $hook, array $args ) use ( $recurring ) {
+		return ! in_array( $hook, $recurring, true ) || ! empty( $args['now'] ) || ! empty( $args['manual'] );
+	};
 	for ( $round = 0; $round < 5000; $round++ ) {
 		$ids = $store->query_actions( array( 'group' => BSH_Queue::GROUP, 'status' => ActionScheduler_Store::STATUS_PENDING, 'date' => as_get_datetime_object( time() + 1 ), 'date_compare' => '<=', 'per_page' => 100, 'orderby' => 'date', 'order' => 'ASC' ) );
 		$ids = array_values(
 			array_filter(
 				$ids,
-				function ( $id ) use ( $store, $recurring ) {
+				function ( $id ) use ( $store, $is_one_off ) {
 					$a = $store->fetch_action( $id );
-					return ! ( in_array( $a->get_hook(), $recurring, true ) && ! $a->get_args() );
+					return $is_one_off( $a->get_hook(), $a->get_args() );
 				}
 			)
 		);
 		if ( ! $ids ) {
 			// Anything left in the future (backoff, 429 pause)? Bring it forward.
-			$later = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}actionscheduler_actions a JOIN {$wpdb->prefix}actionscheduler_groups g ON g.group_id = a.group_id WHERE g.slug = %s AND a.status = 'pending' AND a.hook NOT IN ('" . implode( "','", $recurring ) . "')", BSH_Queue::GROUP ) ); // phpcs:ignore
-			$later += (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}actionscheduler_actions a JOIN {$wpdb->prefix}actionscheduler_groups g ON g.group_id = a.group_id WHERE g.slug = %s AND a.status = 'pending' AND a.hook IN ('" . implode( "','", $recurring ) . "') AND a.args <> '[]'", BSH_Queue::GROUP ) ); // phpcs:ignore
+			$later = array();
+			foreach ( $store->query_actions( array( 'group' => BSH_Queue::GROUP, 'status' => ActionScheduler_Store::STATUS_PENDING, 'per_page' => 500 ) ) as $id ) {
+				$a = $store->fetch_action( $id );
+				if ( $is_one_off( $a->get_hook(), $a->get_args() ) ) {
+					$later[] = (int) $id;
+				}
+			}
 			if ( ! $later ) {
 				break;
 			}
 			delete_option( 'bsh_pause_until' );
-			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}actionscheduler_actions SET scheduled_date_gmt = %s, scheduled_date_local = %s WHERE status = 'pending' AND hook NOT IN ('" . implode( "','", $recurring ) . "')", gmdate( 'Y-m-d H:i:s', time() - 1 ), gmdate( 'Y-m-d H:i:s', time() - 1 ) ) ); // phpcs:ignore
-			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}actionscheduler_actions SET scheduled_date_gmt = %s, scheduled_date_local = %s WHERE status = 'pending' AND args <> '[]' AND hook IN ('" . implode( "','", $recurring ) . "')", gmdate( 'Y-m-d H:i:s', time() - 1 ), gmdate( 'Y-m-d H:i:s', time() - 1 ) ) ); // phpcs:ignore
+			$now = gmdate( 'Y-m-d H:i:s', time() - 1 );
+			$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->prefix}actionscheduler_actions SET scheduled_date_gmt = %s, scheduled_date_local = %s WHERE action_id IN (" . implode( ',', $later ) . ')', $now, $now ) ); // phpcs:ignore
 			++$m['forwards'];
 			continue;
 		}
@@ -133,7 +142,8 @@ foreach ( $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key 
 
 echo "\nST1 Bulk send of {$n} products (healthy API)\n";
 $t0  = microtime( true );
-$ids = array();
+$ids   = array();
+$image = bsh_t_image(); // Basalam requires a photo; one shared photo also proves it is uploaded once.
 BSH_Plugin::$suspend_hooks = true;
 for ( $i = 0; $i < $n; $i++ ) {
 	$p = new WC_Product_Simple();
@@ -143,9 +153,7 @@ for ( $i = 0; $i < $n; $i++ ) {
 	$p->set_manage_stock( true );
 	$p->set_stock_quantity( $i % 20 );
 	$p->set_weight( '0.5' );
-	if ( 0 === $i % 10 ) {
-		$p->set_image_id( bsh_t_image() );
-	}
+	$p->set_image_id( $image );
 	$ids[] = $p->save();
 }
 BSH_Plugin::$suspend_hooks = false;
@@ -154,7 +162,9 @@ $t0    = microtime( true );
 $start = BSH_Bulk::start( array( 'scope' => 'unsent' ) );
 printf( "  «ارسال گروهی» button answered in %.0f ms (only plans; the browser never waits)\n", ( microtime( true ) - $t0 ) * 1000 );
 $m1     = bsh_s_drain( $recurring, 'bulk' );
-$synced = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . BSH_Links::table() . " WHERE object_type = 'product' AND sync_status = 'synced' AND wc_id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')' ) ); // phpcs:ignore
+$synced = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . BSH_Links::table() . " WHERE object_type = 'product' AND sync_status = 'synced' AND wc_id IN (" . implode( ',', array_map( 'intval', $ids ) ) . ')' ); // phpcs:ignore
+$uploads = count( array_filter( bsh_t_mock( $state_file )['files'] ?? array() ) );
+printf( "  photos uploaded to Basalam: %d (one shared photo)\n", $uploads );
 $skus   = bsh_s_mock_skus( $state_file );
 bsh_t_ok( $synced === $n, "all {$n} synced ({$synced})" );
 bsh_t_ok( count( $skus ) === count( array_unique( $skus ) ), 'no duplicate product on Basalam (' . count( $skus ) . ' products)' );
@@ -177,6 +187,7 @@ for ( $i = 0; $i < (int) ( $n / 2 ); $i++ ) {
 	$p->set_regular_price( (string) ( 20000 + $i ) );
 	$p->set_manage_stock( true );
 	$p->set_stock_quantity( 5 );
+	$p->set_image_id( $image );
 	$ids2[] = $p->save();
 }
 BSH_Plugin::$suspend_hooks = false;
