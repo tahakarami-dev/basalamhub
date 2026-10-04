@@ -131,13 +131,13 @@ function slh_t_fresh_start( $state_file ) {
 	update_option( 'woocommerce_currency', 'IRT' );
 	update_option( 'woocommerce_weight_unit', 'kg' );
 	update_option( 'woocommerce_dimension_unit', 'cm' );
-	foreach ( array( SLH_Settings::OPTION, SLH_Settings::TOKEN_OPTION, SLH_Settings::CONNECTION_OPTION, SLH_Bulk::OPTION, SLH_Categories::MAP_OPTION, SLH_Categories::CACHE_OPTION, SLH_Categories::ATTR_OPTION, SLH_Price_Rules::OPTION, 'slh_pause_until', 'slh_orders_polled_at', 'slh_orders_poll_error', 'slh_webhook_last', 'slh_stock_pulled_at', 'slh_stock_pull_changed' ) as $o ) {
+	foreach ( array( SLH_Settings::OPTION, SLH_Settings::TOKEN_OPTION, SLH_Settings::CONNECTION_OPTION, SLH_Bulk::OPTION, SLH_Categories::MAP_OPTION, SLH_Categories::CACHE_OPTION, SLH_Categories::ATTR_OPTION, SLH_Price_Rules::OPTION, 'slh_pause_until', 'slh_orders_polled_at', 'slh_orders_poll_error', 'slh_webhook_last', 'slh_stock_pulled_at', 'slh_stock_pull_changed', 'slh_import_state', 'slh_reconcile_last', 'slh_notify' ) as $o ) {
 		delete_option( $o );
 	}
 	$wpdb->query( 'DELETE FROM ' . SLH_Links::table() );
 	$wpdb->query( 'DELETE FROM ' . SLH_Logger::table() );
 	as_unschedule_all_actions( SLH_Bulk::HOOK_PLAN, null, 'salamhub' );
-	foreach ( array( SLH_Order_Sync::HOOK_POLL, SLH_Order_Sync::HOOK_IMPORT, SLH_Order_Sync::HOOK_ACTION, SLH_Inventory::HOOK_PULL, SLH_Inventory::HOOK_DECREMENT ) as $h ) {
+	foreach ( array( SLH_Order_Sync::HOOK_POLL, SLH_Order_Sync::HOOK_IMPORT, SLH_Order_Sync::HOOK_ACTION, SLH_Inventory::HOOK_PULL, SLH_Inventory::HOOK_DECREMENT, SLH_Importer::HOOK, SLH_Importer::HOOK_ONE, SLH_Reconcile::HOOK, SLH_Notifier::HOOK ) as $h ) {
 		as_unschedule_all_actions( $h, null, 'salamhub' );
 	}
 	slh_t_clear_queue();

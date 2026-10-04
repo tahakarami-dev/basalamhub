@@ -448,6 +448,29 @@ class SLH_Product_Sync {
 	}
 
 	/**
+	 * The change hash a sync would compute for this product right now (null when the product
+	 * can't be sent as is). Stored after an import, so a just-imported product is not sent
+	 * straight back to Basalam until something actually changes.
+	 *
+	 * @param WC_Product $product Product.
+	 * @return string|null
+	 */
+	public function fingerprint( WC_Product $product ) {
+		$mapped = $this->mapper->map( $product );
+		if ( $mapped['problems'] || ! empty( $mapped['payload']['_slh_missing_attributes'] ) ) {
+			return null;
+		}
+		$payload = array_filter(
+			$mapped['payload'],
+			function ( $key ) {
+				return 0 !== strpos( (string) $key, '_slh_' );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
+		return md5( wp_json_encode( array( $payload, $this->image_signatures( $mapped['image_ids'] ) ) ) );
+	}
+
+	/**
 	 * Image identity for the change hash (so a replaced image triggers a sync).
 	 *
 	 * @param int[] $ids Attachment IDs.

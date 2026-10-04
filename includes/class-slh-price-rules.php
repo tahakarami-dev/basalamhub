@@ -36,6 +36,14 @@ class SLH_Price_Rules {
 	}
 
 	/**
+	 * @return bool Whether any rule or rounding changes prices.
+	 */
+	public static function is_active() {
+		$rules = self::get();
+		return 'none' !== $rules['global']['type'] || ! empty( $rules['categories'] ) || (int) $rules['rounding']['unit'] > 0;
+	}
+
+	/**
 	 * @return array
 	 */
 	public static function empty_rule() {

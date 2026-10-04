@@ -137,6 +137,7 @@ class SLH_Settings {
 		if ( function_exists( 'as_next_scheduled_action' ) ) {
 			SLH_Order_Sync::reschedule();
 			SLH_Inventory::schedule();
+			SLH_Reconcile::schedule();
 		}
 		return $errors;
 	}

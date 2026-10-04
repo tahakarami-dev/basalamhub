@@ -279,6 +279,67 @@
 			return;
 		}
 
+		// Import: start / stop.
+		if ( ( btn = closest( e, '[data-slh-import-start]' ) ) ) {
+			var upd = document.querySelector( '[data-slh-import-update]' );
+			var pub = document.querySelector( '[data-slh-import-publish]' );
+			var count = parseInt( btn.getAttribute( 'data-new' ), 10 ) + ( upd && upd.checked ? parseInt( btn.getAttribute( 'data-linked' ), 10 ) : 0 );
+			if ( ! window.confirm( ( t.confirmImport || '' ).replace( '%s', count ) ) ) {
+				return;
+			}
+			busy( btn, t.starting );
+			post( 'slh_import_start', { update_linked: upd && upd.checked ? 1 : '', publish: pub ? pub.value : 'publish' } ).then( function ( res ) {
+				if ( res.success ) {
+					reloadContent();
+				} else {
+					idle( btn );
+					setMessage( document.querySelector( '[data-slh-import-message]' ), ( res.data || {} ).message, 'error' );
+				}
+			} );
+			return;
+		}
+		if ( ( btn = closest( e, '[data-slh-import-cancel]' ) ) ) {
+			if ( ! window.confirm( t.confirmStopImport ) ) {
+				return;
+			}
+			busy( btn, t.loading );
+			post( 'slh_import_cancel' ).then( function () {
+				reloadContent();
+			} );
+			return;
+		}
+
+		// Notifications: find chat id / send a test message.
+		if ( ( btn = closest( e, '[data-slh-notify-find], [data-slh-notify-test]' ) ) ) {
+			var card = btn.closest( '[data-slh-channel]' );
+			var out = card.querySelector( '[data-slh-channel-message]' );
+			var isTest = btn.hasAttribute( 'data-slh-notify-test' );
+			busy( btn, isTest ? t.sendingTest : t.searching );
+			post( isTest ? 'slh_notify_test' : 'slh_notify_find_chat', { channel: card.getAttribute( 'data-slh-channel' ) } ).then( function ( res ) {
+				idle( btn );
+				var d = res.data || {};
+				setMessage( out, d.message, res.success ? 'ok' : 'error' );
+				if ( res.success && d.id ) {
+					card.querySelector( '[data-slh-chat-id]' ).value = d.id;
+					var test = card.querySelector( '[data-slh-notify-test]' );
+					if ( test ) {
+						test.disabled = false;
+					}
+				}
+			} );
+			return;
+		}
+
+		// Orders: nightly reconciliation now.
+		if ( ( btn = closest( e, '[data-slh-reconcile]' ) ) ) {
+			busy( btn, t.starting );
+			post( 'slh_reconcile_now' ).then( function ( res ) {
+				idle( btn );
+				setMessage( document.querySelector( '[data-slh-message]' ), ( res.data || {} ).message, res.success ? 'ok' : 'error' );
+			} );
+			return;
+		}
+
 		// Orders: poll now / stock pull now.
 		if ( ( btn = closest( e, '[data-slh-orders-poll], [data-slh-stock-pull]' ) ) ) {
 			var pollMsg = document.querySelector( '[data-slh-message]' );
@@ -741,10 +802,32 @@
 		} );
 	}
 
+	function importPoll() {
+		var box = document.querySelector( '[data-slh-import-progress]' );
+		if ( ! box ) {
+			return;
+		}
+		post( 'slh_import_status' ).then( function ( res ) {
+			if ( ! res.success || ! document.body.contains( box ) ) {
+				return;
+			}
+			box.querySelector( '[data-slh-import-html]' ).innerHTML = res.data.html;
+			if ( res.data.running ) {
+				later( importPoll, 4000 );
+			} else {
+				reloadContent();
+			}
+		} );
+	}
+
 	function initPage( root ) {
 		var linkBox = root.querySelector( '[data-slh-link-progress]' );
 		if ( linkBox && linkBox.getAttribute( 'data-running' ) === '1' ) {
 			later( linkPoll, 3000 );
+		}
+		var importBox = root.querySelector( '[data-slh-import-progress]' );
+		if ( importBox && importBox.getAttribute( 'data-running' ) === '1' ) {
+			later( importPoll, 3000 );
 		}
 		initChart( root );
 		initBulk( root );

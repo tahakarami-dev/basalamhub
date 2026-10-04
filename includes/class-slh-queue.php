@@ -253,6 +253,16 @@ class SLH_Queue {
 			as_enqueue_async_action( $log->retry_hook, $args, self::GROUP );
 			return true;
 		}
+		if ( 'slh_reconcile_orders' === $log->retry_hook ) {
+			self::reset_attempts( 'reconcile' );
+			SLH_Reconcile::run_now();
+			return true;
+		}
+		if ( 'slh_import_one' === $log->retry_hook && ! empty( $args['basalam_id'] ) ) {
+			self::reset_attempts( 'import_' . (int) $args['basalam_id'] );
+			as_enqueue_async_action( $log->retry_hook, $args, self::GROUP );
+			return true;
+		}
 		return false;
 	}
 
@@ -289,7 +299,7 @@ class SLH_Queue {
 		);
 		// Recurring jobs (maintenance, order poll, stock pull) are always pending; don't count them as work.
 		$recurring = 0;
-		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'slh_poll_orders', array() ), array( 'slh_stock_pull', array( 'page' => 1 ) ) ) as $job ) {
+		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'slh_poll_orders', array() ), array( 'slh_stock_pull', array( 'page' => 1 ) ), array( 'slh_reconcile_orders', array( 'manual' => 0 ) ) ) as $job ) {
 			$recurring += as_has_scheduled_action( $job[0], $job[1], self::GROUP ) ? 1 : 0;
 		}
 		$out['pending'] = max( 0, $out['pending'] - $recurring );

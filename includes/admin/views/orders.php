@@ -146,6 +146,43 @@ $slh_failed    = SLH_Logger::query( array( 'object_type' => 'parcel', 'level' =>
 	<?php endif; ?>
 </section>
 
+<?php $slh_rec = SLH_Reconcile::last(); ?>
+<section class="slh-card slh-section">
+	<div class="slh-card__head">
+		<div>
+			<h2 class="slh-card__title"><?php esc_html_e( 'تطبیق شبانه', 'salamhub' ); ?></h2>
+			<p class="slh-card__meta"><?php esc_html_e( 'هر شب حدود ساعت ۳، همه‌ی سفارش‌های ۷ روز اخیر باسلام با سفارش‌های سایت مقایسه می‌شوند و هر سفارش جاافتاده ثبت و گزارش می‌شود؛ حتی اگر سایت ساعت‌ها قطع بوده باشد.', 'salamhub' ); ?></p>
+		</div>
+		<?php
+		if ( ! $slh_rec ) {
+			echo '<span class="slh-badge slh-badge--stale">' . esc_html__( 'هنوز اجرا نشده', 'salamhub' ) . '</span>';
+		} elseif ( $slh_rec['error'] ) {
+			echo '<span class="slh-badge slh-badge--error">' . esc_html__( 'ناموفق', 'salamhub' ) . '</span>';
+		} elseif ( $slh_rec['missing'] ) {
+			echo '<span class="slh-badge slh-badge--stale">' . esc_html__( 'جاافتاده پیدا شد', 'salamhub' ) . '</span>';
+		} else {
+			echo '<span class="slh-badge slh-badge--synced">' . esc_html__( 'همه‌چیز سر جایش', 'salamhub' ) . '</span>';
+		}
+		?>
+	</div>
+	<?php if ( $slh_rec ) : ?>
+		<p class="slh-card__meta">
+			<?php
+			echo esc_html(
+				$slh_rec['error']
+					/* translators: 1: relative time, 2: error */
+					? sprintf( __( 'آخرین اجرا %1$s: %2$s', 'salamhub' ), slh_time_ago( $slh_rec['at'] ), $slh_rec['error'] )
+					/* translators: 1: relative time, 2: checked, 3: missing */
+					: sprintf( __( 'آخرین اجرا %1$s: %2$s سفارش بررسی شد، %3$s سفارش جاافتاده پیدا و در صف ثبت قرار گرفت.', 'salamhub' ), slh_time_ago( $slh_rec['at'] ), slh_fa_number( $slh_rec['checked'] ), slh_fa_number( $slh_rec['missing'] ) )
+			);
+			?>
+		</p>
+	<?php endif; ?>
+	<div class="slh-card__foot">
+		<button type="button" class="slh-btn" data-slh-reconcile <?php disabled( ! $slh_enabled ); ?>><?php esc_html_e( 'تطبیق الان', 'salamhub' ); ?></button>
+	</div>
+</section>
+
 <section class="slh-card slh-section">
 	<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'سریع‌تر با وب‌هوک (اختیاری)', 'salamhub' ); ?></h2></div>
 	<p class="slh-card__meta"><?php esc_html_e( 'بدون وب‌هوک هم هیچ سفارشی گم نمی‌شود؛ فقط تا چند دقیقه دیرتر می‌رسد. اگر در پنل توسعه‌دهندگان باسلام وب‌هوک سفارش ساختی، این آدرس را بده. سلام‌هاب به محتوای وب‌هوک اعتماد نمی‌کند و فقط با آن زودتر سفارش‌ها را از API می‌خواند.', 'salamhub' ); ?></p>

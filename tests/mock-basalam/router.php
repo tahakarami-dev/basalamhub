@@ -46,6 +46,36 @@ function out( $code, $data, &$state, $state_file ) {
 	exit;
 }
 
+// Fake Bale/Telegram Bot API: /bot<token>/<method>. Token "123:bad…" → 401, chat "-999" → 400.
+if ( preg_match( '#^/bot([^/]+)/(sendMessage|getUpdates)$#', $path, $m ) ) {
+	$state += array( 'bot_messages' => array() );
+	if ( false !== strpos( $m[1], 'bad' ) ) {
+		out( 401, array( 'ok' => false, 'error_code' => 401, 'description' => 'Unauthorized' ), $state, $state_file );
+	}
+	if ( 'getUpdates' === $m[2] ) {
+		$updates = $state['bot_updates'] ?? array( array( 'update_id' => 1, 'message' => array( 'message_id' => 1, 'text' => '/start', 'chat' => array( 'id' => 4242, 'type' => 'private', 'first_name' => 'طاها' ) ) ) );
+		out( 200, array( 'ok' => true, 'result' => $updates ), $state, $state_file );
+	}
+	if ( '-999' === (string) ( $body['chat_id'] ?? '' ) ) {
+		out( 400, array( 'ok' => false, 'error_code' => 400, 'description' => 'Bad Request: chat not found' ), $state, $state_file );
+	}
+	$state['bot_messages'][] = array( 'token' => $m[1], 'chat_id' => $body['chat_id'] ?? null, 'text' => $body['text'] ?? '' );
+	out( 200, array( 'ok' => true, 'result' => array( 'message_id' => count( $state['bot_messages'] ) ) ), $state, $state_file );
+}
+
+// Public photo files (like statics.basalam.com): a generated JPEG; "/mock-files/broken-*" → 404.
+if ( 'GET' === $method && preg_match( '#^/mock-files/(broken-)?(\d+)\.jpg$#', $path, $m ) ) {
+	if ( $m[1] ) {
+		http_response_code( 404 );
+		exit;
+	}
+	$img = imagecreatetruecolor( 300, 300 );
+	imagefill( $img, 0, 0, imagecolorallocate( $img, ( (int) $m[2] * 37 ) % 255, 92, 53 ) );
+	header( 'Content-Type: image/jpeg' );
+	imagejpeg( $img );
+	exit;
+}
+
 if ( ! in_array( $token, array( 'good-token', 'novendor-token' ), true ) ) {
 	out( 401, array( 'detail' => 'Invalid token' ), $state, $state_file );
 }
@@ -192,8 +222,25 @@ if ( preg_match( '#^/v1/products/(\d+)$#', $path, $m ) ) {
 			$body['variants'] = 'append' === ( $state['variants_mode'] ?? 'replace' ) ? array_merge( $state['products'][ $id ]['variants'] ?? array(), $new ) : $new;
 		}
 		$state['products'][ $id ] = array_merge( $state['products'][ $id ], (array) $body );
+		out( 200, $state['products'][ $id ], $state, $state_file );
 	}
-	out( 200, $state['products'][ $id ], $state, $state_file );
+	// GET: the stored record plus the ReadProductResponse fields the importer reads.
+	$p    = $state['products'][ $id ];
+	$base = 'http://' . $_SERVER['HTTP_HOST'] . '/mock-files/';
+	$file = function ( $f ) use ( $base ) {
+		return is_array( $f ) ? $f : array( 'id' => (int) $f, 'original' => $base . (int) $f . '.jpg', 'md' => $base . (int) $f . '.jpg' );
+	};
+	$read = array_merge(
+		$p,
+		array(
+			'title'     => $p['title'] ?? $p['name'] ?? '',
+			'inventory' => $p['inventory'] ?? $p['stock'] ?? 0,
+			'photo'     => isset( $p['photo'] ) ? $file( $p['photo'] ) : null,
+			'photos'    => array_map( $file, $p['photos'] ?? array() ),
+			'category'  => $p['category'] ?? ( isset( $p['category_id'] ) ? array( 'id' => (int) $p['category_id'], 'title' => 'دسته ' . (int) $p['category_id'] ) : null ),
+		)
+	);
+	out( 200, $read, $state, $state_file );
 }
 
 // Orders (vendor parcels). Tests put full ParcelResponse records into $state['parcels'].

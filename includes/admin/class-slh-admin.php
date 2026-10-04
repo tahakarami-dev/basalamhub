@@ -41,10 +41,12 @@ class SLH_Admin {
 		$orders  = $missing ? ' <span class="awaiting-mod">' . esc_html( slh_fa_digits( $missing ) ) . '</span>' : '';
 		add_submenu_page( 'salamhub', __( 'سفارش‌های باسلام', 'salamhub' ), __( 'سفارش‌ها', 'salamhub' ) . $orders, self::CAP, 'salamhub-orders', array( __CLASS__, 'page_orders' ) );
 		SLH_Admin_Tools::add_pages();
+		SLH_Import_UI::add_import_page();
 
 		$errors = SLH_Logger::count_open_errors( 24 * 7 );
 		$badge  = $errors ? ' <span class="awaiting-mod">' . esc_html( slh_fa_digits( $errors ) ) . '</span>' : '';
 		add_submenu_page( 'salamhub', __( 'لاگ همگام‌سازی', 'salamhub' ), __( 'لاگ', 'salamhub' ) . $badge, self::CAP, 'salamhub-logs', array( __CLASS__, 'page_logs' ) );
+		SLH_Import_UI::add_notify_page();
 		add_submenu_page( 'salamhub', __( 'تنظیمات سلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
 	}
 
@@ -107,6 +109,11 @@ class SLH_Admin {
 					'saving'         => __( 'در حال ثبت در باسلام…', 'salamhub' ),
 					'confirmPosted'  => __( 'ارسال این سفارش در باسلام ثبت شود؟ بعد از ثبت، مشتری کد رهگیری را می‌بیند و این کار برگشت‌پذیر نیست.', 'salamhub' ),
 					'copied'         => __( 'کپی شد.', 'salamhub' ),
+					'sendingTest'    => __( 'در حال فرستادن…', 'salamhub' ),
+					'searching'      => __( 'در حال جستجو…', 'salamhub' ),
+					/* translators: %s: number of products */
+					'confirmImport'  => __( '%s محصول از باسلام وارد سایت می‌شود. ادامه می‌دهی؟', 'salamhub' ),
+					'confirmStopImport' => __( 'ایمپورت متوقف شود؟ محصولاتی که تا الان وارد شده‌اند در سایت می‌مانند.', 'salamhub' ),
 					'confirmDisconn' => __( 'اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند.', 'salamhub' ),
 				),
 			)
@@ -367,7 +374,17 @@ class SLH_Admin {
 	}
 
 	/**
-	 * Prints and clears the one-time notice.
+	 * Stores a notice to show after the redirect.
+	 *
+	 * @param string $type success|error.
+	 * @param string $text Text.
+	 */
+	public static function set_notice( $type, $text ) {
+		set_transient( 'slh_notice_' . get_current_user_id(), array( 'type' => $type, 'text' => $text ), 60 );
+	}
+
+	/**
+	 * Prints (once) the notice stored by the last form handler.
 	 */
 	public static function print_notice() {
 		$key    = 'slh_notice_' . get_current_user_id();
