@@ -9,8 +9,9 @@ defined( 'ABSPATH' ) || exit;
 
 // phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only filters.
 $slh_filters = array(
-	'level'      => isset( $_GET['level'] ) ? sanitize_key( wp_unslash( $_GET['level'] ) ) : '',
-	'object_id'  => isset( $_GET['object_id'] ) ? absint( $_GET['object_id'] ) : 0,
+	'level'       => isset( $_GET['level'] ) ? sanitize_key( wp_unslash( $_GET['level'] ) ) : '',
+	'object_id'   => isset( $_GET['object_id'] ) ? absint( $_GET['object_id'] ) : 0,
+	'object_type' => isset( $_GET['object_type'] ) ? sanitize_key( wp_unslash( $_GET['object_type'] ) ) : '',
 	'unresolved' => ! empty( $_GET['unresolved'] ),
 	'search'     => isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '',
 	'page'       => isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1,
@@ -36,6 +37,9 @@ $slh_open = SLH_Logger::count_open_errors( 24 * 30 );
 
 <form class="slh-toolbar" method="get">
 	<input type="hidden" name="page" value="salamhub-logs">
+	<?php if ( $slh_filters['object_type'] ) : ?>
+		<input type="hidden" name="object_type" value="<?php echo esc_attr( $slh_filters['object_type'] ); ?>">
+	<?php endif; ?>
 	<?php if ( $slh_filters['object_id'] ) : ?>
 		<input type="hidden" name="object_id" value="<?php echo esc_attr( $slh_filters['object_id'] ); ?>">
 	<?php endif; ?>

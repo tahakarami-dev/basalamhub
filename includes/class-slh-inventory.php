@@ -246,6 +246,7 @@ class SLH_Inventory {
 	 */
 	public static function set_local_stock( WC_Product $product, $remote ) {
 		$remote = max( 0, (int) $remote );
+		$was    = SLH_Plugin::$suspend_hooks;
 		SLH_Plugin::$suspend_hooks = true;
 		try {
 			if ( $product->managing_stock() ) {
@@ -264,7 +265,7 @@ class SLH_Inventory {
 			$product->save();
 			return true;
 		} finally {
-			SLH_Plugin::$suspend_hooks = false;
+			SLH_Plugin::$suspend_hooks = $was;
 		}
 	}
 

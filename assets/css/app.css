@@ -292,8 +292,17 @@ body.slh-app-screen #wpbody-content > .update-nag { display: none; }
 /* Native form controls in the dark theme. */
 .slh-app[data-theme="dark"] .slh-field__select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23a3aeab%22%2F%3E%3C%2Fsvg%3E"); }
 
+/* Phase 5: inner tiles (import preview), notes list, channel cards */
+.slh-tiles--inner { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: var(--space-3) 0; }
+.slh-root .slh-list { margin: var(--space-3) 0; padding-inline-start: 20px; list-style: disc; color: var(--ink-secondary); font: 400 13px/24px var(--font-sans); }
+.slh-root .slh-list li { margin: 0; }
+.slh-channels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.slh-root .slh-channel__title { display: flex; align-items: center; gap: var(--space-2); }
+.slh-root .slh-inline-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+
 /* ---- Responsive ---- */
 @media (max-width: 1100px) {
+	.slh-channels { grid-template-columns: minmax(0, 1fr); }
 	.slh-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	.slh-onboard__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -311,6 +320,7 @@ body.slh-app-screen #wpbody-content > .update-nag { display: none; }
 @media (max-width: 560px) {
 	.slh-onboard__steps { grid-template-columns: minmax(0, 1fr); }
 	.slh-tiles { gap: var(--space-2); }
+	.slh-tiles--inner { grid-template-columns: minmax(0, 1fr); }
 	.slh-root .slh-tile { min-height: 112px; padding: 12px; }
 	.slh-tile__value { font-size: 24px; line-height: 34px; }
 	.slh-tile__label { font-size: 12px; }

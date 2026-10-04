@@ -86,7 +86,7 @@ class SLH_Linker {
 		if ( ! SLH_Settings::is_connected() ) {
 			return new WP_Error( 'not_connected', __( 'اول در سلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) );
 		}
-		if ( self::is_running() || SLH_Bulk::is_running() ) {
+		if ( self::is_running() || SLH_Bulk::is_running() || SLH_Importer::is_running() ) {
 			return new WP_Error( 'busy', __( 'یک عملیات سنگین دیگر در حال اجراست. صبر کن تمام شود؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'salamhub' ) );
 		}
 		$run = 'r' . time() . wp_rand( 100, 999 );

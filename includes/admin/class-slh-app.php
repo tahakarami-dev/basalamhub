@@ -51,9 +51,11 @@ class SLH_App {
 			'salamhub-orders'     => array( __( 'سفارش‌ها', 'salamhub' ), 'dashicons-cart', 'store' ),
 			'salamhub-bulk'       => array( __( 'ارسال گروهی', 'salamhub' ), 'dashicons-upload', 'sync' ),
 			'salamhub-link'       => array( __( 'اتصال محصولات غرفه', 'salamhub' ), 'dashicons-admin-links', 'sync' ),
+			'salamhub-import'     => array( __( 'ایمپورت غرفه', 'salamhub' ), 'dashicons-download', 'sync' ),
 			'salamhub-categories' => array( __( 'نگاشت دسته‌ها', 'salamhub' ), 'dashicons-category', 'sync' ),
 			'salamhub-pricing'    => array( __( 'قوانین قیمت', 'salamhub' ), 'dashicons-tag', 'sync' ),
 			'salamhub-logs'       => array( __( 'لاگ', 'salamhub' ), 'dashicons-list-view', 'system' ),
+			'salamhub-notify'     => array( __( 'اعلان‌ها', 'salamhub' ), 'dashicons-bell', 'system' ),
 			'salamhub-settings'   => array( __( 'تنظیمات', 'salamhub' ), 'dashicons-admin-generic', 'system' ),
 		);
 	}
@@ -167,6 +169,8 @@ class SLH_App {
 					$badge = '<span class="slh-app__badge slh-app__badge--alert">' . esc_html( slh_fa_digits( SLH_Order_Sync::missing_count() ) ) . '</span>';
 				} elseif ( 'salamhub-logs' === $slug && $errors ) {
 					$badge = '<span class="slh-app__badge slh-app__badge--alert">' . esc_html( slh_fa_digits( $errors ) ) . '</span>';
+				} elseif ( 'salamhub-import' === $slug && SLH_Importer::is_running() ) {
+					$badge = '<span class="slh-app__badge">' . esc_html( slh_fa_digits( SLH_Importer::progress()['percent'] ) ) . '٪</span>';
 				} elseif ( 'salamhub-link' === $slug && SLH_Linker::is_running() ) {
 					$badge = '<span class="slh-app__badge">…</span>';
 				} elseif ( 'salamhub-bulk' === $slug && $batch && 'running' === $batch['status'] ) {
@@ -276,6 +280,28 @@ class SLH_App {
 			/* translators: %s: seconds */
 			$checks[] = array( 'warn', __( 'محدودیت درخواست', 'salamhub' ), sprintf( __( 'صف به درخواست باسلام %s ثانیه مکث کرده و خودکار ادامه می‌دهد.', 'salamhub' ), slh_fa_digits( (int) get_option( 'slh_pause_until' ) - time() ) ), '' );
 		}
+
+		if ( SLH_Order_Sync::enabled() ) {
+			$orders_url = admin_url( 'admin.php?page=salamhub-orders' );
+			$last       = SLH_Reconcile::last();
+			if ( ! $last ) {
+				$checks[] = array( 'warn', __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ), __( 'هنوز اجرا نشده؛ هر شب حدود ساعت ۳ خودکار اجرا می‌شود.', 'salamhub' ), $orders_url );
+			} elseif ( $last['error'] ) {
+				$checks[] = array( 'bad', __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ), $last['error'], $orders_url );
+			} elseif ( strtotime( $last['at'] . ' UTC' ) < time() - 2 * DAY_IN_SECONDS ) {
+				$checks[] = array( 'warn', __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ), __( 'بیش از دو روز است اجرا نشده؛ احتمالاً WP-Cron خاموش است.', 'salamhub' ), $orders_url );
+			} else {
+				/* translators: 1: relative time, 2: checked, 3: missing */
+				$checks[] = array( $last['missing'] ? 'warn' : 'ok', __( 'تطبیق شبانه‌ی سفارش‌ها', 'salamhub' ), sprintf( __( '%1$s · %2$s سفارش بررسی شد، %3$s جاافتاده', 'salamhub' ), slh_time_ago( $last['at'] ), slh_fa_number( $last['checked'] ), slh_fa_number( $last['missing'] ) ), $last['missing'] ? $orders_url : '' );
+			}
+		}
+
+		$channels = SLH_Notifier::active_channels();
+		$labels   = SLH_Notifier::channels();
+		$checks[] = $channels
+			/* translators: %s: messengers */
+			? array( 'ok', __( 'اعلان‌ها', 'salamhub' ), sprintf( __( 'فعال در %s', 'salamhub' ), implode( '، ', array_map( function ( $c ) use ( $labels ) { return $labels[ $c ]['label']; }, $channels ) ) ), '' )
+			: array( 'warn', __( 'اعلان‌ها', 'salamhub' ), __( 'خاموش؛ سفارش جدید و خطاها را در بله یا تلگرام بگیر.', 'salamhub' ), admin_url( 'admin.php?page=salamhub-notify' ) );
 
 		$unmapped = count( SLH_Categories::unmapped_terms() );
 		$cats_url = admin_url( 'admin.php?page=salamhub-categories' );

@@ -133,7 +133,7 @@ class SLH_Bulk {
 		if ( ! SLH_Settings::is_connected() ) {
 			return new WP_Error( 'not_connected', __( 'اول در سلام‌هاب › تنظیمات به باسلام وصل شو.', 'salamhub' ) );
 		}
-		if ( self::is_running() || ( class_exists( 'SLH_Linker' ) && SLH_Linker::is_running() ) ) {
+		if ( self::is_running() || ( class_exists( 'SLH_Linker' ) && SLH_Linker::is_running() ) || ( class_exists( 'SLH_Importer' ) && SLH_Importer::is_running() ) ) {
 			return new WP_Error( 'busy', __( 'یک ارسال گروهی دیگر در حال اجراست. صبر کن تمام شود یا متوقفش کن؛ دو عملیات سنگین هم‌زمان اجرا نمی‌شوند.', 'salamhub' ) );
 		}
 		$scope   = isset( $args['scope'] ) && in_array( $args['scope'], array( 'all', 'unsent', 'ids' ), true ) ? $args['scope'] : 'unsent';
