@@ -208,3 +208,35 @@
 	.slh-root .slh-check__detail { grid-column: 2; }
 	.slh-root .slh-toolbar__spacer { display: none; }
 }
+
+/* ---- Phase 2 ---- */
+
+.slh-root .slh-alert--warning { color: var(--warning); border-color: var(--warning); }
+.slh-root .slh-alert a { color: inherit; font-weight: 600; }
+
+/* Queue progress */
+.slh-root .slh-progress { display: grid; gap: var(--space-2); }
+.slh-root .slh-progress__row { display: flex; justify-content: space-between; gap: var(--space-2); font: 600 13px/20px var(--font-sans); color: var(--ink); }
+.slh-root .slh-progress__count { color: var(--ink-muted); font-weight: 400; }
+.slh-root .slh-progress__track { height: 8px; border-radius: var(--radius-pill); background: var(--brand-tint); overflow: hidden; }
+.slh-root .slh-progress__bar { height: 100%; border-radius: var(--radius-pill); background: var(--brand); transition: width .4s ease; }
+.slh-root .slh-progress__legend { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); font: 400 12px/20px var(--font-sans); color: var(--ink-muted); }
+.slh-root .slh-progress__legend a { color: var(--danger); font-weight: 600; }
+
+/* Rules and mapping */
+.slh-root .slh-rule { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.slh-root .slh-rule .slh-field__select { width: auto; min-width: 120px; }
+.slh-root .slh-rule .slh-field__input { width: 140px; }
+.slh-root .slh-rule .slh-field__hint { flex-basis: 100%; }
+.slh-root .slh-rule.slh-field--error .slh-field__input { border-color: var(--danger); }
+.slh-root .slh-form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: var(--space-3) 0 var(--space-4); }
+.slh-root .slh-map-table td:first-child { width: 30%; }
+.slh-root .slh-map-table td:last-child { width: 120px; }
+.slh-root .slh-map-table .slh-field { max-width: 520px; margin: 0; }
+.slh-root .slh-map-name { display: inline-block; font-weight: 600; }
+.slh-root .slh-map-attrs:not(:empty) { margin-top: var(--space-2); }
+.slh-root .slh-attr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-2) var(--space-3); margin-top: var(--space-2); }
+.slh-root .slh-attr-grid .slh-field { margin: 0; }
+.slh-root .slh-fieldset .slh-checkbox input[type="radio"] { margin: 0; }
+.slh-root [hidden] { display: none !important; }
+.slh-root .slh-rule-add { margin-top: var(--space-3); }

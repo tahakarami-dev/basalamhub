@@ -36,6 +36,7 @@ class SLH_Product_UI {
 		$link    = SLH_Links::get( 'product', $post->ID );
 		$cat     = $product ? $product->get_meta( '_slh_category_id', true ) : '';
 		$prep    = $product ? $product->get_meta( '_slh_preparation_days', true ) : '';
+		$resolved = $product ? SLH_Categories::resolve( $product )['category_id'] : 0;
 		wp_nonce_field( 'slh_product_box', 'slh_product_box_nonce' );
 		?>
 		<div class="slh-root slh-product-box" data-product-id="<?php echo esc_attr( $post->ID ); ?>">
@@ -60,8 +61,17 @@ class SLH_Product_UI {
 
 			<label class="slh-field">
 				<span class="slh-field__label"><?php esc_html_e( 'شناسه‌ی دسته‌ی باسلام', 'salamhub' ); ?></span>
-				<input class="slh-field__input slh-field__ltr" type="text" inputmode="numeric" name="slh_category_id" value="<?php echo esc_attr( $cat ); ?>" placeholder="<?php echo esc_attr( (string) SLH_Settings::get( 'default_category_id' ) ); ?>">
-				<span class="slh-field__hint"><?php esc_html_e( 'خالی بماند، دسته‌ی پیش‌فرض تنظیمات استفاده می‌شود.', 'salamhub' ); ?></span>
+				<input class="slh-field__input slh-field__ltr" type="text" inputmode="numeric" name="slh_category_id" value="<?php echo esc_attr( $cat ); ?>" placeholder="<?php echo esc_attr( (string) ( $resolved ? $resolved : SLH_Settings::get( 'default_category_id' ) ) ); ?>">
+				<span class="slh-field__hint">
+					<?php
+					echo esc_html(
+						$resolved
+							/* translators: %s: Basalam category */
+							? sprintf( __( 'خالی بماند، از نگاشت دسته‌ها: %s', 'salamhub' ), SLH_Categories::label( $resolved ) )
+							: __( 'خالی بماند، از «نگاشت دسته‌ها» یا دسته‌ی پیش‌فرض استفاده می‌شود.', 'salamhub' )
+					);
+					?>
+				</span>
 			</label>
 			<label class="slh-field">
 				<span class="slh-field__label"><?php esc_html_e( 'زمان آماده‌سازی (روز)', 'salamhub' ); ?></span>

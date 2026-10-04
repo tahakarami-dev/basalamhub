@@ -36,11 +36,13 @@ class SLH_Admin {
 
 		add_menu_page( __( 'سلام‌هاب', 'salamhub' ), __( 'سلام‌هاب', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
 		add_submenu_page( 'salamhub', __( 'داشبورد و سلامت', 'salamhub' ), __( 'داشبورد', 'salamhub' ), self::CAP, 'salamhub', array( __CLASS__, 'page_dashboard' ) );
-		add_submenu_page( 'salamhub', __( 'تنظیمات سلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
+		add_submenu_page( 'salamhub', __( 'محصولات', 'salamhub' ), __( 'محصولات', 'salamhub' ), self::CAP, 'salamhub-products', array( __CLASS__, 'page_products' ) );
+		SLH_Admin_Tools::add_pages();
 
 		$errors = SLH_Logger::count_open_errors( 24 * 7 );
 		$badge  = $errors ? ' <span class="awaiting-mod">' . esc_html( slh_fa_digits( $errors ) ) . '</span>' : '';
 		add_submenu_page( 'salamhub', __( 'لاگ همگام‌سازی', 'salamhub' ), __( 'لاگ', 'salamhub' ) . $badge, self::CAP, 'salamhub-logs', array( __CLASS__, 'page_logs' ) );
+		add_submenu_page( 'salamhub', __( 'تنظیمات سلام‌هاب', 'salamhub' ), __( 'تنظیمات', 'salamhub' ), self::CAP, 'salamhub-settings', array( __CLASS__, 'page_settings' ) );
 	}
 
 	/**
@@ -65,6 +67,9 @@ class SLH_Admin {
 			return;
 		}
 		wp_enqueue_style( 'salamhub-admin', SLH_URL . 'assets/css/admin.css', array(), SLH_VERSION );
+		if ( $ours ) {
+			wp_enqueue_style( 'salamhub-app', SLH_URL . 'assets/css/app.css', array( 'salamhub-admin', 'dashicons' ), SLH_VERSION );
+		}
 		wp_enqueue_script( 'salamhub-admin', SLH_URL . 'assets/js/admin.js', array(), SLH_VERSION, true );
 		wp_localize_script(
 			'salamhub-admin',
@@ -78,6 +83,24 @@ class SLH_Admin {
 					'retrying'       => __( 'در حال افزودن به صف…', 'salamhub' ),
 					'queued'         => __( 'در صف قرار گرفت. نتیجه همین‌جا نمایش داده می‌شود.', 'salamhub' ),
 					'networkError'   => __( 'درخواست به سایت خودت نرسید. اینترنت یا ورودت به پیشخوان را بررسی کن و دوباره امتحان کن.', 'salamhub' ),
+					'starting'       => __( 'در حال شروع…', 'salamhub' ),
+					'refreshing'     => __( 'در حال دریافت از باسلام…', 'salamhub' ),
+					'loading'        => __( 'در حال دریافت…', 'salamhub' ),
+					'checkAttrs'     => __( 'بررسی ویژگی‌های اجباری', 'salamhub' ),
+					'themeAuto'      => __( 'پوسته: خودکار (مطابق سیستم)', 'salamhub' ),
+					'themeLight'     => __( 'پوسته: روشن', 'salamhub' ),
+					'themeDark'      => __( 'پوسته: تیره', 'salamhub' ),
+					'chartOk'        => __( 'ارسال موفق', 'salamhub' ),
+					'chartErr'       => __( 'خطا', 'salamhub' ),
+					'queuedShort'    => __( 'در صف', 'salamhub' ),
+					'linking'        => __( 'در حال اتصال…', 'salamhub' ),
+					'nothingSelected' => __( 'هیچ ردیفی انتخاب نشده.', 'salamhub' ),
+					'confirmLinkAll' => __( 'همه‌ی جفت‌های قطعی متصل شوند؟ تا وقتی گزینه‌ی ارسال تیک نخورده، چیزی در باسلام تغییر نمی‌کند.', 'salamhub' ),
+					/* translators: %s: number of selected products */
+					'selected'       => __( '%s محصول انتخاب شده', 'salamhub' ),
+					/* translators: %s: product count */
+					'confirmBulk'    => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'salamhub' ),
+					'confirmCancel'  => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'salamhub' ),
 					'confirmDisconn' => __( 'اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند.', 'salamhub' ),
 				),
 			)
@@ -92,33 +115,36 @@ class SLH_Admin {
 	 * Dashboard + health.
 	 */
 	public static function page_dashboard() {
-		self::render( 'dashboard' );
+		self::render( 'dashboard', 'salamhub' );
 	}
 
 	/**
 	 * Settings.
 	 */
 	public static function page_settings() {
-		self::render( 'settings' );
+		self::render( 'settings', 'salamhub-settings' );
+	}
+
+	/**
+	 * Products with their Basalam status.
+	 */
+	public static function page_products() {
+		self::render( 'products', 'salamhub-products' );
 	}
 
 	/**
 	 * Log center.
 	 */
 	public static function page_logs() {
-		self::render( 'logs' );
+		self::render( 'logs', 'salamhub-logs' );
 	}
 
 	/**
 	 * @param string $view View name.
+	 * @param string $slug Page slug.
 	 */
-	private static function render( $view ) {
-		if ( ! current_user_can( self::CAP ) ) {
-			wp_die( esc_html__( 'دسترسی کافی نداری.', 'salamhub' ) );
-		}
-		echo '<div class="wrap slh-wrap"><div class="slh-root">';
-		include SLH_DIR . 'includes/admin/views/' . $view . '.php';
-		echo '</div></div>';
+	private static function render( $view, $slug ) {
+		SLH_App::render( $view, $slug );
 	}
 
 	/* ---------------------------------------------------------------------

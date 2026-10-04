@@ -21,7 +21,7 @@ class SLH_Product_Mapper {
 		'price'       => array( 'primary_price' ),
 		'stock'       => array( 'stock' ),
 		'shipping'    => array( 'weight', 'package_weight', 'packaging_dimensions', 'preparation_days' ),
-		'category'    => array( 'category_id' ),
+		'category'    => array( 'category_id', 'product_attribute' ),
 	);
 
 	/**
@@ -32,15 +32,11 @@ class SLH_Product_Mapper {
 	public function map( WC_Product $product ) {
 		$problems = array();
 
-		if ( ! $product->is_type( 'simple' ) ) {
+		if ( ! $product->is_type( 'simple' ) && ! $product->is_type( 'variable' ) ) {
 			$problems[] = array(
 				'field'      => 'type',
-				'message'    => $product->is_type( 'variable' )
-					? __( 'محصولات متغیر (رنگ، سایز و…) هنوز پشتیبانی نمی‌شوند.', 'salamhub' )
-					: __( 'فقط محصولات ساده قابل ارسال هستند.', 'salamhub' ),
-				'suggestion' => $product->is_type( 'variable' )
-					? __( 'ارسال محصولات متغیر در نسخه‌ی بعدی سلام‌هاب اضافه می‌شود.', 'salamhub' )
-					: __( 'محصولات گروهی و خارجی در باسلام معادل ندارند.', 'salamhub' ),
+				'message'    => __( 'فقط محصولات ساده و متغیر قابل ارسال هستند.', 'salamhub' ),
+				'suggestion' => __( 'محصولات گروهی و خارجی در باسلام معادل ندارند.', 'salamhub' ),
 			);
 		}
 
@@ -74,7 +70,26 @@ class SLH_Product_Mapper {
 			);
 		}
 
-		$image_ids = array_values( array_filter( array_merge( array( (int) $product->get_image_id() ), array_map( 'intval', $product->get_gallery_image_ids() ) ) ) );
+		$image_ids  = array_values( array_filter( array_merge( array( (int) $product->get_image_id() ), array_map( 'intval', $product->get_gallery_image_ids() ) ) ) );
+		$variations = array();
+		if ( $product->is_type( 'variable' ) ) {
+			$variations = $this->variations( $product, $problems );
+			if ( $variations ) {
+				$payload['variants']      = array_values( array_map( array( __CLASS__, 'variant_payload' ), $variations ) );
+				$payload['primary_price'] = min( wp_list_pluck( $variations, 'primary_price' ) );
+				$payload['stock']         = array_sum( wp_list_pluck( $variations, 'stock' ) );
+				// The product-level price check doesn't apply: each variant has its own price.
+				$problems = array_values( array_filter( $problems, function ( $p ) {
+					return 'primary_price' !== $p['field'];
+				} ) );
+				// Variation photos join the gallery so buyers see every option.
+				foreach ( $variations as $v ) {
+					if ( $v['image_id'] ) {
+						$image_ids[] = $v['image_id'];
+					}
+				}
+			}
+		}
 		if ( ! $image_ids ) {
 			$problems[] = array(
 				'field'      => 'photo',
@@ -92,9 +107,106 @@ class SLH_Product_Mapper {
 		$payload = apply_filters( 'slh_product_payload', $payload, $product );
 
 		return array(
-			'payload'   => $payload,
-			'image_ids' => array_values( array_unique( $image_ids ) ),
-			'problems'  => $problems,
+			'payload'    => $payload,
+			'image_ids'  => array_values( array_unique( $image_ids ) ),
+			'problems'   => $problems,
+			'variations' => $variations,
+		);
+	}
+
+	/**
+	 * Enabled variations of a variable product as Basalam variants.
+	 *
+	 * @param WC_Product_Variable $product  Product.
+	 * @param array               $problems Problems (by reference).
+	 * @return array<int,array> wc_variation_id => [sku, properties, primary_price, stock, image_id, sig, label].
+	 */
+	public function variations( WC_Product $product, array &$problems ) {
+		$out  = array();
+		$seen = array();
+		foreach ( $product->get_children() as $child_id ) {
+			$v = wc_get_product( $child_id );
+			// Disabled variations are stored as "private"; Basalam never sees them.
+			if ( ! $v || 'publish' !== $v->get_status() ) {
+				continue;
+			}
+			$props = array();
+			$label = array();
+			foreach ( $v->get_variation_attributes( false ) as $taxonomy => $value ) {
+				$name = wc_attribute_label( $taxonomy, $product );
+				if ( '' === (string) $value ) {
+					$problems[] = array(
+						'field'      => 'variants',
+						/* translators: 1: variation id, 2: attribute */
+						'message'    => sprintf( __( 'تنوع #%1$s برای «%2$s» مقدار مشخص ندارد («هرکدام»).', 'salamhub' ), $child_id, $name ),
+						'suggestion' => __( 'در تب «متغیرها»ی محصول برای هر تنوع مقدار دقیق انتخاب کن؛ باسلام تنوع «هرکدام» ندارد.', 'salamhub' ),
+					);
+					continue 2;
+				}
+				if ( taxonomy_exists( $taxonomy ) ) {
+					$term  = get_term_by( 'slug', $value, $taxonomy );
+					$value = $term ? $term->name : $value;
+				}
+				$props[] = array( 'property' => (string) $name, 'value' => (string) $value );
+				$label[] = $value;
+			}
+			$sig = md5( wp_json_encode( $props ) );
+			if ( isset( $seen[ $sig ] ) ) {
+				$problems[] = array(
+					'field'      => 'variants',
+					/* translators: %s: variation label */
+					'message'    => sprintf( __( 'دو تنوع با ویژگی‌های یکسان («%s») وجود دارد.', 'salamhub' ), implode( '، ', $label ) ),
+					'suggestion' => __( 'تنوع تکراری را حذف یا غیرفعال کن.', 'salamhub' ),
+				);
+				continue;
+			}
+			$seen[ $sig ] = true;
+
+			$price_problems = array();
+			$price          = $this->price( $v, $price_problems );
+			if ( $price <= 0 ) {
+				$problems[] = array(
+					'field'      => 'variants',
+					/* translators: %s: variation label */
+					'message'    => sprintf( __( 'تنوع «%s» قیمت ندارد یا قیمتش صفر است.', 'salamhub' ), implode( '، ', $label ) ),
+					'suggestion' => __( 'قیمت همه‌ی تنوع‌های فعال را وارد کن، یا تنوع را غیرفعال کن.', 'salamhub' ),
+				);
+				continue;
+			}
+			$out[ (int) $child_id ] = array(
+				'sku'           => self::sku_for( $v ),
+				'properties'    => $props,
+				'primary_price' => $price,
+				'stock'         => $this->stock( $v ),
+				'image_id'      => $v->get_image_id() && (int) $v->get_image_id() !== (int) $product->get_image_id() ? (int) $v->get_image_id() : 0,
+				'sig'           => $sig,
+				'label'         => implode( '، ', $label ),
+			);
+		}
+		if ( ! $out && ! array_filter( $problems, function ( $p ) {
+			return 'variants' === $p['field'];
+		} ) ) {
+			$problems[] = array(
+				'field'      => 'variants',
+				'message'    => __( 'محصول متغیر هیچ تنوع فعالی ندارد.', 'salamhub' ),
+				'suggestion' => __( 'حداقل یک تنوع با قیمت بساز و فعالش کن.', 'salamhub' ),
+			);
+		}
+		return $out;
+	}
+
+	/**
+	 * A mapped variation as Basalam's ProductVariants item.
+	 *
+	 * @param array $v Mapped variation.
+	 * @return array
+	 */
+	public static function variant_payload( array $v ) {
+		return array(
+			'primary_price' => $v['primary_price'],
+			'stock'         => $v['stock'],
+			'sku'           => $v['sku'],
+			'properties'    => $v['properties'],
 		);
 	}
 
@@ -255,10 +367,20 @@ class SLH_Product_Mapper {
 			$cat = (int) SLH_Settings::get( 'default_category_id', 0 );
 		}
 		if ( $cat <= 0 ) {
+			$names = array();
+			foreach ( $product->get_category_ids() as $term_id ) {
+				$term = get_term( $term_id, 'product_cat' );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$names[] = '«' . $term->name . '»';
+				}
+			}
 			$problems[] = array(
 				'field'      => 'category_id',
-				'message'    => __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'salamhub' ),
-				'suggestion' => __( 'شناسه‌ی دسته‌ی باسلام را در کادر «سلام‌هاب» صفحه‌ی ویرایش محصول، یا دسته‌ی پیش‌فرض را در سلام‌هاب › تنظیمات وارد کن.', 'salamhub' ),
+				'message'    => $names
+					/* translators: %s: WooCommerce category names */
+					? sprintf( __( 'دسته‌ی %s به هیچ دسته‌ی باسلام نگاشت نشده.', 'salamhub' ), implode( '، ', $names ) )
+					: __( 'دسته‌ی باسلام برای این محصول انتخاب نشده.', 'salamhub' ),
+				'suggestion' => __( 'در سلام‌هاب › نگاشت دسته‌ها برای این دسته، دسته‌ی باسلام را انتخاب کن. (یا شناسه را در کادر سلام‌هاب همین محصول بنویس.)', 'salamhub' ),
 			);
 		}
 		return $cat;

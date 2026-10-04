@@ -24,6 +24,7 @@ class SLH_Installer {
 			as_unschedule_all_actions( '', array(), SLH_Queue::GROUP );
 		}
 		delete_option( 'slh_lock_worker' );
+		delete_option( 'slh_pause_until' );
 	}
 
 	/**
@@ -58,11 +59,13 @@ class SLH_Installer {
 				last_synced_at datetime DEFAULT NULL,
 				last_error text DEFAULT NULL,
 				last_log_id bigint(20) unsigned DEFAULT NULL,
+				batch_id varchar(20) DEFAULT NULL,
 				updated_at datetime NOT NULL,
 				PRIMARY KEY  (id),
 				UNIQUE KEY object_wc (object_type,wc_id),
 				KEY basalam (object_type,basalam_id),
-				KEY sync_status (sync_status)
+				KEY sync_status (sync_status),
+				KEY batch (batch_id,sync_status)
 			) {$charset};"
 		);
 
@@ -86,6 +89,31 @@ class SLH_Installer {
 				PRIMARY KEY  (id),
 				KEY level_created (level,created_at),
 				KEY object (object_type,object_id)
+			) {$charset};"
+		);
+
+		// Snapshot of the booth's products on Basalam, for linking (and later, importing).
+		$remote = $wpdb->prefix . 'slh_remote_products';
+		dbDelta(
+			"CREATE TABLE {$remote} (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				basalam_id bigint(20) unsigned NOT NULL,
+				title varchar(255) NOT NULL,
+				sku varchar(100) DEFAULT NULL,
+				price bigint(20) DEFAULT NULL,
+				stock int(11) DEFAULT NULL,
+				photo varchar(255) DEFAULT NULL,
+				variants longtext DEFAULT NULL,
+				match_status varchar(12) NOT NULL DEFAULT 'none',
+				match_wc_id bigint(20) unsigned DEFAULT NULL,
+				match_score smallint(5) unsigned NOT NULL DEFAULT 0,
+				match_reason varchar(255) DEFAULT NULL,
+				candidates text DEFAULT NULL,
+				run_id varchar(20) NOT NULL,
+				fetched_at datetime NOT NULL,
+				PRIMARY KEY  (id),
+				UNIQUE KEY basalam (basalam_id),
+				KEY match_status (match_status)
 			) {$charset};"
 		);
 

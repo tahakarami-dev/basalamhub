@@ -102,6 +102,26 @@ class SLH_Product_Sync {
 		}
 
 		$payload = $mapped['payload'];
+		if ( ! empty( $payload['_slh_missing_attributes'] ) ) {
+			$this->fail(
+				$product,
+				array(
+					'message'    => __( 'به باسلام ارسال نشد.', 'salamhub' ),
+					/* translators: %s: attribute names */
+					'reason'     => sprintf( __( 'دسته‌ی باسلام این ویژگی‌های اجباری را می‌خواهد که مقدار ندارند: %s.', 'salamhub' ), implode( '، ', $payload['_slh_missing_attributes'] ) ),
+					'suggestion' => __( 'در سلام‌هاب › نگاشت دسته‌ها مقدار پیش‌فرض این ویژگی‌ها را وارد کن، یا در محصول ویژگی ووکامرسی با همین نام بساز.', 'salamhub' ),
+					'context'    => array( 'category_id' => $payload['category_id'] ),
+				)
+			);
+			return 'failed';
+		}
+		$payload = array_filter(
+			$payload,
+			function ( $key ) {
+				return 0 !== strpos( (string) $key, '_slh_' );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
 		$link    = SLH_Links::get( 'product', $id );
 		$hash    = md5( wp_json_encode( array( $payload, $this->image_signatures( $mapped['image_ids'] ) ) ) );
 
@@ -154,20 +174,40 @@ class SLH_Product_Sync {
 				);
 			}
 			delete_transient( 'slh_pending_create_' . $id );
+			if ( $mapped['variations'] ) {
+				$this->store_variant_map( $product, $basalam_id, $mapped['variations'], isset( $response['variants'] ) ? $response['variants'] : null );
+			}
 		} else {
 			$update = SLH_Product_Mapper::filter_by_groups( $payload, $groups );
+			if ( $mapped['variations'] ) {
+				// Variant prices/stock are handled per variant; the product-level ones are derived.
+				unset( $update['primary_price'], $update['stock'] );
+				$structural = $this->variants_changed_structurally( $product, $mapped['variations'] );
+				if ( $structural ) {
+					$update['variants'] = $payload['variants'];
+				}
+			}
 			if ( $update ) {
 				try {
 					$this->api->update_product( $basalam_id, $update );
+					if ( $mapped['variations'] ) {
+						if ( ! empty( $structural ) ) {
+							$this->store_variant_map( $product, $basalam_id, $mapped['variations'], null );
+						}
+					}
 				} catch ( SLH_Api_Error $e ) {
 					if ( 'not_found' === $e->kind ) {
 						// Deleted on Basalam: unlink so "retry" re-creates it cleanly.
 						SLH_Links::upsert( 'product', $id, array( 'basalam_id' => null, 'payload_hash' => null ) );
+						delete_post_meta( $id, '_slh_variants' );
 						$e->reason     = __( 'این محصول در باسلام حذف شده است.', 'salamhub' );
 						$e->suggestion = __( 'اگر می‌خواهی دوباره در باسلام باشد، «تلاش مجدد» را بزن تا از نو ساخته شود.', 'salamhub' );
 					}
 					throw $e;
 				}
+			}
+			if ( $mapped['variations'] && empty( $structural ) ) {
+				$this->update_changed_variants( $product, $basalam_id, $mapped['variations'], $groups, $force );
 			}
 		}
 
@@ -196,6 +236,181 @@ class SLH_Product_Sync {
 		);
 		update_option( 'slh_last_sync_at', slh_now(), false );
 		return $is_create ? 'created' : 'updated';
+	}
+
+	/* ---------------------------------------------------------------------
+	 * Variants
+	 *
+	 * The map of WooCommerce variation → Basalam variant lives in the parent product's
+	 * meta `_slh_variants`: [wc_variation_id => [id, sig, price, stock, sku]]. It is what
+	 * keeps re-sends from creating duplicate variants.
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * @param WC_Product $product Product.
+	 * @return array
+	 */
+	public static function variant_map( WC_Product $product ) {
+		$map = get_post_meta( $product->get_id(), '_slh_variants', true );
+		return is_array( $map ) ? $map : array();
+	}
+
+	/**
+	 * A structural change (variation added/removed, attributes or SKU changed) needs the
+	 * full variant list to be sent; anything else is a per-variant price/stock update.
+	 *
+	 * @param WC_Product $product    Product.
+	 * @param array      $variations Mapped variations.
+	 * @return bool
+	 */
+	private function variants_changed_structurally( WC_Product $product, array $variations ) {
+		$known = self::variant_map( $product );
+		if ( array_diff_key( $known, $variations ) || array_diff_key( $variations, $known ) ) {
+			return true;
+		}
+		foreach ( $variations as $vid => $v ) {
+			if ( empty( $known[ $vid ]['id'] ) || $known[ $vid ]['sig'] !== $v['sig'] || $known[ $vid ]['sku'] !== $v['sku'] ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Matches Basalam variants to WooCommerce variations (by SKU, then by properties),
+	 * stores the map and warns about duplicates or unmatched variants.
+	 *
+	 * @param WC_Product $product    Product.
+	 * @param int        $basalam_id Basalam product.
+	 * @param array      $variations Mapped variations.
+	 * @param array|null $remote     Variants from a response, or null to read the product.
+	 * @throws SLH_Api_Error When reading the product fails.
+	 */
+	private function store_variant_map( WC_Product $product, $basalam_id, array $variations, $remote ) {
+		if ( ! is_array( $remote ) || ! $remote ) {
+			$read   = $this->api->get_product( $basalam_id );
+			$remote = isset( $read['variants'] ) && is_array( $read['variants'] ) ? $read['variants'] : array();
+		}
+		$by_sku   = array();
+		$by_props = array();
+		foreach ( $remote as $r ) {
+			if ( empty( $r['id'] ) ) {
+				continue;
+			}
+			if ( ! empty( $r['sku'] ) ) {
+				$by_sku[ (string) $r['sku'] ][] = (int) $r['id'];
+			}
+			$by_props[ self::remote_props_sig( $r ) ][] = (int) $r['id'];
+		}
+
+		$map       = array();
+		$unmatched = array();
+		$dupes     = array();
+		foreach ( $variations as $vid => $v ) {
+			$ids = isset( $by_sku[ $v['sku'] ] ) ? $by_sku[ $v['sku'] ] : ( isset( $by_props[ $v['sig'] ] ) ? $by_props[ $v['sig'] ] : array() );
+			if ( ! $ids ) {
+				$unmatched[] = $v['label'];
+				continue;
+			}
+			if ( count( $ids ) > 1 ) {
+				$dupes[] = $v['label'];
+			}
+			$map[ $vid ] = array(
+				'id'    => max( $ids ), // The newest one if Basalam kept duplicates.
+				'sig'   => $v['sig'],
+				'price' => $v['primary_price'],
+				'stock' => $v['stock'],
+				'sku'   => $v['sku'],
+			);
+		}
+		update_post_meta( $product->get_id(), '_slh_variants', $map );
+
+		if ( $dupes || $unmatched || count( $remote ) > count( $variations ) ) {
+			SLH_Logger::log(
+				array(
+					'level'       => 'warning',
+					'event'       => 'variants_mismatch',
+					'object_type' => 'product',
+					'object_id'   => $product->get_id(),
+					'title'       => $product->get_name(),
+					/* translators: 1: remote count, 2: local count */
+					'message'     => sprintf( __( 'تنوع‌های باسلام با سایت جور نیست: %1$s تنوع در باسلام، %2$s تنوع فعال در سایت.', 'salamhub' ), slh_fa_number( count( $remote ) ), slh_fa_number( count( $variations ) ) ),
+					'reason'      => trim(
+						( $dupes ? sprintf( /* translators: %s: labels */ __( 'تنوع تکراری: %s.', 'salamhub' ), implode( '، ', $dupes ) ) . ' ' : '' )
+						. ( $unmatched ? sprintf( /* translators: %s: labels */ __( 'در باسلام پیدا نشد: %s.', 'salamhub' ), implode( '، ', $unmatched ) ) : '' )
+					),
+					'suggestion'  => __( 'تنوع‌های اضافه را در پنل باسلام حذف کن. سلام‌هاب از این به بعد فقط جدیدترین تنوع هر ردیف را به‌روز می‌کند و تنوع تازه نمی‌سازد.', 'salamhub' ),
+					'context'     => array( 'basalam_id' => $basalam_id, 'remote_variants' => wp_list_pluck( $remote, 'id' ) ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Same signature as the mapper's, from a Basalam VariantResponse.
+	 *
+	 * @param array $r Variant.
+	 * @return string
+	 */
+	private static function remote_props_sig( array $r ) {
+		$props = array();
+		foreach ( isset( $r['properties'] ) && is_array( $r['properties'] ) ? $r['properties'] : array() as $p ) {
+			$name    = isset( $p['property']['title'] ) ? $p['property']['title'] : ( isset( $p['property'] ) && is_string( $p['property'] ) ? $p['property'] : '' );
+			$value   = isset( $p['value']['title'] ) ? $p['value']['title'] : ( isset( $p['value'] ) && is_string( $p['value'] ) ? $p['value'] : '' );
+			$props[] = array( 'property' => (string) $name, 'value' => (string) $value );
+		}
+		return md5( wp_json_encode( $props ) );
+	}
+
+	/**
+	 * Sends price/stock only for variants that changed (and only for the selected groups).
+	 *
+	 * @param WC_Product $product    Product.
+	 * @param int        $basalam_id Basalam product.
+	 * @param array      $variations Mapped variations.
+	 * @param string[]   $groups     Selected field groups.
+	 * @param bool       $force      Send every variant.
+	 * @throws SLH_Api_Error On API failure (the map keeps what was already sent).
+	 */
+	private function update_changed_variants( WC_Product $product, $basalam_id, array $variations, array $groups, $force ) {
+		$map  = self::variant_map( $product );
+		$send = array_intersect( array( 'price', 'stock' ), $groups );
+		if ( ! $send ) {
+			return;
+		}
+		foreach ( $variations as $vid => $v ) {
+			$body = array();
+			if ( in_array( 'price', $send, true ) && ( $force || $map[ $vid ]['price'] !== $v['primary_price'] ) ) {
+				$body['primary_price'] = $v['primary_price'];
+			}
+			if ( in_array( 'stock', $send, true ) && ( $force || $map[ $vid ]['stock'] !== $v['stock'] ) ) {
+				$body['stock'] = $v['stock'];
+			}
+			if ( ! $body ) {
+				continue;
+			}
+			try {
+				$this->api->update_variant( $basalam_id, $map[ $vid ]['id'], $body );
+			} catch ( SLH_Api_Error $e ) {
+				if ( 'not_found' === $e->kind ) {
+					// Variant deleted on Basalam: forget it so the retry re-sends the full list.
+					unset( $map[ $vid ] );
+					update_post_meta( $product->get_id(), '_slh_variants', $map );
+					SLH_Links::upsert( 'product', $product->get_id(), array( 'payload_hash' => null ) );
+					/* translators: %s: variation label */
+					$e->reason     = sprintf( __( 'تنوع «%s» در باسلام حذف شده است.', 'salamhub' ), $v['label'] );
+					$e->suggestion = __( '«تلاش مجدد» فهرست کامل تنوع‌ها را دوباره می‌فرستد.', 'salamhub' );
+				}
+				throw $e;
+			}
+			if ( isset( $body['primary_price'] ) ) {
+				$map[ $vid ]['price'] = $v['primary_price'];
+			}
+			if ( isset( $body['stock'] ) ) {
+				$map[ $vid ]['stock'] = $v['stock'];
+			}
+			update_post_meta( $product->get_id(), '_slh_variants', $map );
+		}
 	}
 
 	/**
@@ -257,6 +472,31 @@ class SLH_Product_Sync {
 
 		if ( 'auth' === $e->kind ) {
 			SLH_Settings::update_connection( array( 'status' => 'invalid', 'message' => $e->getMessage() ) );
+		}
+
+		if ( 'rate_limit' === $e->kind ) {
+			// Not this product's fault: pause the whole queue and keep its place, without
+			// using up its retry attempts or writing one warning per product.
+			$already_paused = (int) get_option( 'slh_pause_until', 0 ) > time();
+			SLH_Queue::pause( $e->retry_after );
+			as_schedule_single_action( (int) get_option( 'slh_pause_until' ) + wp_rand( 1, 20 ), SLH_Queue::HOOK_PRODUCT, array( 'product_id' => $id ), SLH_Queue::GROUP );
+			SLH_Links::upsert( 'product', $id, array( 'sync_status' => 'queued' ) );
+			if ( ! $already_paused ) {
+				SLH_Logger::log(
+					array(
+						'level'       => 'warning',
+						'event'       => 'rate_limited',
+						'object_type' => 'system',
+						'title'       => __( 'صف پس‌زمینه', 'salamhub' ),
+						/* translators: %s: seconds */
+						'message'     => $e->getMessage() . ' ' . sprintf( __( 'صف %s ثانیه مکث می‌کند و بعد از همان‌جا ادامه می‌دهد.', 'salamhub' ), slh_fa_digits( max( 10, (int) $e->retry_after ) ) ),
+						'reason'      => $e->reason,
+						'suggestion'  => $e->suggestion,
+						'context'     => $e->details,
+					)
+				);
+			}
+			return 'retrying';
 		}
 
 		if ( $e->retryable ) {
