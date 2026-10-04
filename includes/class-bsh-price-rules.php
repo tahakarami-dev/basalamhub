@@ -31,7 +31,10 @@ class BSH_Price_Rules {
 		return array(
 			'global'     => isset( $saved['global'] ) ? $saved['global'] : self::empty_rule(),
 			'categories' => isset( $saved['categories'] ) && is_array( $saved['categories'] ) ? $saved['categories'] : array(),
-			'rounding'   => isset( $saved['rounding'] ) ? $saved['rounding'] : array( 'unit' => 0, 'mode' => 'up' ),
+			'rounding'   => isset( $saved['rounding'] ) ? $saved['rounding'] : array(
+				'unit' => 0,
+				'mode' => 'up',
+			),
 		);
 	}
 
@@ -47,7 +50,11 @@ class BSH_Price_Rules {
 	 * @return array
 	 */
 	public static function empty_rule() {
-		return array( 'type' => 'none', 'direction' => 'up', 'value' => 0 );
+		return array(
+			'type'      => 'none',
+			'direction' => 'up',
+			'value'     => 0,
+		);
 	}
 
 	/**
@@ -58,7 +65,14 @@ class BSH_Price_Rules {
 	 */
 	public static function save( array $input ) {
 		$errors = array();
-		$clean  = array( 'global' => self::empty_rule(), 'categories' => array(), 'rounding' => array( 'unit' => 0, 'mode' => 'up' ) );
+		$clean  = array(
+			'global'     => self::empty_rule(),
+			'categories' => array(),
+			'rounding'   => array(
+				'unit' => 0,
+				'mode' => 'up',
+			),
+		);
 
 		$global = self::clean_rule( isset( $input['global'] ) ? (array) $input['global'] : array(), $error );
 		if ( $error ) {
@@ -78,8 +92,8 @@ class BSH_Price_Rules {
 			}
 		}
 
-		$unit = isset( $input['rounding']['unit'] ) ? (int) $input['rounding']['unit'] : 0;
-		$mode = isset( $input['rounding']['mode'] ) ? sanitize_key( $input['rounding']['mode'] ) : 'up';
+		$unit              = isset( $input['rounding']['unit'] ) ? (int) $input['rounding']['unit'] : 0;
+		$mode              = isset( $input['rounding']['mode'] ) ? sanitize_key( $input['rounding']['mode'] ) : 'up';
 		$clean['rounding'] = array(
 			'unit' => in_array( $unit, array( 0, 100, 1000, 10000 ), true ) ? $unit : 0,
 			'mode' => in_array( $mode, array( 'up', 'nearest', 'down' ), true ) ? $mode : 'up',
@@ -99,7 +113,24 @@ class BSH_Price_Rules {
 		$type  = isset( $rule['type'] ) ? sanitize_key( $rule['type'] ) : 'none';
 		$type  = in_array( $type, array( 'none', 'percent', 'fixed' ), true ) ? $type : 'none';
 		$dir   = isset( $rule['direction'] ) && 'down' === $rule['direction'] ? 'down' : 'up';
-		$raw   = isset( $rule['value'] ) ? strtr( trim( (string) $rule['value'] ), array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9', '٫' => '.', '٬' => '', ',' => '' ) ) : '';
+		$raw   = isset( $rule['value'] ) ? strtr(
+			trim( (string) $rule['value'] ),
+			array(
+				'۰' => '0',
+				'۱' => '1',
+				'۲' => '2',
+				'۳' => '3',
+				'۴' => '4',
+				'۵' => '5',
+				'۶' => '6',
+				'۷' => '7',
+				'۸' => '8',
+				'۹' => '9',
+				'٫' => '.',
+				'٬' => '',
+				',' => '',
+			)
+		) : '';
 
 		if ( 'none' === $type ) {
 			return self::empty_rule();
@@ -117,7 +148,11 @@ class BSH_Price_Rules {
 			$error = __( 'درصد بیش از ۱۰۰۰ احتمالاً اشتباه تایپی است.', 'basalamhub' );
 			return self::empty_rule();
 		}
-		return array( 'type' => $type, 'direction' => $dir, 'value' => 'fixed' === $type ? (int) round( $value ) : $value );
+		return array(
+			'type'      => $type,
+			'direction' => $dir,
+			'value'     => 'fixed' === $type ? (int) round( $value ) : $value,
+		);
 	}
 
 	/**
@@ -137,13 +172,21 @@ class BSH_Price_Rules {
 				if ( isset( $rules['categories'][ $candidate ] ) ) {
 					if ( count( $chain ) > $depth ) {
 						$depth = count( $chain );
-						$best  = array( 'rule' => $rules['categories'][ $candidate ], 'source' => 'category', 'term_id' => $candidate );
+						$best  = array(
+							'rule'    => $rules['categories'][ $candidate ],
+							'source'  => 'category',
+							'term_id' => $candidate,
+						);
 					}
 					break;
 				}
 			}
 		}
-		return $best ? $best : array( 'rule' => $rules['global'], 'source' => 'global', 'term_id' => 0 );
+		return $best ? $best : array(
+			'rule'    => $rules['global'],
+			'source'  => 'global',
+			'term_id' => 0,
+		);
 	}
 
 	/**

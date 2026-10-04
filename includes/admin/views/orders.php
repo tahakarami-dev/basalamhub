@@ -16,7 +16,14 @@ $bsh_imported  = BSH_Order_Sync::imported_count();
 $bsh_reference = BSH_Inventory::basalam_is_reference();
 $bsh_pulled    = get_option( 'bsh_stock_pulled_at' );
 $bsh_rows      = $wpdb->get_results( 'SELECT wc_id, basalam_id, sync_status, last_error, last_synced_at FROM ' . BSH_Links::table() . " WHERE object_type = 'order' AND wc_id > 0 ORDER BY id DESC LIMIT 30" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-$bsh_failed    = BSH_Logger::query( array( 'object_type' => 'parcel', 'level' => 'error', 'unresolved' => 1, 'per_page' => 20 ) );
+$bsh_failed    = BSH_Logger::query(
+	array(
+		'object_type' => 'parcel',
+		'level'       => 'error',
+		'unresolved'  => 1,
+		'per_page'    => 20,
+	)
+);
 ?>
 <header class="bsh-page-head">
 	<div>

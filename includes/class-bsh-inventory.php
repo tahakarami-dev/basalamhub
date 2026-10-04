@@ -54,7 +54,8 @@ class BSH_Inventory {
 		return $groups;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Safety stock
 	 * ------------------------------------------------------------------ */
 
@@ -95,7 +96,8 @@ class BSH_Inventory {
 		return max( 0, (int) $stock - self::safety_for( $product ) );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Basalam → site (reference = basalam)
 	 * ------------------------------------------------------------------ */
 
@@ -122,7 +124,14 @@ class BSH_Inventory {
 	 * Starts a pull right away (button).
 	 */
 	public static function pull_now() {
-		as_enqueue_async_action( self::HOOK_PULL, array( 'page' => 1, 'manual' => 1 ), BSH_Queue::GROUP );
+		as_enqueue_async_action(
+			self::HOOK_PULL,
+			array(
+				'page'   => 1,
+				'manual' => 1,
+			),
+			BSH_Queue::GROUP
+		);
 	}
 
 	/**
@@ -137,7 +146,10 @@ class BSH_Inventory {
 		$page = max( 1, (int) $page );
 		BSH_Queue::run_exclusive(
 			self::HOOK_PULL,
-			array( 'page' => $page, 'manual' => 1 ),
+			array(
+				'page'   => $page,
+				'manual' => 1,
+			),
 			function () use ( $page ) {
 				try {
 					$res     = BSH_Plugin::api()->vendor_products( BSH_Settings::vendor_id(), $page, 50 );
@@ -149,7 +161,14 @@ class BSH_Inventory {
 					$more  = $res['data'] && ( null === $res['total_page'] ? count( $res['data'] ) >= 50 : $page < $res['total_page'] );
 					if ( $more && $page < 400 ) {
 						update_option( 'bsh_stock_pull_changed', $total, false );
-						as_enqueue_async_action( self::HOOK_PULL, array( 'page' => $page + 1, 'manual' => 1 ), BSH_Queue::GROUP );
+						as_enqueue_async_action(
+							self::HOOK_PULL,
+							array(
+								'page'   => $page + 1,
+								'manual' => 1,
+							),
+							BSH_Queue::GROUP
+						);
 						return;
 					}
 					delete_option( 'bsh_stock_pull_changed' );
@@ -171,7 +190,15 @@ class BSH_Inventory {
 					if ( 'rate_limit' === $e->kind ) {
 						BSH_Queue::pause( $e->retry_after );
 					}
-					if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK_PULL, array( 'page' => $page, 'manual' => 1 ), 'stock_pull', $e->retry_after ) ) {
+					if ( $e->retryable && false !== BSH_Queue::retry_later(
+						self::HOOK_PULL,
+						array(
+							'page'   => $page,
+							'manual' => 1,
+						),
+						'stock_pull',
+						$e->retry_after
+					) ) {
 						return;
 					}
 					delete_option( 'bsh_stock_pull_changed' );
@@ -245,8 +272,8 @@ class BSH_Inventory {
 	 * @return bool Changed.
 	 */
 	public static function set_local_stock( WC_Product $product, $remote ) {
-		$remote = max( 0, (int) $remote );
-		$was    = BSH_Plugin::$suspend_hooks;
+		$remote                    = max( 0, (int) $remote );
+		$was                       = BSH_Plugin::$suspend_hooks;
 		BSH_Plugin::$suspend_hooks = true;
 		try {
 			if ( $product->managing_stock() ) {
@@ -269,7 +296,8 @@ class BSH_Inventory {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Site sale → Basalam (reference = basalam)
 	 * ------------------------------------------------------------------ */
 
@@ -294,7 +322,11 @@ class BSH_Inventory {
 			}
 			as_enqueue_async_action(
 				self::HOOK_DECREMENT,
-				array( 'product_id' => $pid, 'variation_id' => (int) $item->get_variation_id(), 'qty' => (int) $item->get_quantity() ),
+				array(
+					'product_id'   => $pid,
+					'variation_id' => (int) $item->get_variation_id(),
+					'qty'          => (int) $item->get_quantity(),
+				),
 				BSH_Queue::GROUP
 			);
 		}
@@ -308,7 +340,11 @@ class BSH_Inventory {
 	 * @param int $qty          Sold quantity.
 	 */
 	public static function handle_decrement( $product_id, $variation_id, $qty ) {
-		$args = array( 'product_id' => (int) $product_id, 'variation_id' => (int) $variation_id, 'qty' => (int) $qty );
+		$args = array(
+			'product_id'   => (int) $product_id,
+			'variation_id' => (int) $variation_id,
+			'qty'          => (int) $qty,
+		);
 		BSH_Queue::run_exclusive(
 			self::HOOK_DECREMENT,
 			$args,
@@ -332,7 +368,11 @@ class BSH_Inventory {
 		if ( ! $product || ! $link || ! $link->basalam_id || $qty <= 0 ) {
 			return false;
 		}
-		$args = array( 'product_id' => (int) $product_id, 'variation_id' => (int) $variation_id, 'qty' => (int) $qty );
+		$args = array(
+			'product_id'   => (int) $product_id,
+			'variation_id' => (int) $variation_id,
+			'qty'          => (int) $qty,
+		);
 		$key  = 'decrement_' . $product_id . '_' . $variation_id;
 		try {
 			$api    = BSH_Plugin::api();

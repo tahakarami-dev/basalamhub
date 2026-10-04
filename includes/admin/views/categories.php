@@ -120,12 +120,12 @@ $bsh_inherited = function ( $term_id ) use ( $bsh_map ) {
 		<?php foreach ( $bsh_tree as $bsh_row ) : ?>
 			<?php
 			list( $bsh_term, $bsh_depth ) = $bsh_row;
-			$bsh_tid     = (int) $bsh_term->term_id;
-			$bsh_mapped  = isset( $bsh_map[ $bsh_tid ] );
-			$bsh_parent  = $bsh_mapped ? '' : $bsh_inherited( $bsh_tid );
-			$bsh_cat_id  = $bsh_mapped ? (int) $bsh_map[ $bsh_tid ]['category_id'] : 0;
-			$bsh_cached  = $bsh_cat_id && isset( $bsh_attrs[ $bsh_cat_id ] ) ? $bsh_attrs[ $bsh_cat_id ]['attrs'] : null;
-			$bsh_err     = isset( $bsh_errors[ $bsh_tid ] ) ? $bsh_errors[ $bsh_tid ] : '';
+			$bsh_tid                      = (int) $bsh_term->term_id;
+			$bsh_mapped                   = isset( $bsh_map[ $bsh_tid ] );
+			$bsh_parent                   = $bsh_mapped ? '' : $bsh_inherited( $bsh_tid );
+			$bsh_cat_id                   = $bsh_mapped ? (int) $bsh_map[ $bsh_tid ]['category_id'] : 0;
+			$bsh_cached                   = $bsh_cat_id && isset( $bsh_attrs[ $bsh_cat_id ] ) ? $bsh_attrs[ $bsh_cat_id ]['attrs'] : null;
+			$bsh_err                      = isset( $bsh_errors[ $bsh_tid ] ) ? $bsh_errors[ $bsh_tid ] : '';
 			?>
 			<tr data-term="<?php echo esc_attr( $bsh_tid ); ?>">
 				<td>

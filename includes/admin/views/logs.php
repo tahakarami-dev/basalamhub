@@ -12,10 +12,10 @@ $bsh_filters = array(
 	'level'       => isset( $_GET['level'] ) ? sanitize_key( wp_unslash( $_GET['level'] ) ) : '',
 	'object_id'   => isset( $_GET['object_id'] ) ? absint( $_GET['object_id'] ) : 0,
 	'object_type' => isset( $_GET['object_type'] ) ? sanitize_key( wp_unslash( $_GET['object_type'] ) ) : '',
-	'unresolved' => ! empty( $_GET['unresolved'] ),
-	'search'     => isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '',
-	'page'       => isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1,
-	'per_page'   => 30,
+	'unresolved'  => ! empty( $_GET['unresolved'] ),
+	'search'      => isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '',
+	'page'        => isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1,
+	'per_page'    => 30,
 );
 // phpcs:enable
 $bsh_result = BSH_Logger::query( $bsh_filters );
@@ -28,7 +28,7 @@ $bsh_levels = array(
 	'success' => __( 'موفق', 'basalamhub' ),
 	'info'    => __( 'اطلاع', 'basalamhub' ),
 );
-$bsh_open = BSH_Logger::count_open_errors( 24 * 30 );
+$bsh_open   = BSH_Logger::count_open_errors( 24 * 30 );
 ?>
 <header class="bsh-page-head">
 	<h1 class="bsh-page-title"><?php esc_html_e( 'لاگ همگام‌سازی', 'basalamhub' ); ?></h1>

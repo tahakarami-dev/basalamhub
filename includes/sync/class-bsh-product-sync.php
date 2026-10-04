@@ -13,6 +13,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
+
 class BSH_Product_Sync {
 
 	/** @var BSH_Api_Client */
@@ -57,7 +59,11 @@ class BSH_Product_Sync {
 					'message'    => __( 'ارسال به باسلام با خطای داخلی متوقف شد.', 'basalamhub' ),
 					'reason'     => __( 'یک خطای پیش‌بینی‌نشده در سایت رخ داد (احتمالاً تداخل با افزونه‌ی دیگر).', 'basalamhub' ),
 					'suggestion' => __( 'یک بار «تلاش مجدد» بزن. اگر تکرار شد، جزئیات فنی همین ردیف را برای پشتیبانی بفرست.', 'basalamhub' ),
-					'context'    => array( 'exception' => get_class( $e ), 'error' => $e->getMessage(), 'at' => basename( $e->getFile() ) . ':' . $e->getLine() ),
+					'context'    => array(
+						'exception' => get_class( $e ),
+						'error'     => $e->getMessage(),
+						'at'        => basename( $e->getFile() ) . ':' . $e->getLine(),
+					),
 				)
 			);
 			return 'failed';
@@ -198,7 +204,14 @@ class BSH_Product_Sync {
 				} catch ( BSH_Api_Error $e ) {
 					if ( 'not_found' === $e->kind ) {
 						// Deleted on Basalam: unlink so "retry" re-creates it cleanly.
-						BSH_Links::upsert( 'product', $id, array( 'basalam_id' => null, 'payload_hash' => null ) );
+						BSH_Links::upsert(
+							'product',
+							$id,
+							array(
+								'basalam_id'   => null,
+								'payload_hash' => null,
+							)
+						);
 						delete_post_meta( $id, '_bsh_variants' );
 						$e->reason     = __( 'این محصول در باسلام حذف شده است.', 'basalamhub' );
 						$e->suggestion = __( 'اگر می‌خواهی دوباره در باسلام باشد، «تلاش مجدد» را بزن تا از نو ساخته شود.', 'basalamhub' );
@@ -238,7 +251,8 @@ class BSH_Product_Sync {
 		return $is_create ? 'created' : 'updated';
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Variants
 	 *
 	 * The map of WooCommerce variation → Basalam variant lives in the parent product's
@@ -340,7 +354,10 @@ class BSH_Product_Sync {
 						. ( $unmatched ? sprintf( /* translators: %s: labels */ __( 'در باسلام پیدا نشد: %s.', 'basalamhub' ), implode( '، ', $unmatched ) ) : '' )
 					),
 					'suggestion'  => __( 'تنوع‌های اضافه را در پنل باسلام حذف کن. باسلام‌هاب از این به بعد فقط جدیدترین تنوع هر ردیف را به‌روز می‌کند و تنوع تازه نمی‌سازد.', 'basalamhub' ),
-					'context'     => array( 'basalam_id' => $basalam_id, 'remote_variants' => wp_list_pluck( $remote, 'id' ) ),
+					'context'     => array(
+						'basalam_id'      => $basalam_id,
+						'remote_variants' => wp_list_pluck( $remote, 'id' ),
+					),
 				)
 			);
 		}
@@ -357,7 +374,10 @@ class BSH_Product_Sync {
 		foreach ( isset( $r['properties'] ) && is_array( $r['properties'] ) ? $r['properties'] : array() as $p ) {
 			$name    = isset( $p['property']['title'] ) ? $p['property']['title'] : ( isset( $p['property'] ) && is_string( $p['property'] ) ? $p['property'] : '' );
 			$value   = isset( $p['value']['title'] ) ? $p['value']['title'] : ( isset( $p['value'] ) && is_string( $p['value'] ) ? $p['value'] : '' );
-			$props[] = array( 'property' => (string) $name, 'value' => (string) $value );
+			$props[] = array(
+				'property' => (string) $name,
+				'value'    => (string) $value,
+			);
 		}
 		return md5( wp_json_encode( $props ) );
 	}
@@ -494,7 +514,12 @@ class BSH_Product_Sync {
 		$id = $product->get_id();
 
 		if ( 'auth' === $e->kind ) {
-			BSH_Settings::update_connection( array( 'status' => 'invalid', 'message' => $e->getMessage() ) );
+			BSH_Settings::update_connection(
+				array(
+					'status'  => 'invalid',
+					'message' => $e->getMessage(),
+				)
+			);
 		}
 
 		if ( 'rate_limit' === $e->kind ) {
@@ -525,7 +550,14 @@ class BSH_Product_Sync {
 		if ( $e->retryable ) {
 			$delay = BSH_Queue::retry_later( BSH_Queue::HOOK_PRODUCT, array( 'product_id' => $id ), 'product_' . $id, $e->retry_after );
 			if ( false !== $delay ) {
-				BSH_Links::upsert( 'product', $id, array( 'sync_status' => 'queued', 'last_error' => $e->getMessage() ) );
+				BSH_Links::upsert(
+					'product',
+					$id,
+					array(
+						'sync_status' => 'queued',
+						'last_error'  => $e->getMessage(),
+					)
+				);
 				BSH_Logger::log(
 					array(
 						'level'       => 'warning',

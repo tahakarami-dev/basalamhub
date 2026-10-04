@@ -12,6 +12,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
+
 class BSH_Api_Client {
 
 	/** @var string|null */
@@ -120,7 +122,11 @@ class BSH_Api_Client {
 					'retryable'  => true,
 					'reason'     => __( 'باسلام به‌جای داده‌ی معتبر، پاسخ ناقص یا صفحه‌ی HTML برگرداند.', 'basalamhub' ),
 					'suggestion' => __( 'لازم نیست کاری کنی؛ خودکار دوباره تلاش می‌شود.', 'basalamhub' ),
-					'details'    => array( 'request' => $method . ' ' . $path, 'status' => $code, 'body' => mb_substr( $raw, 0, 1000 ) ),
+					'details'    => array(
+						'request' => $method . ' ' . $path,
+						'status'  => $code,
+						'body'    => mb_substr( $raw, 0, 1000 ),
+					),
 				)
 			);
 		}
@@ -144,7 +150,8 @@ class BSH_Api_Client {
 		return $parts ? '?' . implode( '&', $parts ) : '';
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Endpoints
 	 * ------------------------------------------------------------------ */
 
@@ -210,7 +217,15 @@ class BSH_Api_Client {
 	 * @return array[] Products.
 	 */
 	public function find_products_by_sku( $vendor_id, array $skus ) {
-		$res = $this->request( 'GET', '/v1/vendors/' . (int) $vendor_id . '/products', null, array( 'skus' => $skus, 'per_page' => 10 ) );
+		$res = $this->request(
+			'GET',
+			'/v1/vendors/' . (int) $vendor_id . '/products',
+			null,
+			array(
+				'skus'     => $skus,
+				'per_page' => 10,
+			)
+		);
 		return isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array();
 	}
 
@@ -244,7 +259,16 @@ class BSH_Api_Client {
 	 * @return array{data: array[], total_page: int|null, total_count: int|null}
 	 */
 	public function vendor_products( $vendor_id, $page, $per_page = 50 ) {
-		$res = $this->request( 'GET', '/v1/vendors/' . (int) $vendor_id . '/products', null, array( 'page' => (int) $page, 'per_page' => (int) $per_page, 'variants_flatting' => false ) );
+		$res = $this->request(
+			'GET',
+			'/v1/vendors/' . (int) $vendor_id . '/products',
+			null,
+			array(
+				'page'              => (int) $page,
+				'per_page'          => (int) $per_page,
+				'variants_flatting' => false,
+			)
+		);
 		return array(
 			'data'        => isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array(),
 			'total_page'  => isset( $res['total_page'] ) ? (int) $res['total_page'] : null,

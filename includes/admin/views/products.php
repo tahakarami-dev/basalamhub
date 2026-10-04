@@ -14,7 +14,14 @@ $bsh_paged  = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 // phpcs:enable
 $bsh_tabs   = BSH_App::product_tabs();
 $bsh_status = isset( $bsh_tabs[ $bsh_status ] ) ? $bsh_status : '';
-$bsh_result = BSH_App::products( array( 'status' => $bsh_status, 'search' => $bsh_search, 'page' => $bsh_paged, 'per_page' => 20 ) );
+$bsh_result = BSH_App::products(
+	array(
+		'status'   => $bsh_status,
+		'search'   => $bsh_search,
+		'page'     => $bsh_paged,
+		'per_page' => 20,
+	)
+);
 $bsh_pages  = (int) ceil( $bsh_result['total'] / 20 );
 $bsh_conn   = BSH_Settings::connection();
 $bsh_base   = admin_url( 'admin.php?page=basalamhub-products' );
@@ -30,7 +37,21 @@ $bsh_base   = admin_url( 'admin.php?page=basalamhub-products' );
 <nav class="bsh-tabs" aria-label="<?php esc_attr_e( 'فیلتر وضعیت', 'basalamhub' ); ?>">
 	<?php foreach ( $bsh_tabs as $bsh_key => $bsh_label ) : ?>
 		<a class="bsh-tabs__item<?php echo $bsh_key === $bsh_status ? ' is-active' : ''; ?>" data-bsh-nav
-			href="<?php echo esc_url( add_query_arg( array_filter( array( 'status' => $bsh_key, 's' => $bsh_search ) ), $bsh_base ) ); ?>"
+			href="
+			<?php
+			echo esc_url(
+				add_query_arg(
+					array_filter(
+						array(
+							'status' => $bsh_key,
+							's'      => $bsh_search,
+						)
+					),
+					$bsh_base
+				)
+			);
+			?>
+					"
 			<?php echo $bsh_key === $bsh_status ? 'aria-current="page"' : ''; ?>>
 			<?php echo esc_html( $bsh_label ); ?>
 			<span class="bsh-tabs__count"><?php echo esc_html( bsh_fa_number( $bsh_result['counts'][ $bsh_key ] ) ); ?></span>

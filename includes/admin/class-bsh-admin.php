@@ -83,44 +83,45 @@ class BSH_Admin {
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 				'nonce'   => wp_create_nonce( 'bsh_admin' ),
 				'i18n'    => array(
-					'testing'        => __( 'در حال تست اتصال…', 'basalamhub' ),
-					'sending'        => __( 'در حال افزودن به صف…', 'basalamhub' ),
-					'retrying'       => __( 'در حال افزودن به صف…', 'basalamhub' ),
-					'queued'         => __( 'در صف قرار گرفت. نتیجه همین‌جا نمایش داده می‌شود.', 'basalamhub' ),
-					'networkError'   => __( 'درخواست به سایت خودت نرسید. اینترنت یا ورودت به پیشخوان را بررسی کن و دوباره امتحان کن.', 'basalamhub' ),
-					'starting'       => __( 'در حال شروع…', 'basalamhub' ),
-					'refreshing'     => __( 'در حال دریافت از باسلام…', 'basalamhub' ),
-					'loading'        => __( 'در حال دریافت…', 'basalamhub' ),
-					'checkAttrs'     => __( 'بررسی ویژگی‌های اجباری', 'basalamhub' ),
-					'themeAuto'      => __( 'پوسته: خودکار (مطابق سیستم)', 'basalamhub' ),
-					'themeLight'     => __( 'پوسته: روشن', 'basalamhub' ),
-					'themeDark'      => __( 'پوسته: تیره', 'basalamhub' ),
-					'chartOk'        => __( 'ارسال موفق', 'basalamhub' ),
-					'chartErr'       => __( 'خطا', 'basalamhub' ),
-					'queuedShort'    => __( 'در صف', 'basalamhub' ),
-					'linking'        => __( 'در حال اتصال…', 'basalamhub' ),
-					'nothingSelected' => __( 'هیچ ردیفی انتخاب نشده.', 'basalamhub' ),
-					'confirmLinkAll' => __( 'همه‌ی جفت‌های قطعی متصل شوند؟ تا وقتی گزینه‌ی ارسال تیک نخورده، چیزی در باسلام تغییر نمی‌کند.', 'basalamhub' ),
+					'testing'           => __( 'در حال تست اتصال…', 'basalamhub' ),
+					'sending'           => __( 'در حال افزودن به صف…', 'basalamhub' ),
+					'retrying'          => __( 'در حال افزودن به صف…', 'basalamhub' ),
+					'queued'            => __( 'در صف قرار گرفت. نتیجه همین‌جا نمایش داده می‌شود.', 'basalamhub' ),
+					'networkError'      => __( 'درخواست به سایت خودت نرسید. اینترنت یا ورودت به پیشخوان را بررسی کن و دوباره امتحان کن.', 'basalamhub' ),
+					'starting'          => __( 'در حال شروع…', 'basalamhub' ),
+					'refreshing'        => __( 'در حال دریافت از باسلام…', 'basalamhub' ),
+					'loading'           => __( 'در حال دریافت…', 'basalamhub' ),
+					'checkAttrs'        => __( 'بررسی ویژگی‌های اجباری', 'basalamhub' ),
+					'themeAuto'         => __( 'پوسته: خودکار (مطابق سیستم)', 'basalamhub' ),
+					'themeLight'        => __( 'پوسته: روشن', 'basalamhub' ),
+					'themeDark'         => __( 'پوسته: تیره', 'basalamhub' ),
+					'chartOk'           => __( 'ارسال موفق', 'basalamhub' ),
+					'chartErr'          => __( 'خطا', 'basalamhub' ),
+					'queuedShort'       => __( 'در صف', 'basalamhub' ),
+					'linking'           => __( 'در حال اتصال…', 'basalamhub' ),
+					'nothingSelected'   => __( 'هیچ ردیفی انتخاب نشده.', 'basalamhub' ),
+					'confirmLinkAll'    => __( 'همه‌ی جفت‌های قطعی متصل شوند؟ تا وقتی گزینه‌ی ارسال تیک نخورده، چیزی در باسلام تغییر نمی‌کند.', 'basalamhub' ),
 					/* translators: %s: number of selected products */
-					'selected'       => __( '%s محصول انتخاب شده', 'basalamhub' ),
+					'selected'          => __( '%s محصول انتخاب شده', 'basalamhub' ),
 					/* translators: %s: product count */
-					'confirmBulk'    => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'basalamhub' ),
-					'confirmCancel'  => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'basalamhub' ),
-					'saving'         => __( 'در حال ثبت در باسلام…', 'basalamhub' ),
-					'confirmPosted'  => __( 'ارسال این سفارش در باسلام ثبت شود؟ بعد از ثبت، مشتری کد رهگیری را می‌بیند و این کار برگشت‌پذیر نیست.', 'basalamhub' ),
-					'copied'         => __( 'کپی شد.', 'basalamhub' ),
-					'sendingTest'    => __( 'در حال فرستادن…', 'basalamhub' ),
-					'searching'      => __( 'در حال جستجو…', 'basalamhub' ),
+					'confirmBulk'       => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'basalamhub' ),
+					'confirmCancel'     => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'basalamhub' ),
+					'saving'            => __( 'در حال ثبت در باسلام…', 'basalamhub' ),
+					'confirmPosted'     => __( 'ارسال این سفارش در باسلام ثبت شود؟ بعد از ثبت، مشتری کد رهگیری را می‌بیند و این کار برگشت‌پذیر نیست.', 'basalamhub' ),
+					'copied'            => __( 'کپی شد.', 'basalamhub' ),
+					'sendingTest'       => __( 'در حال فرستادن…', 'basalamhub' ),
+					'searching'         => __( 'در حال جستجو…', 'basalamhub' ),
 					/* translators: %s: number of products */
-					'confirmImport'  => __( '%s محصول از باسلام وارد سایت می‌شود. ادامه می‌دهی؟', 'basalamhub' ),
+					'confirmImport'     => __( '%s محصول از باسلام وارد سایت می‌شود. ادامه می‌دهی؟', 'basalamhub' ),
 					'confirmStopImport' => __( 'ایمپورت متوقف شود؟ محصولاتی که تا الان وارد شده‌اند در سایت می‌مانند.', 'basalamhub' ),
-					'confirmDisconn' => __( 'اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند.', 'basalamhub' ),
+					'confirmDisconn'    => __( 'اتصال به باسلام قطع شود؟ توکن پاک می‌شود و همگام‌سازی تا اتصال دوباره متوقف می‌ماند. محصولات در باسلام دست نمی‌خورند.', 'basalamhub' ),
 				),
 			)
 		);
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Pages
 	 * ------------------------------------------------------------------ */
 
@@ -167,7 +168,8 @@ class BSH_Admin {
 		BSH_App::render( $view, $slug );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Form handlers
 	 * ------------------------------------------------------------------ */
 
@@ -182,26 +184,44 @@ class BSH_Admin {
 
 		$input   = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized per field in BSH_Settings::save().
 		$section = isset( $input['bsh_section'] ) ? sanitize_key( $input['bsh_section'] ) : 'products';
-		$notice  = array( 'type' => 'success', 'text' => __( 'تنظیمات ذخیره شد.', 'basalamhub' ) );
+		$notice  = array(
+			'type' => 'success',
+			'text' => __( 'تنظیمات ذخیره شد.', 'basalamhub' ),
+		);
 
 		if ( 'connection' === $section ) {
 			$token = isset( $input['bsh_token'] ) ? trim( (string) $input['bsh_token'] ) : '';
 			if ( '' === $token ) {
-				$notice = array( 'type' => 'error', 'text' => __( 'توکن خالی است. توکن را از پنل توسعه‌دهندگان باسلام کپی کن و اینجا بچسبان.', 'basalamhub' ) );
+				$notice = array(
+					'type' => 'error',
+					'text' => __( 'توکن خالی است. توکن را از پنل توسعه‌دهندگان باسلام کپی کن و اینجا بچسبان.', 'basalamhub' ),
+				);
 			} elseif ( ! BSH_Settings::set_token( $token ) ) {
-				$notice = array( 'type' => 'error', 'text' => __( 'این سرور امکان رمزنگاری ندارد، پس توکن ذخیره نشد. از هاستینگ بخواه افزونه‌ی sodium یا openssl در PHP را فعال کند.', 'basalamhub' ) );
+				$notice = array(
+					'type' => 'error',
+					'text' => __( 'این سرور امکان رمزنگاری ندارد، پس توکن ذخیره نشد. از هاستینگ بخواه افزونه‌ی sodium یا openssl در PHP را فعال کند.', 'basalamhub' ),
+				);
 			} else {
 				$result = self::test_connection();
 				$notice = $result['ok']
-					? array( 'type' => 'success', 'text' => $result['message'] )
-					: array( 'type' => 'error', 'text' => $result['message'] . ' ' . $result['suggestion'] );
+					? array(
+						'type' => 'success',
+						'text' => $result['message'],
+					)
+					: array(
+						'type' => 'error',
+						'text' => $result['message'] . ' ' . $result['suggestion'],
+					);
 			}
 		} else {
 			$errors = BSH_Settings::save( $input );
 			if ( $errors ) {
 				set_transient( 'bsh_settings_errors_' . get_current_user_id(), $errors, 300 );
 				set_transient( 'bsh_settings_input_' . get_current_user_id(), $input, 300 );
-				$notice = array( 'type' => 'error', 'text' => __( 'بعضی فیلدها درست نبودند و ذخیره نشدند. پیام کنار هر فیلد را ببین.', 'basalamhub' ) );
+				$notice = array(
+					'type' => 'error',
+					'text' => __( 'بعضی فیلدها درست نبودند و ذخیره نشدند. پیام کنار هر فیلد را ببین.', 'basalamhub' ),
+				);
 			}
 		}
 
@@ -229,7 +249,14 @@ class BSH_Admin {
 				'message'     => __( 'اتصال قطع و توکن پاک شد.', 'basalamhub' ),
 			)
 		);
-		set_transient( 'bsh_notice_' . get_current_user_id(), array( 'type' => 'success', 'text' => __( 'اتصال قطع شد. محصولات در باسلام دست نخوردند.', 'basalamhub' ) ), 60 );
+		set_transient(
+			'bsh_notice_' . get_current_user_id(),
+			array(
+				'type' => 'success',
+				'text' => __( 'اتصال قطع شد. محصولات در باسلام دست نخوردند.', 'basalamhub' ),
+			),
+			60
+		);
 		wp_safe_redirect( admin_url( 'admin.php?page=basalamhub-settings' ) );
 		exit;
 	}
@@ -314,7 +341,8 @@ class BSH_Admin {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * AJAX
 	 * ------------------------------------------------------------------ */
 
@@ -344,7 +372,7 @@ class BSH_Admin {
 	 */
 	public static function ajax_retry_log() {
 		self::ajax_guard();
-		$log = BSH_Logger::get( isset( $_POST['log_id'] ) ? absint( $_POST['log_id'] ) : 0 );
+		$log = BSH_Logger::get( isset( $_POST['log_id'] ) ? absint( $_POST['log_id'] ) : 0 ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified in ajax_guard().
 		if ( ! $log || ! BSH_Queue::retry_from_log( $log ) ) {
 			wp_send_json_error( array( 'message' => __( 'این مورد قابل تلاش مجدد نیست.', 'basalamhub' ) ) );
 		}
@@ -357,7 +385,7 @@ class BSH_Admin {
 	public static function ajax_retry_all() {
 		self::ajax_guard();
 		global $wpdb;
-		$rows = $wpdb->get_results( 'SELECT MAX(id) AS id FROM ' . BSH_Logger::table() . " WHERE level = 'error' AND resolved = 0 AND retry_hook IS NOT NULL GROUP BY object_type, object_id" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$rows  = $wpdb->get_results( 'SELECT MAX(id) AS id FROM ' . BSH_Logger::table() . " WHERE level = 'error' AND resolved = 0 AND retry_hook IS NOT NULL GROUP BY object_type, object_id" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$count = 0;
 		foreach ( (array) $rows as $row ) {
 			if ( BSH_Queue::retry_from_log( BSH_Logger::get( (int) $row->id ) ) ) {
@@ -380,7 +408,14 @@ class BSH_Admin {
 	 * @param string $text Text.
 	 */
 	public static function set_notice( $type, $text ) {
-		set_transient( 'bsh_notice_' . get_current_user_id(), array( 'type' => $type, 'text' => $text ), 60 );
+		set_transient(
+			'bsh_notice_' . get_current_user_id(),
+			array(
+				'type' => $type,
+				'text' => $text,
+			),
+			60
+		);
 	}
 
 	/**

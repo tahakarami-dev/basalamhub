@@ -21,6 +21,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
+
 class BSH_Order_Sync {
 
 	const HOOK_POLL    = 'bsh_poll_orders';
@@ -30,18 +32,18 @@ class BSH_Order_Sync {
 	const META_PARCEL  = '_bsh_parcel_id';
 
 	/** Basalam parcel statuses (from the official API spec). */
-	const ST_NEW              = 3739;
-	const ST_PREPARATION      = 3237;
-	const ST_POSTED           = 3238;
-	const ST_WRONG_TRACKING   = 5017;
-	const ST_NOT_DELIVERED    = 3572;
-	const ST_PROBLEM          = 3740;
-	const ST_CUSTOMER_CANCEL  = 4633;
-	const ST_OVERDUE_REQUEST  = 5075;
-	const ST_SATISFIED        = 3195;
-	const ST_REFUNDED         = 3233;
-	const ST_CANCEL           = 3067;
-	const ST_VENDOR_CANCEL    = 6440;
+	const ST_NEW             = 3739;
+	const ST_PREPARATION     = 3237;
+	const ST_POSTED          = 3238;
+	const ST_WRONG_TRACKING  = 5017;
+	const ST_NOT_DELIVERED   = 3572;
+	const ST_PROBLEM         = 3740;
+	const ST_CUSTOMER_CANCEL = 4633;
+	const ST_OVERDUE_REQUEST = 5075;
+	const ST_SATISFIED       = 3195;
+	const ST_REFUNDED        = 3233;
+	const ST_CANCEL          = 3067;
+	const ST_VENDOR_CANCEL   = 6440;
 
 	/**
 	 * Hooks.
@@ -102,7 +104,8 @@ class BSH_Order_Sync {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Polling
 	 * ------------------------------------------------------------------ */
 
@@ -155,7 +158,12 @@ class BSH_Order_Sync {
 					}
 					update_option( 'bsh_orders_poll_error', $e->getMessage(), false );
 					if ( 'auth' === $e->kind ) {
-						BSH_Settings::update_connection( array( 'status' => 'invalid', 'message' => $e->getMessage() ) );
+						BSH_Settings::update_connection(
+							array(
+								'status'  => 'invalid',
+								'message' => $e->getMessage(),
+							)
+						);
 					}
 				}
 			}
@@ -174,10 +182,15 @@ class BSH_Order_Sync {
 		$since     = $first_run
 			? time() - max( 0, (int) BSH_Settings::get( 'orders_import_days', 3 ) ) * DAY_IN_SECONDS
 			: strtotime( get_option( 'bsh_orders_polled_at' ) . ' UTC' ) - DAY_IN_SECONDS; // A day of overlap.
-		$queued = 0;
-		$cursor = null;
+		$queued    = 0;
+		$cursor    = null;
 		for ( $page = 0; $page < 20; $page++ ) {
-			$res   = $api->vendor_parcels( array( 'cursor' => $cursor, 'per_page' => 30 ) );
+			$res   = $api->vendor_parcels(
+				array(
+					'cursor'   => $cursor,
+					'per_page' => 30,
+				)
+			);
 			$older = false;
 			foreach ( $res['data'] as $parcel ) {
 				if ( empty( $parcel['id'] ) ) {
@@ -256,7 +269,8 @@ class BSH_Order_Sync {
 		return (bool) BSH_Links::get( 'parcel_skip', (int) $parcel_id );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Import
 	 * ------------------------------------------------------------------ */
 
@@ -297,7 +311,14 @@ class BSH_Order_Sync {
 			$status = isset( $parcel['status']['id'] ) ? (int) $parcel['status']['id'] : 0;
 			if ( in_array( $status, array( self::ST_CANCEL, self::ST_VENDOR_CANCEL ), true ) ) {
 				// Cancelled before we ever saw it: nothing to fulfil, remember so we don't fetch it again.
-				BSH_Links::upsert( 'parcel_skip', (int) $parcel_id, array( 'basalam_id' => (int) $parcel_id, 'sync_status' => 'synced' ) );
+				BSH_Links::upsert(
+					'parcel_skip',
+					(int) $parcel_id,
+					array(
+						'basalam_id'  => (int) $parcel_id,
+						'sync_status' => 'synced',
+					)
+				);
 				BSH_Logger::resolve_for( 'parcel', $parcel_id );
 				return 'skipped';
 			}
@@ -319,7 +340,11 @@ class BSH_Order_Sync {
 					array(
 						'reason'     => __( 'یک خطای پیش‌بینی‌نشده در سایت رخ داد (احتمالاً تداخل با افزونه‌ی دیگر).', 'basalamhub' ),
 						'suggestion' => __( '«تلاش مجدد» را بزن. اگر تکرار شد، جزئیات فنی را برای پشتیبانی بفرست. سفارش در باسلام سالم است.', 'basalamhub' ),
-						'details'    => array( 'exception' => get_class( $e ), 'error' => $e->getMessage(), 'at' => basename( $e->getFile() ) . ':' . $e->getLine() ),
+						'details'    => array(
+							'exception' => get_class( $e ),
+							'error'     => $e->getMessage(),
+							'at'        => basename( $e->getFile() ) . ':' . $e->getLine(),
+						),
 					)
 				)
 			);
@@ -384,15 +409,20 @@ class BSH_Order_Sync {
 
 		BSH_Plugin::$suspend_hooks = true;
 		try {
-			$order = wc_create_order( array( 'created_via' => 'basalamhub', 'status' => 'pending' ) );
+			$order = wc_create_order(
+				array(
+					'created_via' => 'basalamhub',
+					'status'      => 'pending',
+				)
+			);
 			if ( is_wp_error( $order ) ) {
 				throw new BSH_Api_Error( __( 'ووکامرس سفارش را نساخت.', 'basalamhub' ), 'unknown', array( 'reason' => $order->get_error_message() ) );
 			}
 
 			// Items. Basalam's "price" may be per unit or per line; decide from the parcel total.
-			$items       = isset( $parcel['items'] ) && is_array( $parcel['items'] ) ? $parcel['items'] : array();
-			$unit_sum    = 0;
-			$line_sum    = 0;
+			$items    = isset( $parcel['items'] ) && is_array( $parcel['items'] ) ? $parcel['items'] : array();
+			$unit_sum = 0;
+			$line_sum = 0;
 			foreach ( $items as $item ) {
 				$unit_sum += (int) $item['price'] * max( 1, (int) $item['quantity'] );
 				$line_sum += (int) $item['price'];
@@ -407,7 +437,14 @@ class BSH_Order_Sync {
 				$total = $to_store( $line );
 				$wc    = self::resolve_product( $item );
 				if ( $wc ) {
-					$order->add_product( $wc, $qty, array( 'subtotal' => $total, 'total' => $total ) );
+					$order->add_product(
+						$wc,
+						$qty,
+						array(
+							'subtotal' => $total,
+							'total'    => $total,
+						)
+					);
 				} else {
 					$li = new WC_Order_Item_Product();
 					$li->set_name( isset( $item['title'] ) ? (string) $item['title'] : __( 'محصول باسلام', 'basalamhub' ) );
@@ -435,10 +472,17 @@ class BSH_Order_Sync {
 			$name      = trim( isset( $recipient['name'] ) ? (string) $recipient['name'] : ( isset( $customer['user']['name'] ) ? (string) $customer['user']['name'] : '' ) );
 			$parts     = preg_split( '/\s+/u', $name, 2 );
 			$address   = trim( ( isset( $recipient['postal_address'] ) ? $recipient['postal_address'] : '' ) );
-			$unit      = trim( implode( '، ', array_filter( array(
-				! empty( $recipient['house_number'] ) ? sprintf( /* translators: %s: plate */ __( 'پلاک %s', 'basalamhub' ), $recipient['house_number'] ) : '',
-				! empty( $recipient['house_unit'] ) ? sprintf( /* translators: %s: unit */ __( 'واحد %s', 'basalamhub' ), $recipient['house_unit'] ) : '',
-			) ) ) );
+			$unit      = trim(
+				implode(
+					'، ',
+					array_filter(
+						array(
+							! empty( $recipient['house_number'] ) ? sprintf( /* translators: %s: plate */ __( 'پلاک %s', 'basalamhub' ), $recipient['house_number'] ) : '',
+							! empty( $recipient['house_unit'] ) ? sprintf( /* translators: %s: unit */ __( 'واحد %s', 'basalamhub' ), $recipient['house_unit'] ) : '',
+						)
+					)
+				)
+			);
 			$city      = isset( $customer['city']['title'] ) ? (string) $customer['city']['title'] : '';
 			$province  = isset( $customer['city']['parent']['title'] ) ? (string) $customer['city']['parent']['title'] : '';
 			$addr      = array(
@@ -598,7 +642,8 @@ class BSH_Order_Sync {
 		return (string) apply_filters( 'bsh_order_status', isset( $map[ $status ] ) ? $map[ $status ] : 'on-hold', $status );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Basalam → site: status refresh
 	 * ------------------------------------------------------------------ */
 
@@ -622,7 +667,12 @@ class BSH_Order_Sync {
 			}
 		}
 		foreach ( array_chunk( array_keys( $open ), 30, true ) as $ids ) {
-			$res = BSH_Plugin::api()->vendor_parcels( array( 'ids' => $ids, 'per_page' => 30 ) );
+			$res = BSH_Plugin::api()->vendor_parcels(
+				array(
+					'ids'      => $ids,
+					'per_page' => 30,
+				)
+			);
 			foreach ( $res['data'] as $parcel ) {
 				if ( isset( $parcel['id'], $open[ (int) $parcel['id'] ], $parcel['status']['id'] ) ) {
 					self::apply_remote_status( $open[ (int) $parcel['id'] ], (int) $parcel['status']['id'], isset( $parcel['status']['title'] ) ? (string) $parcel['status']['title'] : '' );
@@ -645,7 +695,7 @@ class BSH_Order_Sync {
 		}
 		$order->update_meta_data( '_bsh_parcel_status', $status );
 		$order->save();
-		$target = self::wc_status_for( $status );
+		$target                    = self::wc_status_for( $status );
 		BSH_Plugin::$suspend_hooks = true;
 		try {
 			if ( $order->get_status() !== $target ) {
@@ -659,7 +709,15 @@ class BSH_Order_Sync {
 			BSH_Plugin::$suspend_hooks = false;
 		}
 		// The status moved on in Basalam, so an earlier failed confirm/posted is moot now.
-		BSH_Links::upsert( 'order', $order->get_id(), array( 'last_synced_at' => bsh_now(), 'sync_status' => 'synced', 'last_error' => null ) );
+		BSH_Links::upsert(
+			'order',
+			$order->get_id(),
+			array(
+				'last_synced_at' => bsh_now(),
+				'sync_status'    => 'synced',
+				'last_error'     => null,
+			)
+		);
 		BSH_Logger::resolve_for( 'order', $order->get_id() );
 		$attention = in_array( $status, array( self::ST_PROBLEM, self::ST_CUSTOMER_CANCEL, self::ST_NOT_DELIVERED, self::ST_WRONG_TRACKING, self::ST_OVERDUE_REQUEST ), true );
 		BSH_Logger::log(
@@ -677,7 +735,8 @@ class BSH_Order_Sync {
 		);
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Site → Basalam: confirm / posted
 	 * ------------------------------------------------------------------ */
 
@@ -687,7 +746,15 @@ class BSH_Order_Sync {
 	 * @param array  $data      shipping_method, tracking_code (for posted).
 	 */
 	public static function queue_action( $parcel_id, $action, array $data = array() ) {
-		as_enqueue_async_action( self::HOOK_ACTION, array( 'parcel_id' => (int) $parcel_id, 'action' => $action, 'data' => $data ), BSH_Queue::GROUP );
+		as_enqueue_async_action(
+			self::HOOK_ACTION,
+			array(
+				'parcel_id' => (int) $parcel_id,
+				'action'    => $action,
+				'data'      => $data,
+			),
+			BSH_Queue::GROUP
+		);
 	}
 
 	/**
@@ -700,7 +767,11 @@ class BSH_Order_Sync {
 	public static function handle_action( $parcel_id, $action, $data = array() ) {
 		BSH_Queue::run_exclusive(
 			self::HOOK_ACTION,
-			array( 'parcel_id' => (int) $parcel_id, 'action' => $action, 'data' => $data ),
+			array(
+				'parcel_id' => (int) $parcel_id,
+				'action'    => $action,
+				'data'      => $data,
+			),
 			function () use ( $parcel_id, $action, $data ) {
 				self::do_action( (int) $parcel_id, (string) $action, (array) $data );
 			}
@@ -716,7 +787,10 @@ class BSH_Order_Sync {
 	public static function do_action( $parcel_id, $action, array $data ) {
 		$order_id = self::find_order( $parcel_id );
 		$order    = $order_id ? wc_get_order( $order_id ) : null;
-		$labels   = array( 'confirm' => __( 'تأیید سفارش', 'basalamhub' ), 'posted' => __( 'ثبت ارسال', 'basalamhub' ) );
+		$labels   = array(
+			'confirm' => __( 'تأیید سفارش', 'basalamhub' ),
+			'posted'  => __( 'ثبت ارسال', 'basalamhub' ),
+		);
 		$label    = isset( $labels[ $action ] ) ? $labels[ $action ] : $action;
 		try {
 			if ( 'confirm' === $action ) {
@@ -734,7 +808,15 @@ class BSH_Order_Sync {
 				$order->save();
 				/* translators: %s: action */
 				$order->add_order_note( sprintf( __( '«%s» در باسلام ثبت شد.', 'basalamhub' ), $label ) );
-				BSH_Links::upsert( 'order', $order->get_id(), array( 'sync_status' => 'synced', 'last_error' => null, 'last_synced_at' => bsh_now() ) );
+				BSH_Links::upsert(
+					'order',
+					$order->get_id(),
+					array(
+						'sync_status'    => 'synced',
+						'last_error'     => null,
+						'last_synced_at' => bsh_now(),
+					)
+				);
 				BSH_Logger::resolve_for( 'order', $order->get_id() );
 			}
 			BSH_Logger::log(
@@ -751,7 +833,16 @@ class BSH_Order_Sync {
 			);
 			return true;
 		} catch ( BSH_Api_Error $e ) {
-			if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK_ACTION, array( 'parcel_id' => (int) $parcel_id, 'action' => $action, 'data' => $data ), 'action_' . $parcel_id . $action, $e->retry_after ) ) {
+			if ( $e->retryable && false !== BSH_Queue::retry_later(
+				self::HOOK_ACTION,
+				array(
+					'parcel_id' => (int) $parcel_id,
+					'action'    => $action,
+					'data'      => $data,
+				),
+				'action_' . $parcel_id . $action,
+				$e->retry_after
+			) ) {
 				return false;
 			}
 			$message = $e->getMessage();
@@ -762,7 +853,14 @@ class BSH_Order_Sync {
 				$e->suggestion = __( 'وضعیت سفارش را در پنل باسلام ببین؛ باسلام‌هاب در دریافت بعدی وضعیت را خودش به‌روز می‌کند.', 'basalamhub' );
 			}
 			if ( $order ) {
-				BSH_Links::upsert( 'order', $order->get_id(), array( 'sync_status' => 'error', 'last_error' => $message ) );
+				BSH_Links::upsert(
+					'order',
+					$order->get_id(),
+					array(
+						'sync_status' => 'error',
+						'last_error'  => $message,
+					)
+				);
 				/* translators: 1: action, 2: error */
 				$order->add_order_note( sprintf( __( '«%1$s» در باسلام ثبت نشد: %2$s', 'basalamhub' ), $label, trim( $message . ' ' . $e->reason ) ) );
 			}
@@ -776,7 +874,11 @@ class BSH_Order_Sync {
 						/* translators: %s: parcel */
 						'title'       => sprintf( __( 'سفارش باسلام #%s', 'basalamhub' ), $parcel_id ),
 						'retry_hook'  => self::HOOK_ACTION,
-						'retry_args'  => array( 'parcel_id' => (int) $parcel_id, 'action' => $action, 'data' => $data ),
+						'retry_args'  => array(
+							'parcel_id' => (int) $parcel_id,
+							'action'    => $action,
+							'data'      => $data,
+						),
 					),
 					$e->to_log(),
 					/* translators: %s: action */
@@ -811,7 +913,14 @@ class BSH_Order_Sync {
 				$order->add_order_note( __( 'سفارش «تکمیل‌شده» شد ولی روش ارسال در کادر باسلام‌هاب انتخاب نشده؛ ارسال در باسلام ثبت نشد. روش ارسال و کد رهگیری را وارد کن و «ثبت ارسال در باسلام» را بزن.', 'basalamhub' ) );
 				return;
 			}
-			self::queue_action( $parcel_id, 'posted', array( 'shipping_method' => $method, 'tracking_code' => $tracking ) );
+			self::queue_action(
+				$parcel_id,
+				'posted',
+				array(
+					'shipping_method' => $method,
+					'tracking_code'   => $tracking,
+				)
+			);
 		} elseif ( 'cancelled' === $to && ! in_array( $remote, array( self::ST_CANCEL, self::ST_VENDOR_CANCEL ), true ) ) {
 			$order->add_order_note( __( 'این سفارش در سایت لغو شد، ولی API باسلام اجازه‌ی لغو از سمت غرفه‌دار را نمی‌دهد. درخواست لغو را در پنل باسلام ثبت کن؛ وضعیت بعد از آن خودکار همگام می‌شود.', 'basalamhub' ) );
 			BSH_Logger::log(
@@ -856,7 +965,8 @@ class BSH_Order_Sync {
 		);
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Webhook (optional, faster)
 	 * ------------------------------------------------------------------ */
 
@@ -915,7 +1025,8 @@ class BSH_Order_Sync {
 		return new WP_REST_Response( array( 'ok' => true ), 200 );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Numbers for the dashboard
 	 * ------------------------------------------------------------------ */
 

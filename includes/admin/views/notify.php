@@ -16,7 +16,7 @@ $bsh_err    = function ( $key, $hint ) use ( $bsh_errors ) {
 	$is = isset( $bsh_errors[ $key ] );
 	echo '<span class="bsh-field__hint' . ( $is ? ' is-error' : '' ) . '">' . esc_html( $is ? $bsh_errors[ $key ] : $hint ) . '</span>';
 };
-$bsh_help = array(
+$bsh_help   = array(
 	'bale'     => __( 'در بله به @botfather پیام بده، «/newbot» را بزن و توکن ربات را کپی کن. بعد ربات خودت را باز کن و «/start» بفرست.', 'basalamhub' ),
 	'telegram' => __( 'در تلگرام به @BotFather پیام بده، «/newbot» را بزن و توکن را کپی کن. توجه: بیشتر هاست‌های ایران به تلگرام دسترسی ندارند؛ اگر پیام آزمایشی نرسید، از بله استفاده کن.', 'basalamhub' ),
 );

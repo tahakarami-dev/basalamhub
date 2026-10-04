@@ -157,8 +157,8 @@ class BSH_Logger {
 			$params[] = $like;
 		}
 
-		$per_page = isset( $args['per_page'] ) ? max( 1, (int) $args['per_page'] ) : 30;
-		$page     = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
+		$per_page  = isset( $args['per_page'] ) ? max( 1, (int) $args['per_page'] ) : 30;
+		$page      = isset( $args['page'] ) ? max( 1, (int) $args['page'] ) : 1;
 		$sql_where = implode( ' AND ', $where );
 
 		$count_sql = 'SELECT COUNT(*) FROM ' . self::table() . " WHERE {$sql_where}";
@@ -169,7 +169,10 @@ class BSH_Logger {
 		$items = $wpdb->get_results( $wpdb->prepare( $items_sql, array_merge( $params, array( $per_page, ( $page - 1 ) * $per_page ) ) ) );
 		// phpcs:enable
 
-		return array( 'items' => $items ? $items : array(), 'total' => $total );
+		return array(
+			'items' => $items ? $items : array(),
+			'total' => $total,
+		);
 	}
 
 	/**

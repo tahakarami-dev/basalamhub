@@ -14,9 +14,9 @@ defined( 'ABSPATH' ) || exit;
 
 class BSH_Bulk {
 
-	const OPTION     = 'bsh_batch';
-	const HOOK_PLAN  = 'bsh_bulk_plan';
-	const CHUNK      = 100;
+	const OPTION    = 'bsh_batch';
+	const HOOK_PLAN = 'bsh_bulk_plan';
+	const CHUNK     = 100;
 
 	/**
 	 * Hooks.
@@ -63,7 +63,11 @@ class BSH_Bulk {
 		$all    = self::query_ids( 'all', $term_id, 1, 0, true );
 		$linked = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . BSH_Links::table() . " WHERE object_type = 'product' AND basalam_id IS NOT NULL" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		$unsent = self::query_ids( 'unsent', $term_id, 1, 0, true );
-		return array( 'all' => $all, 'unsent' => $unsent, 'linked' => $linked );
+		return array(
+			'all'    => $all,
+			'unsent' => $unsent,
+			'linked' => $linked,
+		);
 	}
 
 	/**
@@ -115,7 +119,7 @@ class BSH_Bulk {
 			$where .= ' AND l.basalam_id IS NULL';
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $joins/$where contain only fixed SQL and integer IDs.
 		if ( $count ) {
 			return (int) $wpdb->get_var( "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p {$joins} WHERE {$where}" );
 		}
@@ -169,7 +173,11 @@ class BSH_Bulk {
 				'title'       => __( 'ارسال گروهی', 'basalamhub' ),
 				/* translators: %s: count */
 				'message'     => sprintf( __( 'ارسال گروهی %s محصول شروع شد.', 'basalamhub' ), bsh_fa_number( $total ) ),
-				'context'     => array( 'batch' => $batch['id'], 'scope' => $scope, 'term_id' => $term_id ),
+				'context'     => array(
+					'batch'   => $batch['id'],
+					'scope'   => $scope,
+					'term_id' => $term_id,
+				),
 			)
 		);
 		return $batch;
@@ -224,7 +232,15 @@ class BSH_Bulk {
 	public static function progress( $batch = null ) {
 		global $wpdb;
 		$batch = $batch ? $batch : self::current();
-		$out   = array( 'total' => 0, 'done' => 0, 'failed' => 0, 'skipped' => 0, 'waiting' => 0, 'percent' => 0, 'planning' => false );
+		$out   = array(
+			'total'    => 0,
+			'done'     => 0,
+			'failed'   => 0,
+			'skipped'  => 0,
+			'waiting'  => 0,
+			'percent'  => 0,
+			'planning' => false,
+		);
 		if ( ! $batch ) {
 			return $out;
 		}

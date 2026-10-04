@@ -60,7 +60,8 @@ class BSH_Import_UI {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Import
 	 * ------------------------------------------------------------------ */
 
@@ -106,7 +107,10 @@ class BSH_Import_UI {
 	private static function import_payload() {
 		ob_start();
 		self::import_progress_html();
-		return array( 'running' => BSH_Importer::is_running(), 'html' => ob_get_clean() );
+		return array(
+			'running' => BSH_Importer::is_running(),
+			'html'    => ob_get_clean(),
+		);
 	}
 
 	/**
@@ -165,7 +169,8 @@ class BSH_Import_UI {
 		<?php
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Reconciliation
 	 * ------------------------------------------------------------------ */
 
@@ -181,7 +186,8 @@ class BSH_Import_UI {
 		wp_send_json_success( array( 'message' => __( 'در صف قرار گرفت؛ نتیجه تا یکی دو دقیقه‌ی دیگر همین‌جا و در لاگ می‌آید.', 'basalamhub' ) ) );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Notifications
 	 * ------------------------------------------------------------------ */
 
@@ -239,7 +245,12 @@ class BSH_Import_UI {
 		$res = BSH_Notifier::find_chat( $ch );
 		if ( isset( $res['id'] ) ) {
 			/* translators: 1: chat id, 2: chat title */
-			wp_send_json_success( array( 'id' => $res['id'], 'message' => sprintf( __( 'پیدا شد: %2$s (%1$s) — ذخیره شد.', 'basalamhub' ), $res['id'], $res['title'] ) ) );
+			wp_send_json_success(
+				array(
+					'id'      => $res['id'],
+					'message' => sprintf( __( 'پیدا شد: %2$s (%1$s) — ذخیره شد.', 'basalamhub' ), $res['id'], $res['title'] ),
+				)
+			);
 		}
 		wp_send_json_error( array( 'message' => trim( $res['message'] . ' ' . $res['suggestion'] ) ) );
 	}

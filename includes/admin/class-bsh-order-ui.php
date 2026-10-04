@@ -69,7 +69,8 @@ class BSH_Order_UI {
 		return null;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Meta box
 	 * ------------------------------------------------------------------ */
 
@@ -216,13 +217,30 @@ class BSH_Order_UI {
 	 */
 	private static function store_shipping( WC_Order $order, $method, $tracking ) {
 		$method   = (int) $method;
-		$tracking = trim( strtr( (string) $tracking, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' ) ) );
+		$tracking = trim(
+			strtr(
+				(string) $tracking,
+				array(
+					'۰' => '0',
+					'۱' => '1',
+					'۲' => '2',
+					'۳' => '3',
+					'۴' => '4',
+					'۵' => '5',
+					'۶' => '6',
+					'۷' => '7',
+					'۸' => '8',
+					'۹' => '9',
+				)
+			)
+		);
 		$order->update_meta_data( '_bsh_shipping_method', isset( BSH_Order_Sync::shipping_methods()[ $method ] ) ? $method : 0 );
 		$order->update_meta_data( '_bsh_tracking_code', mb_substr( $tracking, 0, 60 ) );
 		$order->save();
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * AJAX
 	 * ------------------------------------------------------------------ */
 
@@ -268,9 +286,20 @@ class BSH_Order_UI {
 					BSH_Plugin::$suspend_hooks = false;
 				}
 			}
-			wp_send_json_success( array( 'message' => __( 'در باسلام ثبت شد.', 'basalamhub' ), 'reload' => true ) );
+			wp_send_json_success(
+				array(
+					'message' => __( 'در باسلام ثبت شد.', 'basalamhub' ),
+					'reload'  => true,
+				)
+			);
 		}
-		$log = BSH_Logger::query( array( 'object_type' => 'order', 'object_id' => $order_id, 'per_page' => 1 ) );
+		$log = BSH_Logger::query(
+			array(
+				'object_type' => 'order',
+				'object_id'   => $order_id,
+				'per_page'    => 1,
+			)
+		);
 		$row = ! empty( $log['items'] ) ? $log['items'][0] : null;
 		wp_send_json_error(
 			array(
@@ -309,7 +338,8 @@ class BSH_Order_UI {
 		wp_send_json_success( array( 'message' => __( 'در صف قرار گرفت؛ نتیجه در لاگ ثبت می‌شود.', 'basalamhub' ) ) );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * List column
 	 * ------------------------------------------------------------------ */
 
@@ -367,7 +397,8 @@ class BSH_Order_UI {
 		echo '<br><small>#' . esc_html( (string) $parcel ) . '</small>';
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Safety stock fields
 	 * ------------------------------------------------------------------ */
 
@@ -386,7 +417,10 @@ class BSH_Order_UI {
 				'desc_tip'          => true,
 				'description'       => __( 'این تعداد از موجودی در باسلام نمایش داده نمی‌شود تا فروش هم‌زمان در دو جا باعث بیش‌فروشی نشود. خالی = مقدار تنظیمات باسلام‌هاب.', 'basalamhub' ),
 				'type'              => 'number',
-				'custom_attributes' => array( 'min' => 0, 'step' => 1 ),
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 1,
+				),
 			)
 		);
 	}
@@ -419,7 +453,10 @@ class BSH_Order_UI {
 				'placeholder'       => __( 'مثل محصول اصلی', 'basalamhub' ),
 				'wrapper_class'     => 'form-row form-row-first',
 				'type'              => 'number',
-				'custom_attributes' => array( 'min' => 0, 'step' => 1 ),
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 1,
+				),
 			)
 		);
 	}

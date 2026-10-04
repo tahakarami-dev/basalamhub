@@ -32,10 +32,10 @@ class BSH_Product_UI {
 	 * @param WP_Post $post Post.
 	 */
 	public static function render_box( $post ) {
-		$product = wc_get_product( $post->ID );
-		$link    = BSH_Links::get( 'product', $post->ID );
-		$cat     = $product ? $product->get_meta( '_bsh_category_id', true ) : '';
-		$prep    = $product ? $product->get_meta( '_bsh_preparation_days', true ) : '';
+		$product  = wc_get_product( $post->ID );
+		$link     = BSH_Links::get( 'product', $post->ID );
+		$cat      = $product ? $product->get_meta( '_bsh_category_id', true ) : '';
+		$prep     = $product ? $product->get_meta( '_bsh_preparation_days', true ) : '';
 		$resolved = $product ? BSH_Categories::resolve( $product )['category_id'] : 0;
 		wp_nonce_field( 'bsh_product_box', 'bsh_product_box_nonce' );
 		?>
@@ -127,8 +127,22 @@ class BSH_Product_UI {
 		if ( ! current_user_can( 'edit_product', $post_id ) || wp_is_post_revision( $post_id ) ) {
 			return;
 		}
-		$digits = array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' );
-		foreach ( array( 'bsh_category_id' => '_bsh_category_id', 'bsh_preparation_days' => '_bsh_preparation_days' ) as $field => $meta ) {
+		$digits = array(
+			'۰' => '0',
+			'۱' => '1',
+			'۲' => '2',
+			'۳' => '3',
+			'۴' => '4',
+			'۵' => '5',
+			'۶' => '6',
+			'۷' => '7',
+			'۸' => '8',
+			'۹' => '9',
+		);
+		foreach ( array(
+			'bsh_category_id'      => '_bsh_category_id',
+			'bsh_preparation_days' => '_bsh_preparation_days',
+		) as $field => $meta ) {
 			$value = isset( $_POST[ $field ] ) ? strtr( trim( sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) ), $digits ) : '';
 			if ( '' === $value || ! ctype_digit( $value ) ) {
 				delete_post_meta( $post_id, $meta );
@@ -185,8 +199,11 @@ class BSH_Product_UI {
 	 * @return int Product ID from the AJAX request after permission checks.
 	 */
 	private static function ajax_product_id() {
+		if ( ! check_ajax_referer( 'bsh_admin', 'nonce', false ) ) {
+			wp_send_json_error( array( 'message' => __( 'نشست کاری منقضی شده. صفحه را تازه کن و دوباره امتحان کن.', 'basalamhub' ) ), 403 );
+		}
 		$id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
-		if ( ! check_ajax_referer( 'bsh_admin', 'nonce', false ) || ! $id || ! current_user_can( 'edit_product', $id ) ) {
+		if ( ! $id || ! current_user_can( 'edit_product', $id ) ) {
 			wp_send_json_error( array( 'message' => __( 'نشست کاری منقضی شده. صفحه را تازه کن و دوباره امتحان کن.', 'basalamhub' ) ), 403 );
 		}
 		return $id;

@@ -90,7 +90,17 @@ class BSH_Reconcile {
 					if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK, array( 'manual' => 1 ), 'reconcile', $e->retry_after ) ) {
 						return;
 					}
-					update_option( self::OPTION, array( 'at' => bsh_now(), 'checked' => 0, 'missing' => 0, 'ids' => array(), 'error' => $e->getMessage() ), false );
+					update_option(
+						self::OPTION,
+						array(
+							'at'      => bsh_now(),
+							'checked' => 0,
+							'missing' => 0,
+							'ids'     => array(),
+							'error'   => $e->getMessage(),
+						),
+						false
+					);
 					BSH_Logger::log(
 						array_merge(
 							array(
@@ -121,7 +131,12 @@ class BSH_Reconcile {
 		$missing = array();
 		$cursor  = null;
 		for ( $page = 0; $page < 60; $page++ ) {
-			$res   = BSH_Plugin::api()->vendor_parcels( array( 'cursor' => $cursor, 'per_page' => 30 ) );
+			$res   = BSH_Plugin::api()->vendor_parcels(
+				array(
+					'cursor'   => $cursor,
+					'per_page' => 30,
+				)
+			);
 			$older = false;
 			foreach ( $res['data'] as $parcel ) {
 				if ( empty( $parcel['id'] ) ) {
@@ -151,7 +166,13 @@ class BSH_Reconcile {
 			$cursor = $res['next_cursor'];
 		}
 
-		$result = array( 'at' => bsh_now(), 'checked' => $checked, 'missing' => count( $missing ), 'ids' => array_slice( $missing, 0, 50 ), 'error' => '' );
+		$result = array(
+			'at'      => bsh_now(),
+			'checked' => $checked,
+			'missing' => count( $missing ),
+			'ids'     => array_slice( $missing, 0, 50 ),
+			'error'   => '',
+		);
 		update_option( self::OPTION, $result, false );
 
 		if ( $missing ) {

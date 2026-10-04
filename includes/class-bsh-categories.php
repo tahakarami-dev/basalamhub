@@ -14,6 +14,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
+
 class BSH_Categories {
 
 	const CACHE_OPTION = 'bsh_basalam_categories';
@@ -29,7 +31,8 @@ class BSH_Categories {
 		add_filter( 'bsh_product_payload', array( __CLASS__, 'filter_payload' ), 10, 2 );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Basalam category tree
 	 * ------------------------------------------------------------------ */
 
@@ -54,7 +57,14 @@ class BSH_Categories {
 				)
 			);
 		}
-		update_option( self::CACHE_OPTION, array( 'fetched_at' => bsh_now(), 'items' => $items ), false );
+		update_option(
+			self::CACHE_OPTION,
+			array(
+				'fetched_at' => bsh_now(),
+				'items'      => $items,
+			),
+			false
+		);
 		return count( $items );
 	}
 
@@ -69,9 +79,9 @@ class BSH_Categories {
 			if ( empty( $node['id'] ) || ! isset( $node['title'] ) ) {
 				continue;
 			}
-			$id       = (int) $node['id'];
-			$children = isset( $node['children'] ) && is_array( $node['children'] ) ? $node['children'] : array();
-			$here     = array_merge( $path, array( (string) $node['title'] ) );
+			$id         = (int) $node['id'];
+			$children   = isset( $node['children'] ) && is_array( $node['children'] ) ? $node['children'] : array();
+			$here       = array_merge( $path, array( (string) $node['title'] ) );
 			$out[ $id ] = array(
 				'title'  => (string) $node['title'],
 				'path'   => implode( ' › ', $here ),
@@ -115,7 +125,8 @@ class BSH_Categories {
 		return $cat ? $cat['path'] : '#' . (int) $id;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Mapping
 	 * ------------------------------------------------------------------ */
 
@@ -144,7 +155,21 @@ class BSH_Categories {
 			if ( preg_match( '/\((\d+)\)\s*$/u', $raw, $m ) ) {
 				$raw = $m[1];
 			}
-			$raw = strtr( $raw, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' ) );
+			$raw = strtr(
+				$raw,
+				array(
+					'۰' => '0',
+					'۱' => '1',
+					'۲' => '2',
+					'۳' => '3',
+					'۴' => '4',
+					'۵' => '5',
+					'۶' => '6',
+					'۷' => '7',
+					'۸' => '8',
+					'۹' => '9',
+				)
+			);
 			if ( '' === $raw ) {
 				continue;
 			}
@@ -170,7 +195,10 @@ class BSH_Categories {
 					}
 				}
 			}
-			$clean[ $term_id ] = array( 'category_id' => $cat_id, 'attrs' => $attrs );
+			$clean[ $term_id ] = array(
+				'category_id' => $cat_id,
+				'attrs'       => $attrs,
+			);
 		}
 		update_option( self::MAP_OPTION, $clean, false );
 		return $errors;
@@ -184,9 +212,16 @@ class BSH_Categories {
 	 */
 	public static function resolve( WC_Product $product ) {
 		$map  = self::map();
-		$best = array( 'category_id' => 0, 'term_id' => 0, 'depth' => -1 );
+		$best = array(
+			'category_id' => 0,
+			'term_id'     => 0,
+			'depth'       => -1,
+		);
 		if ( ! $map ) {
-			return array( 'category_id' => 0, 'term_id' => 0 );
+			return array(
+				'category_id' => 0,
+				'term_id'     => 0,
+			);
 		}
 		foreach ( $product->get_category_ids() as $term_id ) {
 			$chain = array_merge( array( (int) $term_id ), array_map( 'intval', get_ancestors( $term_id, 'product_cat', 'taxonomy' ) ) );
@@ -194,13 +229,20 @@ class BSH_Categories {
 			foreach ( $chain as $candidate ) {
 				if ( isset( $map[ $candidate ] ) && $map[ $candidate ]['category_id'] > 0 ) {
 					if ( $depth > $best['depth'] ) {
-						$best = array( 'category_id' => (int) $map[ $candidate ]['category_id'], 'term_id' => $candidate, 'depth' => $depth );
+						$best = array(
+							'category_id' => (int) $map[ $candidate ]['category_id'],
+							'term_id'     => $candidate,
+							'depth'       => $depth,
+						);
 					}
 					break;
 				}
 			}
 		}
-		return array( 'category_id' => $best['category_id'], 'term_id' => $best['term_id'] );
+		return array(
+			'category_id' => $best['category_id'],
+			'term_id'     => $best['term_id'],
+		);
 	}
 
 	/**
@@ -224,7 +266,12 @@ class BSH_Categories {
 	 */
 	public static function unmapped_terms() {
 		$map   = self::map();
-		$terms = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => true ) );
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => true,
+			)
+		);
 		$out   = array();
 		foreach ( is_array( $terms ) ? $terms : array() as $term ) {
 			$chain  = array_merge( array( (int) $term->term_id ), array_map( 'intval', get_ancestors( $term->term_id, 'product_cat', 'taxonomy' ) ) );
@@ -242,7 +289,8 @@ class BSH_Categories {
 		return $out;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Category attributes
 	 * ------------------------------------------------------------------ */
 
@@ -290,7 +338,10 @@ class BSH_Categories {
 		if ( count( $all ) >= 200 ) {
 			$all = array_slice( $all, -150, null, true );
 		}
-		$all[ $category_id ] = array( 'at' => bsh_now(), 'attrs' => $attrs );
+		$all[ $category_id ] = array(
+			'at'    => bsh_now(),
+			'attrs' => $attrs,
+		);
 		update_option( self::ATTR_OPTION, $all, false );
 		return $attrs;
 	}
@@ -305,7 +356,10 @@ class BSH_Categories {
 	 * @return array{payload: array[], missing: string[]}
 	 */
 	public static function product_attributes( WC_Product $product, $category_id, $term_id ) {
-		$out = array( 'payload' => array(), 'missing' => array() );
+		$out = array(
+			'payload' => array(),
+			'missing' => array(),
+		);
 		try {
 			$attrs = self::attributes( $category_id, true );
 		} catch ( BSH_Api_Error $e ) {
@@ -331,13 +385,19 @@ class BSH_Categories {
 			if ( $a['options'] ) {
 				$option_id = isset( $a['options'][ (int) $value ] ) ? (int) $value : (int) array_search( self::normalize( $value ), array_map( array( __CLASS__, 'normalize' ), $a['options'] ), true );
 				if ( $option_id ) {
-					$out['payload'][] = array( 'attribute_id' => $a['id'], 'selected_values' => array( $option_id ) );
+					$out['payload'][] = array(
+						'attribute_id'    => $a['id'],
+						'selected_values' => array( $option_id ),
+					);
 				} elseif ( $a['required'] ) {
 					$out['missing'][] = $a['title'];
 				}
 				continue;
 			}
-			$out['payload'][] = array( 'attribute_id' => $a['id'], 'value' => $value );
+			$out['payload'][] = array(
+				'attribute_id' => $a['id'],
+				'value'        => $value,
+			);
 		}
 		return $out;
 	}
@@ -402,7 +462,15 @@ class BSH_Categories {
 	 * @return string
 	 */
 	public static function normalize( $text ) {
-		$text = strtr( (string) $text, array( 'ي' => 'ی', 'ك' => 'ک', "\u{200c}" => ' ', 'ة' => 'ه' ) );
+		$text = strtr(
+			(string) $text,
+			array(
+				'ي'        => 'ی',
+				'ك'        => 'ک',
+				"\u{200c}" => ' ',
+				'ة'        => 'ه',
+			)
+		);
 		return trim( preg_replace( '/\s+/u', ' ', mb_strtolower( $text ) ) );
 	}
 }

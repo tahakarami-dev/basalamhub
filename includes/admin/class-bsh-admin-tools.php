@@ -7,6 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.NonceVerification.Missing -- every AJAX handler here starts with guard() (check_ajax_referer + capability); form handlers call check_admin_referer().
+
 class BSH_Admin_Tools {
 
 	/**
@@ -72,7 +74,13 @@ class BSH_Admin_Tools {
 	 * @return array[]
 	 */
 	public static function wc_category_tree() {
-		$terms = get_terms( array( 'taxonomy' => 'product_cat', 'hide_empty' => false, 'orderby' => 'name' ) );
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => false,
+				'orderby'    => 'name',
+			)
+		);
 		if ( ! is_array( $terms ) ) {
 			return array();
 		}
@@ -91,7 +99,8 @@ class BSH_Admin_Tools {
 		return $out;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Forms
 	 * ------------------------------------------------------------------ */
 
@@ -106,10 +115,23 @@ class BSH_Admin_Tools {
 		$input  = isset( $_POST['map'] ) ? (array) wp_unslash( $_POST['map'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- validated in save_map().
 		$errors = BSH_Categories::save_map( $input );
 		if ( $errors ) {
-			set_transient( 'bsh_map_errors_' . get_current_user_id(), array( 'errors' => $errors, 'input' => $input ), 300 );
-			$notice = array( 'type' => 'error', 'text' => __( 'بعضی ردیف‌ها ذخیره نشدند. پیام کنار هر ردیف را ببین.', 'basalamhub' ) );
+			set_transient(
+				'bsh_map_errors_' . get_current_user_id(),
+				array(
+					'errors' => $errors,
+					'input'  => $input,
+				),
+				300
+			);
+			$notice = array(
+				'type' => 'error',
+				'text' => __( 'بعضی ردیف‌ها ذخیره نشدند. پیام کنار هر ردیف را ببین.', 'basalamhub' ),
+			);
 		} else {
-			$notice = array( 'type' => 'success', 'text' => __( 'نگاشت دسته‌ها ذخیره شد. از ارسال بعدی هر محصول اعمال می‌شود.', 'basalamhub' ) );
+			$notice = array(
+				'type' => 'success',
+				'text' => __( 'نگاشت دسته‌ها ذخیره شد. از ارسال بعدی هر محصول اعمال می‌شود.', 'basalamhub' ),
+			);
 		}
 		set_transient( 'bsh_notice_' . get_current_user_id(), $notice, 60 );
 		wp_safe_redirect( admin_url( 'admin.php?page=basalamhub-categories' ) );
@@ -127,17 +149,31 @@ class BSH_Admin_Tools {
 		$input  = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- validated in BSH_Price_Rules::save().
 		$errors = BSH_Price_Rules::save( $input );
 		if ( $errors ) {
-			set_transient( 'bsh_price_errors_' . get_current_user_id(), array( 'errors' => $errors, 'input' => $input ), 300 );
-			$notice = array( 'type' => 'error', 'text' => __( 'بعضی قانون‌ها درست نبودند و ذخیره نشدند. پیام کنار هر ردیف را ببین.', 'basalamhub' ) );
+			set_transient(
+				'bsh_price_errors_' . get_current_user_id(),
+				array(
+					'errors' => $errors,
+					'input'  => $input,
+				),
+				300
+			);
+			$notice = array(
+				'type' => 'error',
+				'text' => __( 'بعضی قانون‌ها درست نبودند و ذخیره نشدند. پیام کنار هر ردیف را ببین.', 'basalamhub' ),
+			);
 		} else {
-			$notice = array( 'type' => 'success', 'text' => __( 'قوانین قیمت ذخیره شد. پیش‌نمایش پایین صفحه را ببین. روی محصولات متصل از به‌روزرسانی بعدی‌شان اعمال می‌شود.', 'basalamhub' ) );
+			$notice = array(
+				'type' => 'success',
+				'text' => __( 'قوانین قیمت ذخیره شد. پیش‌نمایش پایین صفحه را ببین. روی محصولات متصل از به‌روزرسانی بعدی‌شان اعمال می‌شود.', 'basalamhub' ),
+			);
 		}
 		set_transient( 'bsh_notice_' . get_current_user_id(), $notice, 60 );
 		wp_safe_redirect( admin_url( 'admin.php?page=basalamhub-pricing' ) );
 		exit;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Product list bulk action
 	 * ------------------------------------------------------------------ */
 
@@ -160,16 +196,28 @@ class BSH_Admin_Tools {
 		if ( 'bsh_send' !== $action || ! current_user_can( BSH_Admin::CAP ) ) {
 			return $redirect;
 		}
-		$result = BSH_Bulk::start( array( 'scope' => 'ids', 'ids' => $ids ) );
+		$result = BSH_Bulk::start(
+			array(
+				'scope' => 'ids',
+				'ids'   => $ids,
+			)
+		);
 		$notice = is_wp_error( $result )
-			? array( 'type' => 'error', 'text' => $result->get_error_message() )
+			? array(
+				'type' => 'error',
+				'text' => $result->get_error_message(),
+			)
 			/* translators: %s: count */
-			: array( 'type' => 'success', 'text' => sprintf( __( '%s محصول در صف ارسال قرار گرفت. پیشرفت را همین‌جا ببین؛ می‌توانی صفحه را ببندی.', 'basalamhub' ), bsh_fa_number( $result['total'] ) ) );
+			: array(
+				'type' => 'success',
+				'text' => sprintf( __( '%s محصول در صف ارسال قرار گرفت. پیشرفت را همین‌جا ببین؛ می‌توانی صفحه را ببندی.', 'basalamhub' ), bsh_fa_number( $result['total'] ) ),
+			);
 		set_transient( 'bsh_notice_' . get_current_user_id(), $notice, 60 );
 		return admin_url( 'admin.php?page=basalamhub-bulk' );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * AJAX
 	 * ------------------------------------------------------------------ */
 
@@ -223,7 +271,14 @@ class BSH_Admin_Tools {
 	public static function ajax_bulk_count() {
 		self::guard();
 		$c = BSH_Bulk::count_candidates( isset( $_POST['term_id'] ) ? absint( $_POST['term_id'] ) : 0 );
-		wp_send_json_success( array( 'all' => $c['all'], 'unsent' => $c['unsent'], 'all_fa' => bsh_fa_number( $c['all'] ), 'unsent_fa' => bsh_fa_number( $c['unsent'] ) ) );
+		wp_send_json_success(
+			array(
+				'all'       => $c['all'],
+				'unsent'    => $c['unsent'],
+				'all_fa'    => bsh_fa_number( $c['all'] ),
+				'unsent_fa' => bsh_fa_number( $c['unsent'] ),
+			)
+		);
 	}
 
 	/**
@@ -251,8 +306,8 @@ class BSH_Admin_Tools {
 		if ( ! $batch ) {
 			return;
 		}
-		$running = 'running' === $batch['status'];
-		$titles  = array(
+		$running   = 'running' === $batch['status'];
+		$titles    = array(
 			'running'   => __( 'ارسال گروهی به باسلام', 'basalamhub' ),
 			'done'      => __( 'ارسال گروهی تمام شد', 'basalamhub' ),
 			'cancelled' => __( 'ارسال گروهی متوقف شد', 'basalamhub' ),
@@ -328,7 +383,11 @@ class BSH_Admin_Tools {
 		$s = BSH_Linker::state();
 		ob_start();
 		self::link_progress_html( $s );
-		return array( 'running' => BSH_Linker::is_running(), 'status' => $s['status'], 'html' => ob_get_clean() );
+		return array(
+			'running' => BSH_Linker::is_running(),
+			'status'  => $s['status'],
+			'html'    => ob_get_clean(),
+		);
 	}
 
 	/**
@@ -384,7 +443,12 @@ class BSH_Admin_Tools {
 		if ( $result['errors'] ) {
 			$msg .= ' ' . implode( ' ', array_slice( $result['errors'], 0, 3 ) );
 		}
-		wp_send_json_success( array( 'message' => $msg, 'linked' => $result['linked'] ) );
+		wp_send_json_success(
+			array(
+				'message' => $msg,
+				'linked'  => $result['linked'],
+			)
+		);
 	}
 
 	/**

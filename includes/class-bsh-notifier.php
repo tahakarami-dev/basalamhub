@@ -55,9 +55,25 @@ class BSH_Notifier {
 		$s = get_option( self::OPTION, array() );
 		$s = is_array( $s ) ? $s : array();
 		foreach ( array_keys( self::channels() ) as $ch ) {
-			$s[ $ch ] = wp_parse_args( isset( $s[ $ch ] ) ? (array) $s[ $ch ] : array(), array( 'enabled' => 0, 'token' => '', 'chat_id' => '', 'chat_title' => '', 'api_base' => '' ) );
+			$s[ $ch ] = wp_parse_args(
+				isset( $s[ $ch ] ) ? (array) $s[ $ch ] : array(),
+				array(
+					'enabled'    => 0,
+					'token'      => '',
+					'chat_id'    => '',
+					'chat_title' => '',
+					'api_base'   => '',
+				)
+			);
 		}
-		$s['events'] = wp_parse_args( isset( $s['events'] ) ? (array) $s['events'] : array(), array( 'new_order' => 1, 'errors' => 1, 'reconcile' => 1 ) );
+		$s['events'] = wp_parse_args(
+			isset( $s['events'] ) ? (array) $s['events'] : array(),
+			array(
+				'new_order' => 1,
+				'errors'    => 1,
+				'reconcile' => 1,
+			)
+		);
 		return $s;
 	}
 
@@ -109,7 +125,23 @@ class BSH_Notifier {
 			if ( ! empty( $in['forget_token'] ) ) {
 				$s[ $ch ]['token'] = '';
 			}
-			$chat = isset( $in['chat_id'] ) ? trim( strtr( (string) $in['chat_id'], array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' ) ) ) : '';
+			$chat = isset( $in['chat_id'] ) ? trim(
+				strtr(
+					(string) $in['chat_id'],
+					array(
+						'۰' => '0',
+						'۱' => '1',
+						'۲' => '2',
+						'۳' => '3',
+						'۴' => '4',
+						'۵' => '5',
+						'۶' => '6',
+						'۷' => '7',
+						'۸' => '8',
+						'۹' => '9',
+					)
+				)
+			) : '';
 			if ( '' !== $chat && ! preg_match( '/^(-?\d{3,20}|@[A-Za-z0-9_]{4,})$/', $chat ) ) {
 				$errors[ $ch . '_chat_id' ] = __( 'شناسه‌ی گفتگو عدد است (برای گروه با منفی شروع می‌شود) یا نام کانال با @. دکمه‌ی «پیدا کردن شناسه» را بزن.', 'basalamhub' );
 			} else {
@@ -133,7 +165,8 @@ class BSH_Notifier {
 		return $errors;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Which log entries become messages
 	 * ------------------------------------------------------------------ */
 
@@ -154,9 +187,9 @@ class BSH_Notifier {
 		if ( 'order_imported' === $event && $events['new_order'] ) {
 			$text = self::order_text( isset( $entry['object_id'] ) ? (int) $entry['object_id'] : 0 );
 		} elseif ( 'reconcile_missing' === $event && $events['reconcile'] ) {
-			$text = "🔁 " . __( 'تطبیق شبانه‌ی باسلام‌هاب', 'basalamhub' ) . "\n" . $entry['message'] . "\n" . ( isset( $entry['reason'] ) ? $entry['reason'] : '' );
+			$text = '🔁 ' . __( 'تطبیق شبانه‌ی باسلام‌هاب', 'basalamhub' ) . "\n" . $entry['message'] . "\n" . ( isset( $entry['reason'] ) ? $entry['reason'] : '' );
 		} elseif ( 'error' === $level && $events['errors'] && self::error_allowed( $entry ) ) {
-			$text = "⚠️ " . __( 'خطا در باسلام‌هاب', 'basalamhub' ) . "\n" . ( isset( $entry['title'] ) ? $entry['title'] : '' ) . "\n" . ( isset( $entry['message'] ) ? $entry['message'] : '' );
+			$text = '⚠️ ' . __( 'خطا در باسلام‌هاب', 'basalamhub' ) . "\n" . ( isset( $entry['title'] ) ? $entry['title'] : '' ) . "\n" . ( isset( $entry['message'] ) ? $entry['message'] : '' );
 			if ( ! empty( $entry['suggestion'] ) ) {
 				$text .= "\n" . __( 'راه‌حل:', 'basalamhub' ) . ' ' . $entry['suggestion'];
 			}
@@ -167,7 +200,14 @@ class BSH_Notifier {
 		}
 		$text = self::site_prefix() . $text;
 		foreach ( self::active_channels() as $ch ) {
-			as_enqueue_async_action( self::HOOK, array( 'channel' => $ch, 'text' => mb_substr( $text, 0, 3500 ) ), BSH_Queue::GROUP );
+			as_enqueue_async_action(
+				self::HOOK,
+				array(
+					'channel' => $ch,
+					'text'    => mb_substr( $text, 0, 3500 ),
+				),
+				BSH_Queue::GROUP
+			);
 		}
 	}
 
@@ -225,7 +265,8 @@ class BSH_Notifier {
 		return implode( "\n", $lines );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Sending
 	 * ------------------------------------------------------------------ */
 
@@ -241,7 +282,15 @@ class BSH_Notifier {
 			BSH_Queue::reset_attempts( 'notify_' . md5( $channel . $text ) );
 			return;
 		}
-		if ( $result['retryable'] && false !== BSH_Queue::retry_later( self::HOOK, array( 'channel' => $channel, 'text' => $text ), 'notify_' . md5( $channel . $text ), 60 ) ) {
+		if ( $result['retryable'] && false !== BSH_Queue::retry_later(
+			self::HOOK,
+			array(
+				'channel' => $channel,
+				'text'    => $text,
+			),
+			'notify_' . md5( $channel . $text ),
+			60
+		) ) {
 			return;
 		}
 		$labels = self::channels();
@@ -269,9 +318,21 @@ class BSH_Notifier {
 	public static function send( $channel, $text ) {
 		$s = self::settings();
 		if ( ! isset( $s[ $channel ] ) || ! $s[ $channel ]['token'] || '' === (string) $s[ $channel ]['chat_id'] ) {
-			return array( 'message' => __( 'توکن ربات یا شناسه‌ی گفتگو وارد نشده.', 'basalamhub' ), 'suggestion' => __( 'در باسلام‌هاب › اعلان‌ها کامل کن.', 'basalamhub' ), 'retryable' => false );
+			return array(
+				'message'    => __( 'توکن ربات یا شناسه‌ی گفتگو وارد نشده.', 'basalamhub' ),
+				'suggestion' => __( 'در باسلام‌هاب › اعلان‌ها کامل کن.', 'basalamhub' ),
+				'retryable'  => false,
+			);
 		}
-		$res = self::call( $channel, 'sendMessage', array( 'chat_id' => $s[ $channel ]['chat_id'], 'text' => $text, 'disable_web_page_preview' => true ) );
+		$res = self::call(
+			$channel,
+			'sendMessage',
+			array(
+				'chat_id'                  => $s[ $channel ]['chat_id'],
+				'text'                     => $text,
+				'disable_web_page_preview' => true,
+			)
+		);
 		return is_array( $res ) && isset( $res['ok'] ) && true === $res['ok'] ? true : self::explain( $channel, $res );
 	}
 
@@ -292,7 +353,10 @@ class BSH_Notifier {
 				if ( ! empty( $u[ $k ]['chat']['id'] ) ) {
 					$c     = $u[ $k ]['chat'];
 					$title = isset( $c['title'] ) ? $c['title'] : trim( ( isset( $c['first_name'] ) ? $c['first_name'] : '' ) . ' ' . ( isset( $c['last_name'] ) ? $c['last_name'] : '' ) );
-					$found = array( 'id' => (string) $c['id'], 'title' => $title ? $title : ( isset( $c['username'] ) ? '@' . $c['username'] : '' ) );
+					$found = array(
+						'id'    => (string) $c['id'],
+						'title' => $title ? $title : ( isset( $c['username'] ) ? '@' . $c['username'] : '' ),
+					);
 				}
 			}
 		}
@@ -344,8 +408,8 @@ class BSH_Notifier {
 		if ( is_wp_error( $res ) ) {
 			return $res;
 		}
-		$data = json_decode( (string) wp_remote_retrieve_body( $res ), true );
-		$data = is_array( $data ) ? $data : array( 'ok' => false );
+		$data          = json_decode( (string) wp_remote_retrieve_body( $res ), true );
+		$data          = is_array( $data ) ? $data : array( 'ok' => false );
 		$data['_http'] = (int) wp_remote_retrieve_response_code( $res );
 		return $data;
 	}
@@ -360,7 +424,11 @@ class BSH_Notifier {
 	private static function explain( $channel, $res ) {
 		if ( is_wp_error( $res ) ) {
 			if ( 'no_token' === $res->get_error_code() ) {
-				return array( 'message' => __( 'توکن ربات وارد نشده یا قابل خواندن نیست.', 'basalamhub' ), 'suggestion' => __( 'توکن را دوباره وارد و ذخیره کن.', 'basalamhub' ), 'retryable' => false );
+				return array(
+					'message'    => __( 'توکن ربات وارد نشده یا قابل خواندن نیست.', 'basalamhub' ),
+					'suggestion' => __( 'توکن را دوباره وارد و ذخیره کن.', 'basalamhub' ),
+					'retryable'  => false,
+				);
 			}
 			return array(
 				'message'    => 'telegram' === $channel ? __( 'سرور سایت به تلگرام دسترسی ندارد.', 'basalamhub' ) : __( 'سرور سایت به بله وصل نشد.', 'basalamhub' ),
@@ -373,7 +441,11 @@ class BSH_Notifier {
 		$code = isset( $res['_http'] ) ? (int) $res['_http'] : 0;
 		$desc = isset( $res['description'] ) ? (string) $res['description'] : '';
 		if ( 401 === $code || 404 === $code ) {
-			return array( 'message' => __( 'توکن ربات درست نیست.', 'basalamhub' ), 'suggestion' => __( 'توکن را دوباره از BotFather کپی کن و ذخیره کن.', 'basalamhub' ), 'retryable' => false );
+			return array(
+				'message'    => __( 'توکن ربات درست نیست.', 'basalamhub' ),
+				'suggestion' => __( 'توکن را دوباره از BotFather کپی کن و ذخیره کن.', 'basalamhub' ),
+				'retryable'  => false,
+			);
 		}
 		if ( 400 === $code || 403 === $code ) {
 			return array(
@@ -383,8 +455,16 @@ class BSH_Notifier {
 			);
 		}
 		if ( 429 === $code ) {
-			return array( 'message' => __( 'پیام‌رسان گفت کمی صبر کن.', 'basalamhub' ), 'suggestion' => __( 'خودکار دوباره تلاش می‌شود.', 'basalamhub' ), 'retryable' => true );
+			return array(
+				'message'    => __( 'پیام‌رسان گفت کمی صبر کن.', 'basalamhub' ),
+				'suggestion' => __( 'خودکار دوباره تلاش می‌شود.', 'basalamhub' ),
+				'retryable'  => true,
+			);
 		}
-		return array( 'message' => __( 'پیام‌رسان پاسخ نامعلومی داد.', 'basalamhub' ) . ( $desc ? ' (' . $desc . ')' : '' ), 'suggestion' => __( 'خودکار دوباره تلاش می‌شود.', 'basalamhub' ), 'retryable' => $code >= 500 || 0 === $code );
+		return array(
+			'message'    => __( 'پیام‌رسان پاسخ نامعلومی داد.', 'basalamhub' ) . ( $desc ? ' (' . $desc . ')' : '' ),
+			'suggestion' => __( 'خودکار دوباره تلاش می‌شود.', 'basalamhub' ),
+			'retryable'  => $code >= 500 || 0 === $code,
+		);
 	}
 }

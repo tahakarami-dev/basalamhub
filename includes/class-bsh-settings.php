@@ -40,24 +40,24 @@ class BSH_Settings {
 	 */
 	public static function defaults() {
 		return array(
-			'sync_fields'          => array_keys( self::field_groups() ),
-			'auto_update'          => 1,
-			'auto_send_new'        => 0,
-			'default_category_id'  => '',
-			'preparation_days'     => 3,
-			'default_weight'       => 500,
-			'packaging_weight'     => 0,
-			'unmanaged_stock'      => 1,
-			'price_unit'           => 'auto',
-			'create_status'        => self::BASALAM_STATUS_PUBLISHED,
-			'log_retention_days'   => 30,
+			'sync_fields'         => array_keys( self::field_groups() ),
+			'auto_update'         => 1,
+			'auto_send_new'       => 0,
+			'default_category_id' => '',
+			'preparation_days'    => 3,
+			'default_weight'      => 500,
+			'packaging_weight'    => 0,
+			'unmanaged_stock'     => 1,
+			'price_unit'          => 'auto',
+			'create_status'       => self::BASALAM_STATUS_PUBLISHED,
+			'log_retention_days'  => 30,
 			// Phase 4: orders and stock.
-			'orders_enabled'       => 1,
-			'orders_interval'      => 5,
-			'orders_import_days'   => 3,
-			'orders_auto_confirm'  => 0,
-			'stock_reference'      => 'site',
-			'safety_stock'         => 0,
+			'orders_enabled'      => 1,
+			'orders_interval'     => 5,
+			'orders_import_days'  => 3,
+			'orders_auto_confirm' => 0,
+			'stock_reference'     => 'site',
+			'safety_stock'        => 0,
 		);
 	}
 
@@ -109,17 +109,31 @@ class BSH_Settings {
 		}
 
 		foreach ( array(
-			'preparation_days' => array( 0, 60, __( 'زمان آماده‌سازی باید بین ۰ تا ۶۰ روز باشد.', 'basalamhub' ) ),
-			'default_weight'   => array( 1, 1000000, __( 'وزن پیش‌فرض باید بیشتر از صفر گرم باشد.', 'basalamhub' ) ),
-			'packaging_weight' => array( 0, 100000, __( 'وزن بسته‌بندی باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
-			'unmanaged_stock'  => array( 0, 100000, __( 'موجودی پیش‌فرض باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
+			'preparation_days'   => array( 0, 60, __( 'زمان آماده‌سازی باید بین ۰ تا ۶۰ روز باشد.', 'basalamhub' ) ),
+			'default_weight'     => array( 1, 1000000, __( 'وزن پیش‌فرض باید بیشتر از صفر گرم باشد.', 'basalamhub' ) ),
+			'packaging_weight'   => array( 0, 100000, __( 'وزن بسته‌بندی باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
+			'unmanaged_stock'    => array( 0, 100000, __( 'موجودی پیش‌فرض باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
 			'log_retention_days' => array( 7, 365, __( 'نگهداری لاگ باید بین ۷ تا ۳۶۵ روز باشد.', 'basalamhub' ) ),
 			'orders_interval'    => array( 2, 60, __( 'فاصله‌ی دریافت سفارش باید بین ۲ تا ۶۰ دقیقه باشد.', 'basalamhub' ) ),
 			'orders_import_days' => array( 0, 30, __( 'سفارش‌های گذشته را بین ۰ تا ۳۰ روز می‌شود وارد کرد.', 'basalamhub' ) ),
 			'safety_stock'       => array( 0, 100000, __( 'موجودی اطمینان باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
 		) as $key => $rule ) {
 			$raw = isset( $input[ $key ] ) ? trim( (string) $input[ $key ] ) : '';
-			$raw = strtr( $raw, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' ) );
+			$raw = strtr(
+				$raw,
+				array(
+					'۰' => '0',
+					'۱' => '1',
+					'۲' => '2',
+					'۳' => '3',
+					'۴' => '4',
+					'۵' => '5',
+					'۶' => '6',
+					'۷' => '7',
+					'۸' => '8',
+					'۹' => '9',
+				)
+			);
 			if ( '' === $raw || ! preg_match( '/^-?\d+$/', $raw ) || (int) $raw < $rule[0] || (int) $raw > $rule[1] ) {
 				$errors[ $key ] = $rule[2];
 				continue;
@@ -142,7 +156,8 @@ class BSH_Settings {
 		return $errors;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Token
 	 * ------------------------------------------------------------------ */
 
@@ -178,7 +193,8 @@ class BSH_Settings {
 		return '' !== (string) get_option( self::TOKEN_OPTION, '' );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Connection state (filled by "test connection")
 	 * ------------------------------------------------------------------ */
 

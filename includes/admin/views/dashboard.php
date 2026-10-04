@@ -21,9 +21,17 @@ $bsh_user      = wp_get_current_user();
 
 $bsh_sum_ok  = array_sum( wp_list_pluck( $bsh_activity, 'ok' ) );
 $bsh_sum_err = array_sum( wp_list_pluck( $bsh_activity, 'error' ) );
-$bsh_peak    = max( 1, max( array_map( function ( $d ) {
-	return $d['ok'] + $d['error'];
-}, $bsh_activity ) ) );
+$bsh_peak    = max(
+	1,
+	max(
+		array_map(
+			function ( $d ) {
+				return $d['ok'] + $d['error'];
+			},
+			$bsh_activity
+		)
+	)
+);
 // A clean axis top: 1, 2, 5 × 10^n.
 $bsh_mag  = pow( 10, floor( log10( $bsh_peak ) ) );
 $bsh_axis = $bsh_mag;
@@ -33,10 +41,20 @@ foreach ( array( 1, 2, 5, 10 ) as $bsh_step ) {
 		break;
 	}
 }
-$bsh_bad_checks = count( array_filter( $bsh_checks, function ( $c ) {
-	return 'ok' !== $c[0];
-} ) );
-$bsh_level_icon = array( 'success' => 'dashicons-yes-alt', 'warning' => 'dashicons-clock', 'error' => 'dashicons-warning', 'info' => 'dashicons-info-outline' );
+$bsh_bad_checks = count(
+	array_filter(
+		$bsh_checks,
+		function ( $c ) {
+			return 'ok' !== $c[0];
+		}
+	)
+);
+$bsh_level_icon = array(
+	'success' => 'dashicons-yes-alt',
+	'warning' => 'dashicons-clock',
+	'error'   => 'dashicons-warning',
+	'info'    => 'dashicons-info-outline',
+);
 ?>
 <header class="bsh-page-head bsh-page-head--row">
 	<div>

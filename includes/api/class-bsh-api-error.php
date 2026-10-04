@@ -77,7 +77,7 @@ class BSH_Api_Error extends Exception {
 	 */
 	public static function from_response( $response, $method, $path ) {
 		if ( is_wp_error( $response ) ) {
-			$raw = $response->get_error_message();
+			$raw        = $response->get_error_message();
 			$is_timeout = false !== stripos( $raw, 'timed out' ) || false !== stripos( $raw, 'timeout' );
 			return new self(
 				__( 'ارتباط با باسلام برقرار نشد.', 'basalamhub' ),
@@ -88,15 +88,18 @@ class BSH_Api_Error extends Exception {
 						? __( 'باسلام در زمان مقرر جواب نداد (Timeout).', 'basalamhub' )
 						: __( 'سرور سایتت نتوانست به سرور باسلام وصل شود.', 'basalamhub' ),
 					'suggestion' => __( 'لازم نیست کاری کنی؛ چند دقیقه‌ی بعد خودکار دوباره تلاش می‌شود. اگر بارها تکرار شد، از پشتیبانی هاستت بپرس دسترسی خروجی به openapi.basalam.com باز است یا نه.', 'basalamhub' ),
-					'details'    => array( 'request' => $method . ' ' . $path, 'error' => $raw ),
+					'details'    => array(
+						'request' => $method . ' ' . $path,
+						'error'   => $raw,
+					),
 				)
 			);
 		}
 
-		$code    = (int) wp_remote_retrieve_response_code( $response );
-		$body    = wp_remote_retrieve_body( $response );
-		$decoded = json_decode( $body, true );
-		$details = array(
+		$code       = (int) wp_remote_retrieve_response_code( $response );
+		$body       = wp_remote_retrieve_body( $response );
+		$decoded    = json_decode( $body, true );
+		$details    = array(
 			'request' => $method . ' ' . $path,
 			'status'  => $code,
 			'body'    => is_array( $decoded ) ? $decoded : mb_substr( (string) $body, 0, 2000 ),
@@ -239,9 +242,14 @@ class BSH_Api_Error extends Exception {
 		foreach ( $items as $item ) {
 			$field = '';
 			if ( isset( $item['loc'] ) && is_array( $item['loc'] ) ) {
-				$loc   = array_values( array_filter( $item['loc'], function ( $p ) {
-					return 'body' !== $p && ! is_int( $p );
-				} ) );
+				$loc   = array_values(
+					array_filter(
+						$item['loc'],
+						function ( $p ) {
+							return 'body' !== $p && ! is_int( $p );
+						}
+					)
+				);
 				$field = $loc ? (string) $loc[0] : '';
 			} elseif ( isset( $item['fields'] ) && is_array( $item['fields'] ) ) {
 				$field = (string) reset( $item['fields'] );
@@ -251,7 +259,7 @@ class BSH_Api_Error extends Exception {
 			if ( '' === $field ) {
 				continue;
 			}
-			$label = isset( self::FIELD_LABELS[ $field ] ) ? self::FIELD_LABELS[ $field ] : $field;
+			$label         = isset( self::FIELD_LABELS[ $field ] ) ? self::FIELD_LABELS[ $field ] : $field;
 			$out[ $label ] = $label;
 		}
 		return array_values( $out );

@@ -17,6 +17,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
+
 class BSH_Importer {
 
 	const STATE    = 'bsh_import_state';
@@ -127,7 +129,14 @@ class BSH_Importer {
 			),
 			false
 		);
-		as_enqueue_async_action( self::HOOK, array( 'run_id' => $run, 'offset' => 0 ), BSH_Queue::GROUP );
+		as_enqueue_async_action(
+			self::HOOK,
+			array(
+				'run_id' => $run,
+				'offset' => 0,
+			),
+			BSH_Queue::GROUP
+		);
 		return true;
 	}
 
@@ -136,7 +145,12 @@ class BSH_Importer {
 	 */
 	public static function cancel() {
 		if ( self::is_running() ) {
-			self::set_state( array( 'status' => 'cancelled', 'finished_at' => bsh_now() ) );
+			self::set_state(
+				array(
+					'status'      => 'cancelled',
+					'finished_at' => bsh_now(),
+				)
+			);
 		}
 	}
 
@@ -166,7 +180,10 @@ class BSH_Importer {
 		}
 		BSH_Queue::run_exclusive(
 			self::HOOK,
-			array( 'run_id' => $run_id, 'offset' => (int) $offset ),
+			array(
+				'run_id' => $run_id,
+				'offset' => (int) $offset,
+			),
 			function () use ( $run_id, $offset ) {
 				global $wpdb;
 				$state    = self::state();
@@ -179,7 +196,15 @@ class BSH_Importer {
 				$result = self::import_one( (int) $row->basalam_id, $state );
 				if ( 'retry' === $result ) {
 					// Temporary Basalam/network problem: try the same product again later.
-					if ( false !== BSH_Queue::retry_later( self::HOOK, array( 'run_id' => $run_id, 'offset' => (int) $offset ), 'import_' . $row->basalam_id, 60 ) ) {
+					if ( false !== BSH_Queue::retry_later(
+						self::HOOK,
+						array(
+							'run_id' => $run_id,
+							'offset' => (int) $offset,
+						),
+						'import_' . $row->basalam_id,
+						60
+					) ) {
 						return;
 					}
 					$result = 'failed';
@@ -188,8 +213,20 @@ class BSH_Importer {
 				if ( 'running' !== $state['status'] ) {
 					return; // Cancelled meanwhile.
 				}
-				self::set_state( array( $result => $state[ $result ] + 1, 'offset' => (int) $offset + 1 ) );
-				as_enqueue_async_action( self::HOOK, array( 'run_id' => $run_id, 'offset' => (int) $offset + 1 ), BSH_Queue::GROUP );
+				self::set_state(
+					array(
+						$result  => $state[ $result ] + 1,
+						'offset' => (int) $offset + 1,
+					)
+				);
+				as_enqueue_async_action(
+					self::HOOK,
+					array(
+						'run_id' => $run_id,
+						'offset' => (int) $offset + 1,
+					),
+					BSH_Queue::GROUP
+				);
 			}
 		);
 	}
@@ -198,7 +235,12 @@ class BSH_Importer {
 	 * Run finished: summary log entry.
 	 */
 	private static function finish() {
-		self::set_state( array( 'status' => 'done', 'finished_at' => bsh_now() ) );
+		self::set_state(
+			array(
+				'status'      => 'done',
+				'finished_at' => bsh_now(),
+			)
+		);
 		$s = self::state();
 		BSH_Logger::log(
 			array(
@@ -224,7 +266,13 @@ class BSH_Importer {
 			array( 'basalam_id' => (int) $basalam_id ),
 			function () use ( $basalam_id ) {
 				$state = self::state();
-				$res   = self::import_one( (int) $basalam_id, array( 'update_linked' => 1, 'publish' => $state['publish'] ) );
+				$res   = self::import_one(
+					(int) $basalam_id,
+					array(
+						'update_linked' => 1,
+						'publish'       => $state['publish'],
+					)
+				);
 				if ( 'retry' === $res ) {
 					BSH_Queue::retry_later( self::HOOK_ONE, array( 'basalam_id' => (int) $basalam_id ), 'import_' . $basalam_id, 60 );
 				}
@@ -232,7 +280,8 @@ class BSH_Importer {
 		);
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * One product
 	 * ------------------------------------------------------------------ */
 
@@ -282,7 +331,14 @@ class BSH_Importer {
 			BSH_Queue::reset_attempts( 'import_' . $basalam_id );
 			BSH_Logger::resolve_for( 'import', $basalam_id );
 			global $wpdb;
-			$wpdb->update( BSH_Linker::table(), array( 'match_status' => 'linked', 'match_wc_id' => $wc_id ), array( 'basalam_id' => $basalam_id ) );
+			$wpdb->update(
+				BSH_Linker::table(),
+				array(
+					'match_status' => 'linked',
+					'match_wc_id'  => $wc_id,
+				),
+				array( 'basalam_id' => $basalam_id )
+			);
 			return 'created';
 		} catch ( BSH_Api_Error $e ) {
 			if ( 'rate_limit' === $e->kind ) {
@@ -299,7 +355,10 @@ class BSH_Importer {
 				array(
 					'reason'     => __( 'ساخت محصول در ووکامرس با خطای داخلی متوقف شد.', 'basalamhub' ),
 					'suggestion' => __( '«تلاش مجدد» را بزن. اگر تکرار شد، جزئیات فنی را برای پشتیبانی بفرست.', 'basalamhub' ),
-					'context'    => array( 'error' => $e->getMessage(), 'at' => basename( $e->getFile() ) . ':' . $e->getLine() ),
+					'context'    => array(
+						'error' => $e->getMessage(),
+						'at'    => basename( $e->getFile() ) . ':' . $e->getLine(),
+					),
 				),
 				__( 'خطای داخلی.', 'basalamhub' )
 			);
@@ -414,8 +473,8 @@ class BSH_Importer {
 	 * @throws BSH_Api_Error When prices can't be converted.
 	 */
 	public static function create_from_remote( array $r, array $options ) {
-		$basalam_id = (int) $r['id'];
-		$variants   = array_values(
+		$basalam_id                = (int) $r['id'];
+		$variants                  = array_values(
 			array_filter(
 				isset( $r['variants'] ) && is_array( $r['variants'] ) ? $r['variants'] : array(),
 				function ( $v ) {
@@ -478,7 +537,16 @@ class BSH_Importer {
 		$wc_id = $product->save();
 
 		// Link right away: from here on, nothing can import this product a second time.
-		BSH_Links::upsert( 'product', $wc_id, array( 'basalam_id' => $basalam_id, 'sync_status' => 'synced', 'last_synced_at' => bsh_now(), 'last_error' => null ) );
+		BSH_Links::upsert(
+			'product',
+			$wc_id,
+			array(
+				'basalam_id'     => $basalam_id,
+				'sync_status'    => 'synced',
+				'last_synced_at' => bsh_now(),
+				'last_error'     => null,
+			)
+		);
 
 		if ( $variants ) {
 			self::create_variations( $wc_id, $variants );
@@ -578,7 +646,7 @@ class BSH_Importer {
 				$attrs[ sanitize_title( self::prop_name( $p ) ) ] = self::prop_value( $p );
 			}
 			list( $regular, $sale ) = self::prices( $v );
-			$var = new WC_Product_Variation();
+			$var                    = new WC_Product_Variation();
 			$var->set_parent_id( $parent_id );
 			$var->set_attributes( $attrs );
 			$var->set_regular_price( $regular );
@@ -619,7 +687,13 @@ class BSH_Importer {
 			}
 			$key = self::prop_key( $pairs );
 			if ( isset( $remote[ $key ] ) ) {
-				$map[ $vid ] = array( 'id' => $remote[ $key ], 'sig' => $mv['sig'], 'price' => $mv['primary_price'], 'stock' => $mv['stock'], 'sku' => $mv['sku'] );
+				$map[ $vid ] = array(
+					'id'    => $remote[ $key ],
+					'sig'   => $mv['sig'],
+					'price' => $mv['primary_price'],
+					'stock' => $mv['stock'],
+					'sku'   => $mv['sku'],
+				);
 			}
 		}
 		update_post_meta( $product->get_id(), '_bsh_variants', $map );
@@ -658,7 +732,10 @@ class BSH_Importer {
 		}
 		$map = BSH_Categories::map();
 		if ( ! isset( $map[ $term_id ] ) ) {
-			$map[ $term_id ] = array( 'category_id' => $cat_id, 'attrs' => array() );
+			$map[ $term_id ] = array(
+				'category_id' => $cat_id,
+				'attrs'       => array(),
+			);
 			update_option( BSH_Categories::MAP_OPTION, $map, false );
 		}
 		return $term_id;
@@ -736,7 +813,13 @@ class BSH_Importer {
 		if ( ! preg_match( '/\.(jpe?g|png|webp|gif)$/i', $name ) ) {
 			$name = 'basalam-' . ( $file_id ? $file_id : wp_generate_password( 6, false ) ) . '.jpg';
 		}
-		$id = media_handle_sideload( array( 'name' => $name, 'tmp_name' => $tmp ), 0 );
+		$id = media_handle_sideload(
+			array(
+				'name'     => $name,
+				'tmp_name' => $tmp,
+			),
+			0
+		);
 		if ( is_wp_error( $id ) ) {
 			if ( file_exists( $tmp ) ) {
 				wp_delete_file( $tmp );
@@ -763,7 +846,7 @@ class BSH_Importer {
 	 * @throws BSH_Api_Error When prices can't be converted.
 	 */
 	public static function update_from_remote( WC_Product $product, array $r ) {
-		$prices = ! BSH_Price_Rules::is_active();
+		$prices                    = ! BSH_Price_Rules::is_active();
 		BSH_Plugin::$suspend_hooks = true;
 		if ( $product->is_type( 'variable' ) ) {
 			$remote = array();
@@ -797,7 +880,15 @@ class BSH_Importer {
 			BSH_Inventory::set_local_stock( wc_get_product( $product->get_id() ), isset( $r['inventory'] ) ? (int) $r['inventory'] : ( isset( $r['stock'] ) ? (int) $r['stock'] : 0 ) );
 		}
 		$sync = new BSH_Product_Sync( BSH_Plugin::api() );
-		BSH_Links::upsert( 'product', $product->get_id(), array( 'payload_hash' => $sync->fingerprint( wc_get_product( $product->get_id() ) ), 'sync_status' => 'synced', 'last_synced_at' => bsh_now() ) );
+		BSH_Links::upsert(
+			'product',
+			$product->get_id(),
+			array(
+				'payload_hash'   => $sync->fingerprint( wc_get_product( $product->get_id() ) ),
+				'sync_status'    => 'synced',
+				'last_synced_at' => bsh_now(),
+			)
+		);
 		BSH_Plugin::$suspend_hooks = false;
 	}
 }

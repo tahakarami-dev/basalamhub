@@ -190,7 +190,8 @@ class BSH_App {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Data for the dashboard
 	 * ------------------------------------------------------------------ */
 
@@ -206,8 +207,8 @@ class BSH_App {
 		$today = new DateTimeImmutable( 'now', $tz );
 		$out   = array();
 		for ( $i = $days - 1; $i >= 0; $i-- ) {
-			$d = $today->modify( "-{$i} days" );
-			list( $jy, $jm, $jd ) = bsh_gregorian_to_jalali( (int) $d->format( 'Y' ), (int) $d->format( 'n' ), (int) $d->format( 'j' ) );
+			$d                            = $today->modify( "-{$i} days" );
+			list( $jy, $jm, $jd )         = bsh_gregorian_to_jalali( (int) $d->format( 'Y' ), (int) $d->format( 'n' ), (int) $d->format( 'j' ) );
 			$out[ $d->format( 'Y-m-d' ) ] = array(
 				'date'  => $d->format( 'Y-m-d' ),
 				'day'   => bsh_fa_digits( $jd ),
@@ -300,7 +301,22 @@ class BSH_App {
 		$labels   = BSH_Notifier::channels();
 		$checks[] = $channels
 			/* translators: %s: messengers */
-			? array( 'ok', __( 'اعلان‌ها', 'basalamhub' ), sprintf( __( 'فعال در %s', 'basalamhub' ), implode( '، ', array_map( function ( $c ) use ( $labels ) { return $labels[ $c ]['label']; }, $channels ) ) ), '' )
+			? array(
+				'ok',
+				__( 'اعلان‌ها', 'basalamhub' ),
+				sprintf(
+					__( 'فعال در %s', 'basalamhub' ),
+					implode(
+						'، ',
+						array_map(
+							function ( $c ) use ( $labels ) {
+								return $labels[ $c ]['label']; },
+							$channels
+						)
+					)
+				),
+				'',
+			)
 			: array( 'warn', __( 'اعلان‌ها', 'basalamhub' ), __( 'خاموش؛ سفارش جدید و خطاها را در بله یا تلگرام بگیر.', 'basalamhub' ), admin_url( 'admin.php?page=basalamhub-notify' ) );
 
 		$unmapped = count( BSH_Categories::unmapped_terms() );
@@ -328,7 +344,8 @@ class BSH_App {
 		return $checks;
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Products page
 	 * ------------------------------------------------------------------ */
 
@@ -367,7 +384,7 @@ class BSH_App {
 			$params = array( $like, $like );
 		}
 
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $base/$where are fixed SQL with %s placeholders; values only through prepare().
 		$count_sql = "SELECT COALESCE(l.sync_status, 'none') AS s, (l.basalam_id IS NULL) AS unsent, COUNT(*) AS n {$base} {$where} GROUP BY COALESCE(l.sync_status, 'none'), (l.basalam_id IS NULL)";
 		$rows      = $params ? $wpdb->get_results( $wpdb->prepare( $count_sql, $params ) ) : $wpdb->get_results( $count_sql );
 		$counts    = array_fill_keys( array_keys( self::product_tabs() ), 0 );
@@ -398,7 +415,11 @@ class BSH_App {
 			)
 		);
 		// phpcs:enable
-		return array( 'items' => $items ? $items : array(), 'total' => $total, 'counts' => $counts );
+		return array(
+			'items'  => $items ? $items : array(),
+			'total'  => $total,
+			'counts' => $counts,
+		);
 	}
 
 	/**
@@ -409,7 +430,12 @@ class BSH_App {
 			wp_send_json_error( array( 'message' => __( 'نشست کاری منقضی شده. صفحه را تازه کن و دوباره امتحان کن.', 'basalamhub' ) ), 403 );
 		}
 		$ids    = isset( $_POST['ids'] ) ? array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_POST['ids'] ) ) ) ) : array();
-		$result = BSH_Bulk::start( array( 'scope' => 'ids', 'ids' => $ids ) );
+		$result = BSH_Bulk::start(
+			array(
+				'scope' => 'ids',
+				'ids'   => $ids,
+			)
+		);
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}

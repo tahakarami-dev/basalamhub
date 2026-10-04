@@ -102,7 +102,14 @@ class BSH_Linker {
 			),
 			false
 		);
-		as_enqueue_async_action( self::HOOK_FETCH, array( 'run_id' => $run, 'page' => 1 ), BSH_Queue::GROUP );
+		as_enqueue_async_action(
+			self::HOOK_FETCH,
+			array(
+				'run_id' => $run,
+				'page'   => 1,
+			),
+			BSH_Queue::GROUP
+		);
 		return true;
 	}
 
@@ -118,15 +125,31 @@ class BSH_Linker {
 		}
 		BSH_Queue::run_exclusive(
 			self::HOOK_FETCH,
-			array( 'run_id' => $run_id, 'page' => $page ),
+			array(
+				'run_id' => $run_id,
+				'page'   => $page,
+			),
 			function () use ( $run_id, $page ) {
 				try {
 					$res = BSH_Plugin::api()->vendor_products( BSH_Settings::vendor_id(), $page, self::PER_PAGE );
 				} catch ( BSH_Api_Error $e ) {
-					if ( $e->retryable && false !== BSH_Queue::retry_later( self::HOOK_FETCH, array( 'run_id' => $run_id, 'page' => $page ), 'link_fetch', $e->retry_after ) ) {
+					if ( $e->retryable && false !== BSH_Queue::retry_later(
+						self::HOOK_FETCH,
+						array(
+							'run_id' => $run_id,
+							'page'   => $page,
+						),
+						'link_fetch',
+						$e->retry_after
+					) ) {
 						return;
 					}
-					self::set_state( array( 'status' => 'failed', 'error' => trim( $e->getMessage() . ' ' . $e->reason ) ) );
+					self::set_state(
+						array(
+							'status' => 'failed',
+							'error'  => trim( $e->getMessage() . ' ' . $e->reason ),
+						)
+					);
 					BSH_Logger::log(
 						array_merge(
 							array(
@@ -154,14 +177,33 @@ class BSH_Linker {
 					)
 				);
 				if ( $more ) {
-					as_enqueue_async_action( self::HOOK_FETCH, array( 'run_id' => $run_id, 'page' => $page + 1 ), BSH_Queue::GROUP );
+					as_enqueue_async_action(
+						self::HOOK_FETCH,
+						array(
+							'run_id' => $run_id,
+							'page'   => $page + 1,
+						),
+						BSH_Queue::GROUP
+					);
 					return;
 				}
 				// Products deleted from the booth since the last run disappear from the preview.
 				global $wpdb;
 				$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . self::table() . ' WHERE run_id <> %s', $run_id ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				self::set_state( array( 'status' => 'matching', 'total' => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::table() ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				as_enqueue_async_action( self::HOOK_MATCH, array( 'run_id' => $run_id, 'offset' => 0 ), BSH_Queue::GROUP );
+				self::set_state(
+					array(
+						'status' => 'matching',
+						'total'  => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::table() ),
+					)
+				); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				as_enqueue_async_action(
+					self::HOOK_MATCH,
+					array(
+						'run_id' => $run_id,
+						'offset' => 0,
+					),
+					BSH_Queue::GROUP
+				);
 			}
 		);
 	}
@@ -203,8 +245,8 @@ class BSH_Linker {
 				}
 			}
 		}
-		$price = isset( $item['primary_price'] ) ? $item['primary_price'] : ( isset( $item['price'] ) ? $item['price'] : null );
-		$row   = array(
+		$price  = isset( $item['primary_price'] ) ? $item['primary_price'] : ( isset( $item['price'] ) ? $item['price'] : null );
+		$row    = array(
 			'basalam_id' => (int) $item['id'],
 			'title'      => mb_substr( isset( $item['title'] ) ? (string) $item['title'] : ( isset( $item['name'] ) ? (string) $item['name'] : '' ), 0, 250 ),
 			'sku'        => isset( $item['sku'] ) && '' !== (string) $item['sku'] ? mb_substr( (string) $item['sku'], 0, 100 ) : null,
@@ -223,7 +265,8 @@ class BSH_Linker {
 		}
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Matching
 	 * ------------------------------------------------------------------ */
 
@@ -256,11 +299,23 @@ class BSH_Linker {
 		}
 		self::set_state( array( 'matched' => $offset + count( $rows ) ) );
 		if ( count( $rows ) === self::CHUNK ) {
-			as_enqueue_async_action( self::HOOK_MATCH, array( 'run_id' => $run_id, 'offset' => $offset + self::CHUNK ), BSH_Queue::GROUP );
+			as_enqueue_async_action(
+				self::HOOK_MATCH,
+				array(
+					'run_id' => $run_id,
+					'offset' => $offset + self::CHUNK,
+				),
+				BSH_Queue::GROUP
+			);
 			return;
 		}
 		self::resolve_conflicts();
-		self::set_state( array( 'status' => 'ready', 'finished_at' => bsh_now() ) );
+		self::set_state(
+			array(
+				'status'      => 'ready',
+				'finished_at' => bsh_now(),
+			)
+		);
 		$c = self::counts();
 		BSH_Logger::log(
 			array(
@@ -328,7 +383,13 @@ class BSH_Linker {
 	public static function match_one( $row, array $index ) {
 		$bid = (int) $row->basalam_id;
 		if ( isset( $index['linked_basalam'][ $bid ] ) ) {
-			return array( 'status' => 'linked', 'wc_id' => $index['linked_basalam'][ $bid ], 'score' => 100, 'reason' => __( 'قبلاً متصل شده.', 'basalamhub' ), 'candidates' => array() );
+			return array(
+				'status'     => 'linked',
+				'wc_id'      => $index['linked_basalam'][ $bid ],
+				'score'      => 100,
+				'reason'     => __( 'قبلاً متصل شده.', 'basalamhub' ),
+				'candidates' => array(),
+			);
 		}
 
 		// 1) SKU: the product's own, or any of its variants'.
@@ -364,16 +425,34 @@ class BSH_Linker {
 				);
 			}
 			/* translators: %s: SKU */
-			return array( 'status' => 'certain', 'wc_id' => $wc_id, 'score' => 100, 'reason' => sprintf( __( 'SKU یکسان: %s', 'basalamhub' ), current( $sku_hits ) ), 'candidates' => array( $wc_id ) );
+			return array(
+				'status'     => 'certain',
+				'wc_id'      => $wc_id,
+				'score'      => 100,
+				'reason'     => sprintf( __( 'SKU یکسان: %s', 'basalamhub' ), current( $sku_hits ) ),
+				'candidates' => array( $wc_id ),
+			);
 		}
 		if ( count( $sku_hits ) > 1 ) {
-			return array( 'status' => 'suspect', 'wc_id' => (int) key( $sku_hits ), 'score' => 80, 'reason' => __( 'SKUهای این محصول به چند محصول مختلف سایت می‌خورند.', 'basalamhub' ), 'candidates' => array_map( 'intval', array_keys( $sku_hits ) ) );
+			return array(
+				'status'     => 'suspect',
+				'wc_id'      => (int) key( $sku_hits ),
+				'score'      => 80,
+				'reason'     => __( 'SKUهای این محصول به چند محصول مختلف سایت می‌خورند.', 'basalamhub' ),
+				'candidates' => array_map( 'intval', array_keys( $sku_hits ) ),
+			);
 		}
 
 		// 2) Name: exact (normalized), then fuzzy among products that share words.
 		$norm = self::normalize( $row->title );
 		if ( '' === $norm ) {
-			return array( 'status' => 'none', 'wc_id' => 0, 'score' => 0, 'reason' => '', 'candidates' => array() );
+			return array(
+				'status'     => 'none',
+				'wc_id'      => 0,
+				'score'      => 0,
+				'reason'     => '',
+				'candidates' => array(),
+			);
 		}
 		$scores = array();
 		if ( isset( $index['titles'][ $norm ] ) ) {
@@ -412,7 +491,13 @@ class BSH_Linker {
 			}
 		);
 		if ( ! $top ) {
-			return array( 'status' => 'none', 'wc_id' => 0, 'score' => 0, 'reason' => '', 'candidates' => array() );
+			return array(
+				'status'     => 'none',
+				'wc_id'      => 0,
+				'score'      => 0,
+				'reason'     => '',
+				'candidates' => array(),
+			);
 		}
 		$best  = (int) key( $top );
 		$score = (int) current( $top );
@@ -424,7 +509,13 @@ class BSH_Linker {
 		if ( isset( $index['linked_wc'][ $best ] ) ) {
 			$reason .= ' ' . __( 'این محصول سایت قبلاً به محصول دیگری متصل است.', 'basalamhub' );
 		}
-		return array( 'status' => 'suspect', 'wc_id' => $best, 'score' => $score, 'reason' => $reason, 'candidates' => array_map( 'intval', array_slice( array_keys( $top ), 0, 5 ) ) );
+		return array(
+			'status'     => 'suspect',
+			'wc_id'      => $best,
+			'score'      => $score,
+			'reason'     => $reason,
+			'candidates' => array_map( 'intval', array_slice( array_keys( $top ), 0, 5 ) ),
+		);
 	}
 
 	/**
@@ -450,7 +541,35 @@ class BSH_Linker {
 	 */
 	public static function normalize( $text ) {
 		$text = html_entity_decode( wp_strip_all_tags( (string) $text ), ENT_QUOTES, 'UTF-8' );
-		$text = strtr( $text, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9', '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9', 'أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ؤ' => 'و' ) );
+		$text = strtr(
+			$text,
+			array(
+				'۰' => '0',
+				'۱' => '1',
+				'۲' => '2',
+				'۳' => '3',
+				'۴' => '4',
+				'۵' => '5',
+				'۶' => '6',
+				'۷' => '7',
+				'۸' => '8',
+				'۹' => '9',
+				'٠' => '0',
+				'١' => '1',
+				'٢' => '2',
+				'٣' => '3',
+				'٤' => '4',
+				'٥' => '5',
+				'٦' => '6',
+				'٧' => '7',
+				'٨' => '8',
+				'٩' => '9',
+				'أ' => 'ا',
+				'إ' => 'ا',
+				'آ' => 'ا',
+				'ؤ' => 'و',
+			)
+		);
 		$text = BSH_Categories::normalize( $text );
 		$text = preg_replace( '/[^\p{L}\p{N}]+/u', ' ', $text );
 		return trim( preg_replace( '/\s+/u', ' ', $text ) );
@@ -461,9 +580,16 @@ class BSH_Linker {
 	 * @return string[] Words of 2+ characters.
 	 */
 	private static function tokens( $norm ) {
-		return array_values( array_unique( array_filter( explode( ' ', $norm ), function ( $t ) {
-			return mb_strlen( $t ) >= 2;
-		} ) ) );
+		return array_values(
+			array_unique(
+				array_filter(
+					explode( ' ', $norm ),
+					function ( $t ) {
+						return mb_strlen( $t ) >= 2;
+					}
+				)
+			)
+		);
 	}
 
 	/**
@@ -475,7 +601,8 @@ class BSH_Linker {
 		return implode( '|', $m[0] );
 	}
 
-	/* ---------------------------------------------------------------------
+	/*
+	---------------------------------------------------------------------
 	 * Preview data and approval
 	 * ------------------------------------------------------------------ */
 
@@ -484,7 +611,12 @@ class BSH_Linker {
 	 */
 	public static function counts() {
 		global $wpdb;
-		$out = array( 'certain' => 0, 'suspect' => 0, 'none' => 0, 'linked' => 0 );
+		$out = array(
+			'certain' => 0,
+			'suspect' => 0,
+			'none'    => 0,
+			'linked'  => 0,
+		);
 		foreach ( (array) $wpdb->get_results( 'SELECT match_status, COUNT(*) AS n FROM ' . self::table() . ' GROUP BY match_status' ) as $r ) { // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			if ( isset( $out[ $r->match_status ] ) ) {
 				$out[ $r->match_status ] = (int) $r->n;
@@ -502,11 +634,14 @@ class BSH_Linker {
 	public static function rows( $status, $page = 1, $per_page = 50 ) {
 		global $wpdb;
 		$order = 'suspect' === $status ? 'match_score DESC, id ASC' : 'id ASC';
-		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $order is one of two fixed ORDER BY clauses.
 		$total = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . self::table() . ' WHERE match_status = %s', $status ) );
 		$items = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . " WHERE match_status = %s ORDER BY {$order} LIMIT %d OFFSET %d", $status, $per_page, ( max( 1, $page ) - 1 ) * $per_page ) );
 		// phpcs:enable
-		return array( 'items' => $items ? $items : array(), 'total' => $total );
+		return array(
+			'items' => $items ? $items : array(),
+			'total' => $total,
+		);
 	}
 
 	/**
@@ -558,7 +693,13 @@ class BSH_Linker {
 						$same_label = self::normalize( $r['label'] ) === self::normalize( $v['label'] );
 						if ( $same_sku || $same_label ) {
 							// Price/stock unknown (null) so the first sync sends them.
-							$map[ $vid ] = array( 'id' => (int) $r['id'], 'sig' => $v['sig'], 'price' => null, 'stock' => null, 'sku' => $v['sku'] );
+							$map[ $vid ] = array(
+								'id'    => (int) $r['id'],
+								'sig'   => $v['sig'],
+								'price' => null,
+								'stock' => null,
+								'sku'   => $v['sku'],
+							);
 							break;
 						}
 					}
@@ -577,7 +718,14 @@ class BSH_Linker {
 					'last_error'   => null,
 				)
 			);
-			$wpdb->update( self::table(), array( 'match_status' => 'linked', 'match_wc_id' => $wc_id ), array( 'basalam_id' => $basalam_id ) );
+			$wpdb->update(
+				self::table(),
+				array(
+					'match_status' => 'linked',
+					'match_wc_id'  => $wc_id,
+				),
+				array( 'basalam_id' => $basalam_id )
+			);
 			BSH_Logger::log(
 				array(
 					'level'       => 'success',
@@ -598,6 +746,9 @@ class BSH_Linker {
 			}
 			++$linked;
 		}
-		return array( 'linked' => $linked, 'errors' => $errors );
+		return array(
+			'linked' => $linked,
+			'errors' => $errors,
+		);
 	}
 }

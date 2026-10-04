@@ -41,16 +41,16 @@ class BSH_Product_Mapper {
 		}
 
 		$payload = array(
-			'name'                 => $this->name( $product ),
-			'description'          => $this->plain_text( $product->get_description() ),
-			'brief'                => $this->plain_text( $product->get_short_description() ),
-			'primary_price'        => $this->price( $product, $problems ),
-			'stock'                => $this->stock( $product ),
-			'category_id'          => $this->category( $product, $problems ),
-			'preparation_days'     => $this->preparation_days( $product ),
-			'sku'                  => self::sku_for( $product ),
-			'status'               => (int) BSH_Settings::get( 'create_status', BSH_Settings::BASALAM_STATUS_PUBLISHED ),
-			'is_wholesale'         => false,
+			'name'             => $this->name( $product ),
+			'description'      => $this->plain_text( $product->get_description() ),
+			'brief'            => $this->plain_text( $product->get_short_description() ),
+			'primary_price'    => $this->price( $product, $problems ),
+			'stock'            => $this->stock( $product ),
+			'category_id'      => $this->category( $product, $problems ),
+			'preparation_days' => $this->preparation_days( $product ),
+			'sku'              => self::sku_for( $product ),
+			'status'           => (int) BSH_Settings::get( 'create_status', BSH_Settings::BASALAM_STATUS_PUBLISHED ),
+			'is_wholesale'     => false,
 		);
 
 		$weight                    = $this->weight_grams( $product );
@@ -79,9 +79,14 @@ class BSH_Product_Mapper {
 				$payload['primary_price'] = min( wp_list_pluck( $variations, 'primary_price' ) );
 				$payload['stock']         = array_sum( wp_list_pluck( $variations, 'stock' ) );
 				// The product-level price check doesn't apply: each variant has its own price.
-				$problems = array_values( array_filter( $problems, function ( $p ) {
-					return 'primary_price' !== $p['field'];
-				} ) );
+				$problems = array_values(
+					array_filter(
+						$problems,
+						function ( $p ) {
+							return 'primary_price' !== $p['field'];
+						}
+					)
+				);
 				// Variation photos join the gallery so buyers see every option.
 				foreach ( $variations as $v ) {
 					if ( $v['image_id'] ) {
@@ -153,7 +158,10 @@ class BSH_Product_Mapper {
 					$term  = get_term_by( 'slug', $value, $taxonomy );
 					$value = $term ? $term->name : $value;
 				}
-				$props[] = array( 'property' => (string) $name, 'value' => (string) $value );
+				$props[] = array(
+					'property' => (string) $name,
+					'value'    => (string) $value,
+				);
 				$label[] = $value;
 			}
 			$sig = md5( wp_json_encode( $props ) );
@@ -189,9 +197,12 @@ class BSH_Product_Mapper {
 				'label'         => implode( '، ', $label ),
 			);
 		}
-		if ( ! $out && ! array_filter( $problems, function ( $p ) {
-			return 'variants' === $p['field'];
-		} ) ) {
+		if ( ! $out && ! array_filter(
+			$problems,
+			function ( $p ) {
+				return 'variants' === $p['field'];
+			}
+		) ) {
 			$problems[] = array(
 				'field'      => 'variants',
 				'message'    => __( 'محصول متغیر هیچ تنوع فعالی ندارد.', 'basalamhub' ),

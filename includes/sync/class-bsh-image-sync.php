@@ -14,6 +14,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception messages are never printed raw: they are stored in the log and escaped where shown.
+
 class BSH_Image_Sync {
 
 	const META_ID  = '_bsh_basalam_file_id';
@@ -152,13 +154,19 @@ class BSH_Image_Sync {
 			&& max( (int) $info[0], (int) $info[1] ) <= $limits['max_side']
 			&& filesize( $path ) <= $limits['max_bytes'];
 		if ( $fits || ! $info ) {
-			return array( 'path' => $path, 'temp' => false );
+			return array(
+				'path' => $path,
+				'temp' => false,
+			);
 		}
 
 		$editor = wp_get_image_editor( $path );
 		if ( is_wp_error( $editor ) ) {
 			// No GD/Imagick: upload the original and let Basalam decide.
-			return array( 'path' => $path, 'temp' => false );
+			return array(
+				'path' => $path,
+				'temp' => false,
+			);
 		}
 
 		$size = $editor->get_size();
@@ -176,7 +184,10 @@ class BSH_Image_Sync {
 			$editor->set_quality( $quality );
 			$saved = $editor->save( $target, $out_mime );
 			if ( is_wp_error( $saved ) ) {
-				return array( 'path' => $path, 'temp' => false );
+				return array(
+					'path' => $path,
+					'temp' => false,
+				);
 			}
 			$target = $saved['path'];
 			clearstatcache( true, $target );
@@ -191,11 +202,17 @@ class BSH_Image_Sync {
 			$editor->set_quality( 72 );
 			$saved = $editor->save( preg_replace( '/\.png$/', '.jpg', $target ), 'image/jpeg' );
 			if ( is_wp_error( $saved ) ) {
-				return array( 'path' => $path, 'temp' => false );
+				return array(
+					'path' => $path,
+					'temp' => false,
+				);
 			}
 			$target = $saved['path'];
 		}
-		return array( 'path' => $target, 'temp' => true );
+		return array(
+			'path' => $target,
+			'temp' => true,
+		);
 	}
 
 	/**

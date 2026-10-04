@@ -16,11 +16,11 @@ defined( 'ABSPATH' ) || exit;
 
 class BSH_Queue {
 
-	const GROUP        = 'basalamhub';
-	const HOOK_PRODUCT = 'bsh_sync_product';
-	const HOOK_MAINTENANCE   = 'bsh_maintenance';
-	const LOCK_TTL     = 180;
-	const BACKOFF      = array( 60, 300, 900, 3600, 10800 );
+	const GROUP            = 'basalamhub';
+	const HOOK_PRODUCT     = 'bsh_sync_product';
+	const HOOK_MAINTENANCE = 'bsh_maintenance';
+	const LOCK_TTL         = 180;
+	const BACKOFF          = array( 60, 300, 900, 3600, 10800 );
 
 	/**
 	 * Registers queue hooks.
@@ -56,7 +56,7 @@ class BSH_Queue {
 	 */
 	public static function heal() {
 		global $wpdb;
-		$ids = $wpdb->get_col(
+		$ids    = $wpdb->get_col(
 			$wpdb->prepare(
 				'SELECT wc_id FROM ' . BSH_Links::table() . " WHERE object_type = 'product' AND sync_status = 'queued' AND updated_at < %s LIMIT 200", // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 				gmdate( 'Y-m-d H:i:s', time() - 30 * MINUTE_IN_SECONDS )
@@ -272,12 +272,20 @@ class BSH_Queue {
 	 * @return array{pending:int, running:int, failed:int, past_due:int}
 	 */
 	public static function stats() {
-		$out = array( 'pending' => 0, 'running' => 0, 'failed' => 0, 'past_due' => 0 );
+		$out = array(
+			'pending'  => 0,
+			'running'  => 0,
+			'failed'   => 0,
+			'past_due' => 0,
+		);
 		if ( ! class_exists( 'ActionScheduler' ) || ! ActionScheduler::is_initialized() ) {
 			return $out;
 		}
-		$store = ActionScheduler::store();
-		$base  = array( 'group' => self::GROUP, 'per_page' => -1 );
+		$store          = ActionScheduler::store();
+		$base           = array(
+			'group'    => self::GROUP,
+			'per_page' => -1,
+		);
 		$out['pending'] = (int) $store->query_actions( $base + array( 'status' => ActionScheduler_Store::STATUS_PENDING ), 'count' );
 		$out['running'] = (int) $store->query_actions( $base + array( 'status' => ActionScheduler_Store::STATUS_RUNNING ), 'count' );
 		$out['failed']  = (int) $store->query_actions(

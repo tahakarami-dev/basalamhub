@@ -31,14 +31,14 @@ $bsh_val = function ( $key ) use ( $bsh_s, $bsh_input, $bsh_errors ) {
 /**
  * Prints the hint or the error message under a field.
  */
-$bsh_hint = function ( $key, $hint ) use ( $bsh_errors ) {
+$bsh_hint      = function ( $key, $hint ) use ( $bsh_errors ) {
 	$text = isset( $bsh_errors[ $key ] ) ? $bsh_errors[ $key ] : $hint;
 	echo '<span class="bsh-field__hint">' . esc_html( $text ) . '</span>';
 };
 $bsh_err_class = function ( $key ) use ( $bsh_errors ) {
 	return isset( $bsh_errors[ $key ] ) ? ' bsh-field--error' : '';
 };
-$bsh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : '';
+$bsh_currency  = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : '';
 ?>
 <header class="bsh-page-head">
 	<h1 class="bsh-page-title"><?php esc_html_e( 'تنظیمات باسلام‌هاب', 'basalamhub' ); ?></h1>

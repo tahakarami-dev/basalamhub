@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 $bsh_tab   = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'certain';
 $bsh_paged = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
 // phpcs:enable
-$bsh_tabs = array(
+$bsh_tabs    = array(
 	'certain' => __( 'قطعی', 'basalamhub' ),
 	'suspect' => __( 'مشکوک', 'basalamhub' ),
 	'none'    => __( 'بدون جفت', 'basalamhub' ),
@@ -212,7 +212,20 @@ $bsh_wc_cell = function ( $wc_id ) {
 		</div>
 		<?php if ( $bsh_pages > 1 ) : ?>
 			<nav class="bsh-pagination" aria-label="<?php esc_attr_e( 'صفحه‌بندی', 'basalamhub' ); ?>">
-				<?php echo wp_kses_post( paginate_links( array( 'base' => add_query_arg( 'paged', '%#%' ), 'format' => '', 'current' => $bsh_paged, 'total' => $bsh_pages, 'prev_text' => __( 'قبلی', 'basalamhub' ), 'next_text' => __( 'بعدی', 'basalamhub' ) ) ) ); ?>
+				<?php
+				echo wp_kses_post(
+					paginate_links(
+						array(
+							'base'      => add_query_arg( 'paged', '%#%' ),
+							'format'    => '',
+							'current'   => $bsh_paged,
+							'total'     => $bsh_pages,
+							'prev_text' => __( 'قبلی', 'basalamhub' ),
+							'next_text' => __( 'بعدی', 'basalamhub' ),
+						)
+					)
+				);
+				?>
 			</nav>
 		<?php endif; ?>
 	<?php endif; ?>

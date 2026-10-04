@@ -71,7 +71,14 @@ class BSH_Links {
 				$row['updated_at']
 			)
 		);
-		$wpdb->update( self::table(), $data, array( 'object_type' => $type, 'wc_id' => $wc_id ) );
+		$wpdb->update(
+			self::table(),
+			$data,
+			array(
+				'object_type' => $type,
+				'wc_id'       => $wc_id,
+			)
+		);
 	}
 
 	/**
@@ -92,7 +99,13 @@ class BSH_Links {
 	public static function counts( $type ) {
 		global $wpdb;
 		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT sync_status, COUNT(*) AS n FROM ' . self::table() . ' WHERE object_type = %s GROUP BY sync_status', $type ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		$out  = array( 'synced' => 0, 'queued' => 0, 'stale' => 0, 'error' => 0, 'linked' => 0 );
+		$out  = array(
+			'synced' => 0,
+			'queued' => 0,
+			'stale'  => 0,
+			'error'  => 0,
+			'linked' => 0,
+		);
 		foreach ( (array) $rows as $r ) {
 			$out[ $r->sync_status ] = (int) $r->n;
 		}
@@ -114,7 +127,7 @@ class BSH_Links {
 			return array();
 		}
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-		$rows         = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . " WHERE object_type = %s AND wc_id IN ({$placeholders})", array_merge( array( $type ), $ids ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$rows         = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . self::table() . " WHERE object_type = %s AND wc_id IN ({$placeholders})", array_merge( array( $type ), $ids ) ) ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholders are a list of %d.
 		$out          = array();
 		foreach ( (array) $rows as $r ) {
 			$out[ (int) $r->wc_id ] = $r;

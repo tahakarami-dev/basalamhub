@@ -38,7 +38,15 @@ $bsh_rule_fields = function ( $name, array $rule, $error ) {
 };
 
 // Preview: the 8 most recent published simple products (a variable product's price is per variant).
-$bsh_preview = wc_get_products( array( 'status' => 'publish', 'type' => 'simple', 'limit' => 8, 'orderby' => 'date', 'order' => 'DESC' ) );
+$bsh_preview = wc_get_products(
+	array(
+		'status'  => 'publish',
+		'type'    => 'simple',
+		'limit'   => 8,
+		'orderby' => 'date',
+		'order'   => 'DESC',
+	)
+);
 $bsh_mult    = BSH_Product_Mapper::rial_multiplier();
 ?>
 <header class="bsh-page-head">
@@ -77,22 +85,29 @@ $bsh_mult    = BSH_Product_Mapper::rial_multiplier();
 	</section>
 
 	<?php if ( $bsh_tree ) : ?>
-	<?php
-	$bsh_names = array();
-	foreach ( $bsh_tree as $bsh_row ) {
-		$bsh_names[ (int) $bsh_row[0]->term_id ] = $bsh_row[0];
-	}
-	// Rows: categories that have a rule (or a rejected one to fix).
-	$bsh_rows = array_keys( $bsh_rules['categories'] );
-	foreach ( array_keys( $bsh_errors ) as $bsh_key ) {
-		if ( 0 === strpos( $bsh_key, 'cat_' ) ) {
-			$bsh_rows[] = (int) substr( $bsh_key, 4 );
+		<?php
+		$bsh_names = array();
+		foreach ( $bsh_tree as $bsh_row ) {
+			$bsh_names[ (int) $bsh_row[0]->term_id ] = $bsh_row[0];
 		}
-	}
-	$bsh_rows = array_values( array_unique( array_filter( $bsh_rows, function ( $id ) use ( $bsh_names ) {
-		return isset( $bsh_names[ $id ] );
-	} ) ) );
-	?>
+		// Rows: categories that have a rule (or a rejected one to fix).
+		$bsh_rows = array_keys( $bsh_rules['categories'] );
+		foreach ( array_keys( $bsh_errors ) as $bsh_key ) {
+			if ( 0 === strpos( $bsh_key, 'cat_' ) ) {
+				$bsh_rows[] = (int) substr( $bsh_key, 4 );
+			}
+		}
+		$bsh_rows = array_values(
+			array_unique(
+				array_filter(
+					$bsh_rows,
+					function ( $id ) use ( $bsh_names ) {
+						return isset( $bsh_names[ $id ] );
+					}
+				)
+			)
+		);
+		?>
 	<section class="bsh-section">
 		<div class="bsh-section__head">
 			<h2 class="bsh-card__title"><?php esc_html_e( 'قانون جدا برای دسته‌ها', 'basalamhub' ); ?></h2>
@@ -124,7 +139,19 @@ $bsh_mult    = BSH_Product_Mapper::rial_multiplier();
 		<template data-bsh-rule-template>
 			<tr data-term="__TERM__">
 				<td>__NAME__</td>
-				<td><?php $bsh_rule_fields( 'categories[__TERM__]', array( 'type' => 'percent', 'direction' => 'up', 'value' => 0 ), '' ); ?></td>
+				<td>
+				<?php
+				$bsh_rule_fields(
+					'categories[__TERM__]',
+					array(
+						'type'      => 'percent',
+						'direction' => 'up',
+						'value'     => 0,
+					),
+					''
+				);
+				?>
+					</td>
 				<td><button type="button" class="bsh-btn bsh-btn--ghost" data-bsh-rule-remove><?php esc_html_e( 'حذف', 'basalamhub' ); ?></button></td>
 			</tr>
 		</template>

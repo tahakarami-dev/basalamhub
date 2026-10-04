@@ -42,9 +42,15 @@ $bsh_connected = BSH_Settings::is_connected();
 <?php if ( $bsh_unmapped ) : ?>
 	<p class="bsh-alert bsh-alert--warning">
 		<?php
-		$bsh_names = implode( '، ', array_map( function ( $t ) {
-			return '«' . $t->name . '»';
-		}, array_slice( $bsh_unmapped, 0, 5 ) ) ) . ( count( $bsh_unmapped ) > 5 ? '، …' : '' );
+		$bsh_names = implode(
+			'، ',
+			array_map(
+				function ( $t ) {
+					return '«' . $t->name . '»';
+				},
+				array_slice( $bsh_unmapped, 0, 5 )
+			)
+		) . ( count( $bsh_unmapped ) > 5 ? '، …' : '' );
 		echo esc_html(
 			$bsh_default
 				/* translators: 1: count, 2: names */
