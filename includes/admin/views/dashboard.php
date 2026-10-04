@@ -66,7 +66,7 @@ $slh_level_icon = array( 'success' => 'dashicons-yes-alt', 'warning' => 'dashico
 	<section class="slh-card slh-section slh-onboard">
 		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'راه‌اندازی در چهار قدم', 'salamhub' ); ?></h2></div>
 		<ol class="slh-onboard__steps">
-			<li><strong><?php esc_html_e( 'توکن بساز', 'salamhub' ); ?></strong><span><?php esc_html_e( 'در پنل توسعه‌دهندگان باسلام، با دسترسی محصولات غرفه.', 'salamhub' ); ?></span></li>
+			<li><strong><?php esc_html_e( 'توکن بساز', 'salamhub' ); ?></strong><span><?php esc_html_e( 'در پنل توسعه‌دهندگان باسلام، با دسترسی محصولات و سفارش‌های غرفه.', 'salamhub' ); ?></span></li>
 			<li><strong><?php esc_html_e( 'وصل شو', 'salamhub' ); ?></strong><span><?php esc_html_e( 'توکن را در تنظیمات بچسبان و تست اتصال بزن.', 'salamhub' ); ?></span></li>
 			<li><strong><?php esc_html_e( 'دسته‌ها را نگاشت کن', 'salamhub' ); ?></strong><span><?php esc_html_e( 'برای هر دسته‌ی ووکامرس، دسته‌ی باسلام.', 'salamhub' ); ?></span></li>
 			<li><strong><?php esc_html_e( 'بفرست', 'salamhub' ); ?></strong><span><?php esc_html_e( 'اول یک محصول، بعد بقیه با ارسال گروهی.', 'salamhub' ); ?></span></li>
@@ -107,11 +107,23 @@ $slh_level_icon = array( 'success' => 'dashicons-yes-alt', 'warning' => 'dashico
 			<?php endif; ?>
 		</span>
 	</a>
-	<div class="slh-tile slh-tile--muted">
+	<?php $slh_missing = SLH_Order_Sync::missing_count(); ?>
+	<a class="slh-tile<?php echo $slh_missing ? ' slh-tile--alert' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=salamhub-orders' ) ); ?>" data-slh-nav>
 		<span class="slh-tile__label"><?php esc_html_e( 'سفارش جاافتاده', 'salamhub' ); ?></span>
-		<span class="slh-tile__value">—</span>
-		<span class="slh-tile__meta"><?php esc_html_e( 'با فعال‌شدن همگام‌سازی سفارش‌ها', 'salamhub' ); ?></span>
-	</div>
+		<span class="slh-tile__value"><?php echo SLH_Order_Sync::enabled() ? esc_html( slh_fa_number( $slh_missing ) ) : '—'; ?></span>
+		<span class="slh-tile__meta">
+			<?php
+			if ( ! SLH_Order_Sync::enabled() ) {
+				esc_html_e( 'دریافت سفارش‌ها خاموش است', 'salamhub' );
+			} elseif ( $slh_missing ) {
+				echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'در ووکامرس ثبت نشده‌اند', 'salamhub' );
+			} else {
+				/* translators: %s: count */
+				echo '<span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>' . esc_html( sprintf( __( '%s سفارش باسلام در سایت', 'salamhub' ), slh_fa_number( SLH_Order_Sync::imported_count() ) ) );
+			}
+			?>
+		</span>
+	</a>
 </section>
 
 <div class="slh-grid slh-section">

@@ -196,4 +196,56 @@ if ( preg_match( '#^/v1/products/(\d+)$#', $path, $m ) ) {
 	out( 200, $state['products'][ $id ], $state, $state_file );
 }
 
+// Orders (vendor parcels). Tests put full ParcelResponse records into $state['parcels'].
+if ( 'GET' === $method && '/v1/vendor-parcels' === $path ) {
+	parse_str( $_SERVER['QUERY_STRING'] ?? '', $q );
+	$list = array_values( $state['parcels'] ?? array() );
+	usort( $list, function ( $a, $b ) {
+		return strcmp( $b['created_at'], $a['created_at'] ) ?: $b['id'] - $a['id'];
+	} );
+	if ( ! empty( $q['ids'] ) ) {
+		$ids  = array_map( 'intval', explode( ',', $q['ids'] ) );
+		$list = array_values( array_filter( $list, function ( $p ) use ( $ids ) { return in_array( (int) $p['id'], $ids, true ); } ) );
+	}
+	if ( ! empty( $q['statuses'] ) ) {
+		$st   = array_map( 'intval', explode( ',', $q['statuses'] ) );
+		$list = array_values( array_filter( $list, function ( $p ) use ( $st ) { return in_array( (int) $p['status']['id'], $st, true ); } ) );
+	}
+	$per    = max( 1, (int) ( $q['per_page'] ?? 30 ) );
+	$offset = isset( $q['cursor'] ) ? (int) base64_decode( $q['cursor'] ) : 0;
+	$page   = array_slice( $list, $offset, $per );
+	$next   = $offset + $per < count( $list ) ? base64_encode( (string) ( $offset + $per ) ) : null;
+	out( 200, array( 'data' => $page, 'next_cursor' => $next, 'previous_cursor' => null ), $state, $state_file );
+}
+
+if ( preg_match( '#^/v1/vendor-parcels/(\d+)(/set-preparation|/set-posted)?$#', $path, $m ) ) {
+	$id = (int) $m[1];
+	if ( ! isset( $state['parcels'][ $id ] ) ) {
+		out( 404, array( 'detail' => 'Parcel not found' ), $state, $state_file );
+	}
+	$status = (int) $state['parcels'][ $id ]['status']['id'];
+	$action = $m[2] ?? '';
+	if ( '/set-preparation' === $action ) {
+		if ( 3739 !== $status ) {
+			out( 422, array( 'message' => array( array( 'message' => 'وضعیت سفارش اجازه‌ی این تغییر را نمی‌دهد' ) ) ), $state, $state_file );
+		}
+		$state['parcels'][ $id ]['status'] = array( 'id' => 3237, 'title' => 'در حال آماده سازی' );
+		out( 200, array( 'id' => $id ), $state, $state_file );
+	}
+	if ( '/set-posted' === $action ) {
+		if ( empty( $body['shipping_method'] ) ) {
+			out( 422, array( 'message' => array( array( 'fields' => array( 'shipping_method' ), 'message' => 'field required' ) ) ), $state, $state_file );
+		}
+		if ( ! in_array( $status, array( 3739, 3237, 5017 ), true ) ) {
+			out( 422, array( 'message' => array( array( 'message' => 'وضعیت سفارش اجازه‌ی این تغییر را نمی‌دهد' ) ) ), $state, $state_file );
+		}
+		$state['parcels'][ $id ]['status']       = array( 'id' => 3238, 'title' => 'ارسال شده' );
+		$state['parcels'][ $id ]['post_receipt'] = array( 'tracking_code' => $body['tracking_code'] ?? null, 'shipping_method' => $body['shipping_method'] );
+		out( 200, array( 'id' => $id ), $state, $state_file );
+	}
+	if ( 'GET' === $method ) {
+		out( 200, $state['parcels'][ $id ], $state, $state_file );
+	}
+}
+
 out( 404, array( 'detail' => 'mock: unknown route ' . $route_key ), $state, $state_file );

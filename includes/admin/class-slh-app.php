@@ -48,6 +48,7 @@ class SLH_App {
 		return array(
 			'salamhub'            => array( __( 'داشبورد', 'salamhub' ), 'dashicons-chart-area', 'store' ),
 			'salamhub-products'   => array( __( 'محصولات', 'salamhub' ), 'dashicons-products', 'store' ),
+			'salamhub-orders'     => array( __( 'سفارش‌ها', 'salamhub' ), 'dashicons-cart', 'store' ),
 			'salamhub-bulk'       => array( __( 'ارسال گروهی', 'salamhub' ), 'dashicons-upload', 'sync' ),
 			'salamhub-link'       => array( __( 'اتصال محصولات غرفه', 'salamhub' ), 'dashicons-admin-links', 'sync' ),
 			'salamhub-categories' => array( __( 'نگاشت دسته‌ها', 'salamhub' ), 'dashicons-category', 'sync' ),
@@ -162,7 +163,9 @@ class SLH_App {
 					continue;
 				}
 				$badge = '';
-				if ( 'salamhub-logs' === $slug && $errors ) {
+				if ( 'salamhub-orders' === $slug && SLH_Order_Sync::missing_count() ) {
+					$badge = '<span class="slh-app__badge slh-app__badge--alert">' . esc_html( slh_fa_digits( SLH_Order_Sync::missing_count() ) ) . '</span>';
+				} elseif ( 'salamhub-logs' === $slug && $errors ) {
 					$badge = '<span class="slh-app__badge slh-app__badge--alert">' . esc_html( slh_fa_digits( $errors ) ) . '</span>';
 				} elseif ( 'salamhub-link' === $slug && SLH_Linker::is_running() ) {
 					$badge = '<span class="slh-app__badge">…</span>';

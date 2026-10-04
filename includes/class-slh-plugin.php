@@ -32,6 +32,8 @@ class SLH_Plugin {
 		SLH_Linker::init();
 		SLH_Categories::init();
 		SLH_Price_Rules::init();
+		SLH_Inventory::init();
+		SLH_Order_Sync::init();
 
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_update_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
@@ -47,6 +49,7 @@ class SLH_Plugin {
 			SLH_Admin_Tools::init();
 			SLH_App::init();
 			SLH_Product_UI::init();
+			SLH_Order_UI::init();
 		}
 	}
 

@@ -143,7 +143,7 @@ class SLH_Product_Sync {
 		}
 
 		$is_create = ! $basalam_id;
-		$groups    = (array) SLH_Settings::get( 'sync_fields', array() );
+		$groups    = SLH_Inventory::push_groups();
 
 		if ( $is_create || in_array( 'images', $groups, true ) ) {
 			$file_ids = ( new SLH_Image_Sync( $this->api ) )->ensure_uploaded( $mapped['image_ids'] );

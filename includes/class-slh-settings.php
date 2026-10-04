@@ -51,6 +51,13 @@ class SLH_Settings {
 			'price_unit'           => 'auto',
 			'create_status'        => self::BASALAM_STATUS_PUBLISHED,
 			'log_retention_days'   => 30,
+			// Phase 4: orders and stock.
+			'orders_enabled'       => 1,
+			'orders_interval'      => 5,
+			'orders_import_days'   => 3,
+			'orders_auto_confirm'  => 0,
+			'stock_reference'      => 'site',
+			'safety_stock'         => 0,
 		);
 	}
 
@@ -89,6 +96,11 @@ class SLH_Settings {
 		$clean['auto_update']   = empty( $input['auto_update'] ) ? 0 : 1;
 		$clean['auto_send_new'] = empty( $input['auto_send_new'] ) ? 0 : 1;
 
+		$clean['orders_enabled']      = empty( $input['orders_enabled'] ) ? 0 : 1;
+		$clean['orders_auto_confirm'] = empty( $input['orders_auto_confirm'] ) ? 0 : 1;
+		$reference                    = isset( $input['stock_reference'] ) ? sanitize_key( $input['stock_reference'] ) : 'site';
+		$clean['stock_reference']     = in_array( $reference, array( 'site', 'basalam' ), true ) ? $reference : 'site';
+
 		$cat = isset( $input['default_category_id'] ) ? trim( (string) $input['default_category_id'] ) : '';
 		if ( '' !== $cat && ! ctype_digit( $cat ) ) {
 			$errors['default_category_id'] = __( 'شناسه‌ی دسته فقط عدد است؛ مثلاً 1287.', 'salamhub' );
@@ -102,6 +114,9 @@ class SLH_Settings {
 			'packaging_weight' => array( 0, 100000, __( 'وزن بسته‌بندی باید صفر یا بیشتر باشد.', 'salamhub' ) ),
 			'unmanaged_stock'  => array( 0, 100000, __( 'موجودی پیش‌فرض باید صفر یا بیشتر باشد.', 'salamhub' ) ),
 			'log_retention_days' => array( 7, 365, __( 'نگهداری لاگ باید بین ۷ تا ۳۶۵ روز باشد.', 'salamhub' ) ),
+			'orders_interval'    => array( 2, 60, __( 'فاصله‌ی دریافت سفارش باید بین ۲ تا ۶۰ دقیقه باشد.', 'salamhub' ) ),
+			'orders_import_days' => array( 0, 30, __( 'سفارش‌های گذشته را بین ۰ تا ۳۰ روز می‌شود وارد کرد.', 'salamhub' ) ),
+			'safety_stock'       => array( 0, 100000, __( 'موجودی اطمینان باید صفر یا بیشتر باشد.', 'salamhub' ) ),
 		) as $key => $rule ) {
 			$raw = isset( $input[ $key ] ) ? trim( (string) $input[ $key ] ) : '';
 			$raw = strtr( $raw, array( '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4', '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9' ) );
@@ -119,6 +134,10 @@ class SLH_Settings {
 		$clean['create_status'] = in_array( $status, array( self::BASALAM_STATUS_PUBLISHED, self::BASALAM_STATUS_UNPUBLISHED ), true ) ? $status : self::BASALAM_STATUS_PUBLISHED;
 
 		update_option( self::OPTION, $clean, false );
+		if ( function_exists( 'as_next_scheduled_action' ) ) {
+			SLH_Order_Sync::reschedule();
+			SLH_Inventory::schedule();
+		}
 		return $errors;
 	}
 

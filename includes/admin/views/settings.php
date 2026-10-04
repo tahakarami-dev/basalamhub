@@ -73,7 +73,7 @@ $slh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_
 			<input class="slh-field__input slh-field__ltr" type="password" name="slh_token" autocomplete="off" spellcheck="false"
 				placeholder="<?php echo esc_attr( $slh_token ? SLH_Crypto::mask( $slh_token ) : '' ); ?>">
 			<span class="slh-field__hint">
-				<?php esc_html_e( 'از پنل توسعه‌دهندگان باسلام › توکن‌ها، یک توکن شخصی با دسترسی «محصولات غرفه» بساز. رمزنگاری‌شده ذخیره می‌شود و دیگر کامل نمایش داده نمی‌شود.', 'salamhub' ); ?>
+				<?php esc_html_e( 'از پنل توسعه‌دهندگان باسلام › توکن‌ها، یک توکن شخصی با دسترسی «محصولات غرفه» و «سفارش‌های غرفه» بساز. رمزنگاری‌شده ذخیره می‌شود و دیگر کامل نمایش داده نمی‌شود.', 'salamhub' ); ?>
 				<a href="https://developers.basalam.com/panel/tokens" target="_blank" rel="noopener"><?php esc_html_e( 'رفتن به پنل', 'salamhub' ); ?></a>
 			</span>
 		</label>
@@ -160,6 +160,50 @@ $slh_currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_
 				<?php $slh_hint( 'unmanaged_stock', __( 'باسلام عدد موجودی می‌خواهد. عدد کم امن‌تر است: جلوی فروش کالای ناموجود را می‌گیرد.', 'salamhub' ) ); ?>
 			</label>
 		</div>
+	</section>
+
+	<section class="slh-card slh-section" id="slh-orders-settings">
+		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'سفارش‌های باسلام', 'salamhub' ); ?></h2></div>
+		<label class="slh-checkbox">
+			<input type="checkbox" name="orders_enabled" value="1" <?php checked( (int) $slh_s['orders_enabled'], 1 ); ?>>
+			<?php esc_html_e( 'سفارش‌های باسلام خودکار در ووکامرس ثبت شوند', 'salamhub' ); ?>
+		</label>
+		<label class="slh-checkbox">
+			<input type="checkbox" name="orders_auto_confirm" value="1" <?php checked( (int) $slh_s['orders_auto_confirm'], 1 ); ?>>
+			<?php esc_html_e( 'سفارش جدید بلافاصله در باسلام «تأیید» شود (وضعیت: در حال آماده‌سازی)', 'salamhub' ); ?>
+		</label>
+		<div class="slh-form-grid">
+			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'orders_interval' ) ); ?>">
+				<span class="slh-field__label"><?php esc_html_e( 'بررسی سفارش‌ها هر چند دقیقه', 'salamhub' ); ?></span>
+				<input class="slh-field__input" type="number" min="2" max="60" name="orders_interval" value="<?php echo esc_attr( $slh_val( 'orders_interval' ) ); ?>">
+				<?php $slh_hint( 'orders_interval', __( 'هر بار سفارش‌های تازه و تغییر وضعیت سفارش‌های باز خوانده می‌شود. ۵ دقیقه برای بیشتر فروشگاه‌ها مناسب است.', 'salamhub' ) ); ?>
+			</label>
+			<label class="slh-field<?php echo esc_attr( $slh_err_class( 'orders_import_days' ) ); ?>">
+				<span class="slh-field__label"><?php esc_html_e( 'سفارش‌های چند روز گذشته وارد شوند', 'salamhub' ); ?></span>
+				<input class="slh-field__input" type="number" min="0" max="30" name="orders_import_days" value="<?php echo esc_attr( $slh_val( 'orders_import_days' ) ); ?>">
+				<?php $slh_hint( 'orders_import_days', __( 'فقط در اولین دریافت اعمال می‌شود. صفر یعنی فقط سفارش‌هایی که از این به بعد می‌آیند.', 'salamhub' ) ); ?>
+			</label>
+		</div>
+	</section>
+
+	<section class="slh-card slh-section" id="slh-stock-settings">
+		<div class="slh-card__head"><h2 class="slh-card__title"><?php esc_html_e( 'موجودی دوطرفه', 'salamhub' ); ?></h2></div>
+		<fieldset class="slh-fieldset">
+			<legend class="slh-field__label"><?php esc_html_e( 'مرجع موجودی', 'salamhub' ); ?></legend>
+			<label class="slh-radio">
+				<input type="radio" name="stock_reference" value="site" <?php checked( $slh_s['stock_reference'], 'site' ); ?>>
+				<span><strong><?php esc_html_e( 'سایت (پیشنهادی)', 'salamhub' ); ?></strong> — <?php esc_html_e( 'موجودی را در ووکامرس مدیریت می‌کنی. هر فروش در سایت یا باسلام از موجودی سایت کم می‌شود و عدد جدید به باسلام می‌رود.', 'salamhub' ); ?></span>
+			</label>
+			<label class="slh-radio">
+				<input type="radio" name="stock_reference" value="basalam" <?php checked( $slh_s['stock_reference'], 'basalam' ); ?>>
+				<span><strong><?php esc_html_e( 'باسلام', 'salamhub' ); ?></strong> — <?php esc_html_e( 'موجودی را در پنل باسلام مدیریت می‌کنی. هر ساعت موجودی باسلام در سایت نوشته می‌شود و فروش سایت از موجودی باسلام کم می‌شود.', 'salamhub' ); ?></span>
+			</label>
+		</fieldset>
+		<label class="slh-field<?php echo esc_attr( $slh_err_class( 'safety_stock' ) ); ?>">
+			<span class="slh-field__label"><?php esc_html_e( 'موجودی اطمینان', 'salamhub' ); ?></span>
+			<input class="slh-field__input" type="number" min="0" name="safety_stock" value="<?php echo esc_attr( $slh_val( 'safety_stock' ) ); ?>">
+			<?php $slh_hint( 'safety_stock', __( 'این تعداد از هر کالا در باسلام نمایش داده نمی‌شود تا اگر هم‌زمان در سایت و باسلام فروش رفت، بیش‌فروشی نشود. مثلاً موجودی ۱۰ و اطمینان ۲ یعنی باسلام ۸ می‌بیند. برای هر محصول جدا هم در تب «انبار» محصول قابل تغییر است.', 'salamhub' ) ); ?>
+		</label>
 	</section>
 
 	<section class="slh-card slh-section">

@@ -190,6 +190,7 @@ body.slh-app-screen #wpbody-content > .update-nag { display: none; }
 .slh-tile--alert { border-color: color-mix(in srgb, var(--danger) 45%, var(--line)); }
 .slh-tile:not(.slh-tile--alert) .slh-tile__meta .dashicons-yes-alt { color: var(--success); }
 .slh-tile--muted .slh-tile__value { color: var(--ink-muted); }
+.slh-tile__value--sm { font-size: 20px; line-height: 44px; }
 .slh-meter { display: block; height: 6px; margin-top: 6px; border-radius: var(--radius-pill); background: var(--brand-tint); overflow: hidden; }
 .slh-meter > span { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--brand); }
 

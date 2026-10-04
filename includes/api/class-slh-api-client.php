@@ -253,6 +253,66 @@ class SLH_Api_Client {
 	}
 
 	/**
+	 * GET /v1/vendor-parcels — the seller's orders (parcels), newest first, cursor-paginated.
+	 *
+	 * @param array $args cursor, per_page, ids (int[]), statuses (int[]).
+	 * @return array{data: array[], next_cursor: string|null}
+	 */
+	public function vendor_parcels( array $args = array() ) {
+		$query = array( 'per_page' => isset( $args['per_page'] ) ? (int) $args['per_page'] : 30 );
+		if ( ! empty( $args['cursor'] ) ) {
+			$query['cursor'] = (string) $args['cursor'];
+		}
+		if ( ! empty( $args['ids'] ) ) {
+			$query['ids'] = implode( ',', array_map( 'intval', (array) $args['ids'] ) );
+		}
+		if ( ! empty( $args['statuses'] ) ) {
+			$query['statuses'] = implode( ',', array_map( 'intval', (array) $args['statuses'] ) );
+		}
+		$res = $this->request( 'GET', '/v1/vendor-parcels', null, $query );
+		return array(
+			'data'        => isset( $res['data'] ) && is_array( $res['data'] ) ? $res['data'] : array(),
+			'next_cursor' => isset( $res['next_cursor'] ) && '' !== (string) $res['next_cursor'] ? (string) $res['next_cursor'] : null,
+		);
+	}
+
+	/**
+	 * GET /v1/vendor-parcels/{parcel_id} — full order details (address, items, shipping cost).
+	 *
+	 * @param int $parcel_id Parcel.
+	 * @return array
+	 */
+	public function get_parcel( $parcel_id ) {
+		return $this->request( 'GET', '/v1/vendor-parcels/' . (int) $parcel_id );
+	}
+
+	/**
+	 * POST /v1/vendor-parcels/{parcel_id}/set-preparation — "تأیید سفارش".
+	 *
+	 * @param int $parcel_id Parcel.
+	 * @return array
+	 */
+	public function set_parcel_preparation( $parcel_id ) {
+		return $this->request( 'POST', '/v1/vendor-parcels/' . (int) $parcel_id . '/set-preparation', new stdClass() );
+	}
+
+	/**
+	 * POST /v1/vendor-parcels/{parcel_id}/set-posted — "تأیید ارسال" with the courier and tracking code.
+	 *
+	 * @param int    $parcel_id       Parcel.
+	 * @param int    $shipping_method Basalam shipping method code.
+	 * @param string $tracking_code   Tracking code.
+	 * @return array
+	 */
+	public function set_parcel_posted( $parcel_id, $shipping_method, $tracking_code ) {
+		$body = array( 'shipping_method' => (int) $shipping_method );
+		if ( '' !== (string) $tracking_code ) {
+			$body['tracking_code'] = (string) $tracking_code;
+		}
+		return $this->request( 'POST', '/v1/vendor-parcels/' . (int) $parcel_id . '/set-posted', $body );
+	}
+
+	/**
 	 * POST /v1/files (multipart) — uploads a product photo, returns the file record with `id`.
 	 *
 	 * @param string $path      Local file path.
