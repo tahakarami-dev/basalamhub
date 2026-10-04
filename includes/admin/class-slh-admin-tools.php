@@ -36,29 +36,25 @@ class SLH_Admin_Tools {
 
 	/**
 	 * @param string $view View.
+	 * @param string $slug Page slug.
 	 */
-	private static function render( $view ) {
-		if ( ! current_user_can( SLH_Admin::CAP ) ) {
-			wp_die( esc_html__( 'دسترسی کافی نداری.', 'salamhub' ) );
-		}
-		echo '<div class="wrap slh-wrap"><div class="slh-root">';
-		include SLH_DIR . 'includes/admin/views/' . $view . '.php';
-		echo '</div></div>';
+	private static function render( $view, $slug ) {
+		SLH_App::render( $view, $slug );
 	}
 
 	/** Bulk page. */
 	public static function page_bulk() {
-		self::render( 'bulk' );
+		self::render( 'bulk', 'salamhub-bulk' );
 	}
 
 	/** Category mapping page. */
 	public static function page_categories() {
-		self::render( 'categories' );
+		self::render( 'categories', 'salamhub-categories' );
 	}
 
 	/** Price rules page. */
 	public static function page_pricing() {
-		self::render( 'pricing' );
+		self::render( 'pricing', 'salamhub-pricing' );
 	}
 
 	/**

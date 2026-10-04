@@ -39,6 +39,7 @@ class SLH_Plugin {
 		if ( is_admin() ) {
 			SLH_Admin::init();
 			SLH_Admin_Tools::init();
+			SLH_App::init();
 			SLH_Product_UI::init();
 		}
 	}
