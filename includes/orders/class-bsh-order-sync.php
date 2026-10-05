@@ -658,7 +658,7 @@ class BSH_Order_Sync {
 		$open = array();
 		foreach ( (array) $rows as $r ) {
 			$order = wc_get_order( (int) $r->wc_id );
-			if ( ! $order ) {
+			if ( ! $order || BSH_Demo::is_demo( $order ) ) {
 				continue;
 			}
 			$st = (int) $order->get_meta( '_bsh_parcel_status' );
@@ -898,7 +898,7 @@ class BSH_Order_Sync {
 	 * @param WC_Order $order    Order.
 	 */
 	public static function on_wc_status_changed( $order_id, $from, $to, $order ) {
-		if ( BSH_Plugin::$suspend_hooks || ! $order instanceof WC_Order ) {
+		if ( BSH_Plugin::$suspend_hooks || ! $order instanceof WC_Order || BSH_Demo::is_demo( $order ) ) {
 			return;
 		}
 		$parcel_id = (int) $order->get_meta( self::META_PARCEL );

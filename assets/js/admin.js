@@ -225,6 +225,100 @@
 	}
 
 	/* ------------------------------------------------------------------
+	 * Live: a toast when a Basalam order arrives while the panel is open
+	 * ---------------------------------------------------------------- */
+
+	var liveSince = 0;
+	var livePrimed = false;
+	var liveBusy = false;
+	var toasts = null;
+
+	function toastStack() {
+		if ( ! toasts ) {
+			toasts = document.createElement( 'div' );
+			toasts.className = 'bsh-toasts';
+			toasts.setAttribute( 'aria-live', 'polite' );
+			toasts.setAttribute( 'role', 'status' );
+			( app || document.body ).appendChild( toasts );
+		}
+		return toasts;
+	}
+
+	function showToast( item ) {
+		var el = document.createElement( 'div' );
+		el.className = 'bsh-toast';
+		var icon = document.createElement( 'span' );
+		icon.className = 'bsh-toast__icon';
+		icon.setAttribute( 'aria-hidden', 'true' );
+		icon.innerHTML = cfg.bagIcon || '';
+		var body = document.createElement( 'div' );
+		body.className = 'bsh-toast__body';
+		var title = document.createElement( 'strong' );
+		title.textContent = ( t.liveTitle || '%s' ).replace( '%s', item.number );
+		var meta = document.createElement( 'span' );
+		meta.textContent = [ item.total, ( t.liveItems || '%s' ).replace( '%s', item.items ), item.city ].filter( Boolean ).join( ' · ' );
+		body.appendChild( title );
+		body.appendChild( meta );
+		var view = document.createElement( 'a' );
+		view.className = 'bsh-toast__link';
+		view.href = item.url;
+		view.textContent = t.liveView;
+		var close = document.createElement( 'button' );
+		close.type = 'button';
+		close.className = 'bsh-toast__close';
+		close.setAttribute( 'aria-label', t.close );
+		close.textContent = '×';
+		var remove = function () {
+			el.classList.add( 'is-leaving' );
+			window.setTimeout( function () {
+				el.remove();
+			}, 250 );
+		};
+		close.addEventListener( 'click', remove );
+		el.appendChild( icon );
+		el.appendChild( body );
+		el.appendChild( view );
+		el.appendChild( close );
+		toastStack().appendChild( el );
+		window.setTimeout( remove, 9000 );
+	}
+
+	function livePoll() {
+		if ( liveBusy || document.hidden ) {
+			return;
+		}
+		liveBusy = true;
+		post( 'bsh_live', livePrimed ? { since: liveSince, primed: 1 } : {} ).then( function ( res ) {
+			liveBusy = false;
+			if ( ! res.success ) {
+				return;
+			}
+			var d = res.data || {};
+			var fresh = d.items && d.items.length;
+			( d.items || [] ).forEach( showToast );
+			liveSince = Math.max( liveSince, d.latest || 0 );
+			livePrimed = true;
+			if ( fresh && app ) {
+				var content = app.querySelector( '[data-bsh-content]' );
+				var page = content ? content.getAttribute( 'data-page' ) : '';
+				if ( [ 'basalamhub', 'basalamhub-sales', 'basalamhub-orders' ].indexOf( page ) !== -1 ) {
+					reloadContent(); // Fresh numbers behind the toast.
+				}
+			}
+		} );
+	}
+
+	if ( app && t.live ) {
+		livePoll(); // Sets the starting point; old orders never pop up.
+		window.setInterval( livePoll, 15000 );
+		document.addEventListener( 'visibilitychange', function () {
+			if ( ! document.hidden ) {
+				livePoll();
+			}
+		} );
+	}
+
+	/* ------------------------------------------------------------------
 	 * Delegated actions (bound once)
 	 * ---------------------------------------------------------------- */
 
@@ -326,6 +420,30 @@
 						test.disabled = false;
 					}
 				}
+			} );
+			return;
+		}
+
+		// Demo mode: fill, clear, simulate a Basalam order.
+		if ( ( btn = closest( e, '[data-bsh-demo]' ) ) ) {
+			var mode = btn.getAttribute( 'data-bsh-demo' );
+			if ( 'clear' === mode && ! window.confirm( t.confirmDemoClear ) ) {
+				return;
+			}
+			busy( btn, 'order' === mode ? t.loading : ( 'clear' === mode ? t.demoClearing : t.demoFilling ) );
+			post( 'bsh_demo_' + mode ).then( function ( res ) {
+				var d = res.data || {};
+				if ( ! res.success ) {
+					idle( btn );
+					window.alert( d.message || t.networkError );
+					return;
+				}
+				if ( 'order' === mode ) {
+					idle( btn );
+					livePoll(); // Show the toast right away instead of on the next tick.
+					return;
+				}
+				window.location.reload(); // The banner and the menu change too.
 			} );
 			return;
 		}

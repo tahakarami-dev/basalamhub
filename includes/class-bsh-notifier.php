@@ -17,6 +17,13 @@ class BSH_Notifier {
 	const OPTION = 'bsh_notify';
 	const HOOK   = 'bsh_notify_send';
 
+	/**
+	 * Set while demo data is seeded or removed, so no message goes out for it.
+	 *
+	 * @var bool
+	 */
+	public static $muted = false;
+
 	/** Errors per hour before further error alerts are held back (no flood). */
 	const ERROR_CAP = 10;
 
@@ -181,7 +188,7 @@ class BSH_Notifier {
 	 */
 	public static function on_logged( $id, $level, $entry ) {
 		$event = isset( $entry['event'] ) ? (string) $entry['event'] : '';
-		if ( 0 === strpos( $event, 'notify_' ) || ! self::active_channels() ) {
+		if ( self::$muted || 0 === strpos( $event, 'notify_' ) || ! self::active_channels() ) {
 			return; // Never alert about alerts.
 		}
 		$events = self::settings()['events'];

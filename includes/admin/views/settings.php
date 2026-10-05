@@ -250,3 +250,21 @@ $bsh_currency  = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce
 		</div>
 	</section>
 </form>
+
+<section class="bsh-card bsh-section bsh-demo-card" id="bsh-demo">
+	<div>
+		<h2 class="bsh-card__title"><?php BSH_Icons::e( 'image', 20 ); ?><?php esc_html_e( 'حالت نمایشی', 'basalamhub' ); ?></h2>
+		<p class="bsh-card__meta">
+			<?php
+			echo BSH_Demo::active()
+				? esc_html__( 'روشن است. داده‌ی نمایشی فقط با نشانه‌ی خودش پاک می‌شود و به محصولات و سفارش‌های واقعی دست نمی‌زند.', 'basalamhub' )
+				: esc_html__( 'برای معرفی افزونه به مشتری یا تیم: چند محصول و یک ماه سفارش نمونه ساخته می‌شود. چیزی به باسلام فرستاده نمی‌شود و با یک کلیک پاک می‌شود.', 'basalamhub' );
+			?>
+		</p>
+	</div>
+	<?php if ( BSH_Demo::active() ) : ?>
+		<button type="button" class="bsh-btn bsh-btn--ghost" data-bsh-demo="clear"><?php esc_html_e( 'پاک کردن داده‌ی نمایشی', 'basalamhub' ); ?></button>
+	<?php else : ?>
+		<button type="button" class="bsh-btn" data-bsh-demo="fill"><?php esc_html_e( 'روشن کردن حالت نمایشی', 'basalamhub' ); ?></button>
+	<?php endif; ?>
+</section>

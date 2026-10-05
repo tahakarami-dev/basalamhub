@@ -104,8 +104,8 @@ class BSH_Queue {
 	 */
 	public static function enqueue_product( $product_id, $force = false, $batch_id = null ) {
 		$product_id = (int) $product_id;
-		if ( ! self::available() || $product_id <= 0 ) {
-			return false;
+		if ( ! self::available() || $product_id <= 0 || BSH_Demo::is_demo( $product_id ) ) {
+			return false; // Demo products never go to Basalam.
 		}
 		if ( $force ) {
 			set_transient( 'bsh_force_product_' . $product_id, 1, DAY_IN_SECONDS );
@@ -150,6 +150,9 @@ class BSH_Queue {
 	 * @param int $product_id Product ID.
 	 */
 	public static function handle_product( $product_id ) {
+		if ( BSH_Demo::is_demo( (int) $product_id ) ) {
+			return;
+		}
 		self::run_exclusive(
 			self::HOOK_PRODUCT,
 			array( 'product_id' => (int) $product_id ),

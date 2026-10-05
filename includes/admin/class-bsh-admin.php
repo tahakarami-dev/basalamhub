@@ -82,6 +82,7 @@ class BSH_Admin {
 			'BasalamHub',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'bagIcon' => BSH_Icons::svg( 'bag', 20 ),
 				'nonce'   => wp_create_nonce( 'bsh_admin' ),
 				'i18n'    => array(
 					'testing'           => __( 'در حال تست اتصال…', 'basalamhub' ),
@@ -108,6 +109,16 @@ class BSH_Admin {
 					'confirmBulk'       => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'basalamhub' ),
 					'confirmCancel'     => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'basalamhub' ),
 					'saving'            => __( 'در حال ثبت در باسلام…', 'basalamhub' ),
+					'demoFilling'       => __( 'در حال ساخت داده‌ی نمایشی…', 'basalamhub' ),
+					'demoClearing'      => __( 'در حال پاک کردن…', 'basalamhub' ),
+					'confirmDemoClear'  => __( 'همه‌ی محصولات و سفارش‌های نمایشی پاک شوند؟ داده‌ی واقعی دست نمی‌خورد.', 'basalamhub' ),
+					/* translators: %s: order number */
+					'liveTitle'         => __( 'سفارش جدید باسلام #%s', 'basalamhub' ),
+					/* translators: %s: item count */
+					'liveItems'         => __( '%s قلم', 'basalamhub' ),
+					'liveView'          => __( 'مشاهده', 'basalamhub' ),
+					'close'             => __( 'بستن', 'basalamhub' ),
+					'live'              => (bool) BSH_Settings::is_connected() || BSH_Demo::active(),
 					'confirmPosted'     => __( 'ارسال این سفارش در باسلام ثبت شود؟ بعد از ثبت، مشتری کد رهگیری را می‌بیند و این کار برگشت‌پذیر نیست.', 'basalamhub' ),
 					'copied'            => __( 'کپی شد.', 'basalamhub' ),
 					'sendingTest'       => __( 'در حال فرستادن…', 'basalamhub' ),
