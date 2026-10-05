@@ -72,6 +72,8 @@ class BSH_Notifier {
 				'new_order' => 1,
 				'errors'    => 1,
 				'reconcile' => 1,
+				'low_stock' => 1,
+				'weekly'    => 1,
 			)
 		);
 		return $s;
@@ -158,7 +160,7 @@ class BSH_Notifier {
 			}
 			$s[ $ch ]['enabled'] = empty( $in['enabled'] ) ? 0 : 1;
 		}
-		foreach ( array( 'new_order', 'errors', 'reconcile' ) as $ev ) {
+		foreach ( array( 'new_order', 'errors', 'reconcile', 'low_stock', 'weekly' ) as $ev ) {
 			$s['events'][ $ev ] = empty( $input['events'][ $ev ] ) ? 0 : 1;
 		}
 		update_option( self::OPTION, $s, false );
@@ -188,6 +190,11 @@ class BSH_Notifier {
 			$text = self::order_text( isset( $entry['object_id'] ) ? (int) $entry['object_id'] : 0 );
 		} elseif ( 'reconcile_missing' === $event && $events['reconcile'] ) {
 			$text = '🔁 ' . __( 'تطبیق شبانه‌ی باسلام‌هاب', 'basalamhub' ) . "\n" . $entry['message'] . "\n" . ( isset( $entry['reason'] ) ? $entry['reason'] : '' );
+		} elseif ( in_array( $event, array( 'stock_low', 'stock_out' ), true ) && $events['low_stock'] ) {
+			$text = ( 'stock_out' === $event ? '🚫 ' . __( 'تمام شد', 'basalamhub' ) : '📉 ' . __( 'موجودی رو به اتمام', 'basalamhub' ) ) . "\n" . ( isset( $entry['title'] ) ? $entry['title'] : '' ) . "\n" . ( isset( $entry['message'] ) ? $entry['message'] : '' );
+			if ( ! empty( $entry['object_id'] ) ) {
+				$text .= "\n" . get_edit_post_link( (int) $entry['object_id'], 'raw' );
+			}
 		} elseif ( 'error' === $level && $events['errors'] && self::error_allowed( $entry ) ) {
 			$text = '⚠️ ' . __( 'خطا در باسلام‌هاب', 'basalamhub' ) . "\n" . ( isset( $entry['title'] ) ? $entry['title'] : '' ) . "\n" . ( isset( $entry['message'] ) ? $entry['message'] : '' );
 			if ( ! empty( $entry['suggestion'] ) ) {
@@ -195,11 +202,22 @@ class BSH_Notifier {
 			}
 			$text .= "\n" . admin_url( 'admin.php?page=basalamhub-logs&level=error&unresolved=1' );
 		}
-		if ( '' === trim( $text ) ) {
-			return;
+		self::broadcast( $text );
+	}
+
+	/**
+	 * Queues a message to every active channel (sent from the background queue).
+	 *
+	 * @param string $text Text (the shop name is prefixed).
+	 * @return int Channels queued.
+	 */
+	public static function broadcast( $text ) {
+		if ( '' === trim( (string) $text ) ) {
+			return 0;
 		}
-		$text = self::site_prefix() . $text;
-		foreach ( self::active_channels() as $ch ) {
+		$text     = self::site_prefix() . $text;
+		$channels = self::active_channels();
+		foreach ( $channels as $ch ) {
 			as_enqueue_async_action(
 				self::HOOK,
 				array(
@@ -209,6 +227,7 @@ class BSH_Notifier {
 				BSH_Queue::GROUP
 			);
 		}
+		return count( $channels );
 	}
 
 	/**

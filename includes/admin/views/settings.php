@@ -204,6 +204,15 @@ $bsh_currency  = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce
 			<input class="bsh-field__input" type="number" min="0" name="safety_stock" value="<?php echo esc_attr( $bsh_val( 'safety_stock' ) ); ?>">
 			<?php $bsh_hint( 'safety_stock', __( 'این تعداد از هر کالا در باسلام نمایش داده نمی‌شود تا اگر هم‌زمان در سایت و باسلام فروش رفت، بیش‌فروشی نشود. مثلاً موجودی ۱۰ و اطمینان ۲ یعنی باسلام ۸ می‌بیند. برای هر محصول جدا هم در تب «انبار» محصول قابل تغییر است.', 'basalamhub' ) ); ?>
 		</label>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="low_stock_alert" value="1" <?php checked( (int) $bsh_s['low_stock_alert'], 1 ); ?>>
+			<?php esc_html_e( 'وقتی موجودی کالایی که در باسلام است کم شد یا تمام شد، هشدار بده (لاگ و بله/تلگرام)', 'basalamhub' ); ?>
+		</label>
+		<label class="bsh-field<?php echo esc_attr( $bsh_err_class( 'low_stock_threshold' ) ); ?>">
+			<span class="bsh-field__label"><?php esc_html_e( 'حد هشدار موجودی', 'basalamhub' ); ?></span>
+			<input class="bsh-field__input" type="number" min="0" name="low_stock_threshold" value="<?php echo esc_attr( $bsh_val( 'low_stock_threshold' ) ); ?>">
+			<?php $bsh_hint( 'low_stock_threshold', __( 'وقتی موجودی به این عدد یا کمتر برسد هشدار می‌آید، فقط یک بار برای هر بار کم‌شدن. اگر برای محصولی در ووکامرس «آستانه‌ی کمبود موجودی» جدا گذاشته‌ای، همان استفاده می‌شود.', 'basalamhub' ) ); ?>
+		</label>
 	</section>
 
 	<section class="bsh-card bsh-section">

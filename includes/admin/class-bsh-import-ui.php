@@ -20,6 +20,7 @@ class BSH_Import_UI {
 		add_action( 'wp_ajax_bsh_reconcile_now', array( __CLASS__, 'ajax_reconcile_now' ) );
 		add_action( 'wp_ajax_bsh_notify_test', array( __CLASS__, 'ajax_notify_test' ) );
 		add_action( 'wp_ajax_bsh_notify_find_chat', array( __CLASS__, 'ajax_notify_find_chat' ) );
+		add_action( 'wp_ajax_bsh_report_now', array( __CLASS__, 'ajax_report_now' ) );
 		add_action( 'admin_post_bsh_save_notify', array( __CLASS__, 'handle_save_notify' ) );
 	}
 
@@ -253,5 +254,22 @@ class BSH_Import_UI {
 			);
 		}
 		wp_send_json_error( array( 'message' => trim( $res['message'] . ' ' . $res['suggestion'] ) ) );
+	}
+
+	/**
+	 * «ساخت و ارسال الان» for the weekly report.
+	 */
+	public static function ajax_report_now() {
+		self::guard();
+		$r = BSH_Report::send( true );
+		wp_send_json_success(
+			array(
+				'text'    => $r['text'],
+				'message' => $r['channels']
+					/* translators: %s: count */
+					? sprintf( __( 'ساخته شد و در صف ارسال به %s پیام‌رسان قرار گرفت.', 'basalamhub' ), bsh_fa_number( $r['channels'] ) )
+					: __( 'ساخته شد. برای دریافتش در بله یا تلگرام، بالای همین صفحه یک پیام‌رسان را فعال کن.', 'basalamhub' ),
+			)
+		);
 	}
 }

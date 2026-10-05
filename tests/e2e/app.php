@@ -65,7 +65,7 @@ set_error_handler( function ( $no, $str, $file, $line ) use ( &$errors ) {
 } );
 foreach ( array_keys( BSH_App::pages() ) as $slug ) {
 	$_GET['page'] = $slug;
-	$views        = array( 'basalamhub' => 'dashboard', 'basalamhub-products' => 'products', 'basalamhub-orders' => 'orders', 'basalamhub-bulk' => 'bulk', 'basalamhub-link' => 'link', 'basalamhub-import' => 'import', 'basalamhub-categories' => 'categories', 'basalamhub-pricing' => 'pricing', 'basalamhub-logs' => 'logs', 'basalamhub-notify' => 'notify', 'basalamhub-settings' => 'settings' );
+	$views        = array( 'basalamhub' => 'dashboard', 'basalamhub-sales' => 'sales', 'basalamhub-products' => 'products', 'basalamhub-orders' => 'orders', 'basalamhub-bulk' => 'bulk', 'basalamhub-link' => 'link', 'basalamhub-import' => 'import', 'basalamhub-categories' => 'categories', 'basalamhub-pricing' => 'pricing', 'basalamhub-logs' => 'logs', 'basalamhub-notify' => 'notify', 'basalamhub-settings' => 'settings' );
 	ob_start();
 	BSH_App::render( $views[ $slug ], $slug );
 	$html = ob_get_clean();

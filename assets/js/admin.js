@@ -330,6 +330,22 @@
 			return;
 		}
 
+		// Notifications: weekly report now.
+		if ( ( btn = closest( e, '[data-bsh-report-now]' ) ) ) {
+			busy( btn, t.loading );
+			post( 'bsh_report_now' ).then( function ( res ) {
+				idle( btn );
+				var d = res.data || {};
+				var pre = document.querySelector( '[data-bsh-report-text]' );
+				if ( res.success && pre ) {
+					pre.textContent = d.text;
+					pre.hidden = false;
+				}
+				setMessage( document.querySelector( '[data-bsh-report-message]' ), d.message, res.success ? 'ok' : 'error' );
+			} );
+			return;
+		}
+
 		// Orders: nightly reconciliation now.
 		if ( ( btn = closest( e, '[data-bsh-reconcile]' ) ) ) {
 			busy( btn, t.starting );
@@ -614,7 +630,11 @@
 			var title = document.createElement( 'strong' );
 			title.textContent = col.getAttribute( 'data-label' );
 			tip.appendChild( title );
-			[ [ 'ok', t.chartOk ], [ 'err', t.chartErr ] ].forEach( function ( s ) {
+			var series = [ [ 'ok', t.chartOk ], [ 'err', t.chartErr ] ];
+			try {
+				series = JSON.parse( chart.getAttribute( 'data-series' ) ) || series;
+			} catch ( e ) {}
+			series.forEach( function ( s ) {
 				var line = document.createElement( 'span' );
 				var key = document.createElement( 'i' );
 				key.style.background = 'var(--chart-' + s[ 0 ] + ')';

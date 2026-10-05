@@ -193,9 +193,9 @@ class BSH_Linker {
 				self::set_state(
 					array(
 						'status' => 'matching',
-						'total'  => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::table() ),
+						'total'  => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::table() ), // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table name only.
 					)
-				); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+				);
 				as_enqueue_async_action(
 					self::HOOK_MATCH,
 					array(
