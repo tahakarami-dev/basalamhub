@@ -183,3 +183,27 @@ function bsh_t_variable( $name, array $colors = array( 'قرمز', 'آبی' ), a
 	BSH_Plugin::$suspend_hooks = false;
 	return wc_get_product( $id );
 }
+
+/** Calls an admin-ajax action and returns the decoded JSON. */
+function bsh_t_ajax( $action, array $post = array() ) {
+	$_POST    = $post;
+	$_REQUEST = array_merge( $post, array( 'nonce' => wp_create_nonce( 'bsh_admin' ) ) );
+	add_filter( 'wp_doing_ajax', '__return_true' );
+	$die = function () {
+		return function () {
+			throw new RuntimeException( 'die' );
+		};
+	};
+	add_filter( 'wp_die_ajax_handler', $die );
+	ob_start();
+	try {
+		do_action( 'wp_ajax_' . $action );
+	} catch ( RuntimeException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement
+	}
+	$out = ob_get_clean();
+	remove_filter( 'wp_die_ajax_handler', $die );
+	remove_filter( 'wp_doing_ajax', '__return_true' );
+	$_POST    = array();
+	$_REQUEST = array();
+	return json_decode( $out, true );
+}

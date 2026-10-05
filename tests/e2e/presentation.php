@@ -27,30 +27,6 @@ BSH_Admin::test_connection();
 $wpdb->query( "UPDATE {$wpdb->prefix}wc_orders SET status = 'wc-cancelled' WHERE type = 'shop_order'" ); // phpcs:ignore
 BSH_Sales::bust();
 
-/** Calls an admin-ajax action and returns the decoded JSON. */
-function bsh_t_ajax( $action, array $post = array() ) {
-	$_POST    = $post;
-	$_REQUEST = array_merge( $post, array( 'nonce' => wp_create_nonce( 'bsh_admin' ) ) );
-	add_filter( 'wp_doing_ajax', '__return_true' );
-	$die = function () {
-		return function () {
-			throw new RuntimeException( 'die' );
-		};
-	};
-	add_filter( 'wp_die_ajax_handler', $die );
-	ob_start();
-	try {
-		do_action( 'wp_ajax_' . $action );
-	} catch ( RuntimeException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement
-	}
-	$out = ob_get_clean();
-	remove_filter( 'wp_die_ajax_handler', $die );
-	remove_filter( 'wp_doing_ajax', '__return_true' );
-	$_POST    = array();
-	$_REQUEST = array();
-	return json_decode( $out, true );
-}
-
 echo "P1 Health score\n";
 update_option( BSH_Reconcile::OPTION, array( 'at' => gmdate( 'Y-m-d H:i:s' ), 'checked' => 3, 'missing' => 0, 'ids' => array(), 'error' => '' ), false );
 $s = BSH_Insights::score();
