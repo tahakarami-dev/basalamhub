@@ -20,7 +20,7 @@ $bsh_rules      = BSH_Price_Rules::is_active();
 		<p class="bsh-card__meta"><?php esc_html_e( 'محصولات غرفه‌ی باسلام با عکس، قیمت، موجودی، دسته و تنوع‌ها در سایت ساخته می‌شوند. اجرای دوباره هیچ محصولی را تکراری نمی‌سازد؛ فقط به‌روز می‌کند.', 'basalamhub' ); ?></p>
 	</div>
 	<button type="button" class="bsh-btn" data-bsh-link-start <?php disabled( ! BSH_Settings::is_connected() || $bsh_linking || $bsh_running ); ?>>
-		<span class="dashicons dashicons-update" aria-hidden="true"></span>
+		<?php BSH_Icons::e( 'refresh' ); ?>
 		<?php echo $bsh_preview['ready'] ? esc_html__( 'دریافت دوباره‌ی فهرست غرفه', 'basalamhub' ) : esc_html__( 'دریافت فهرست غرفه', 'basalamhub' ); ?>
 	</button>
 </header>
@@ -42,7 +42,7 @@ $bsh_rules      = BSH_Price_Rules::is_active();
 
 <?php if ( ! $bsh_preview['ready'] && ! $bsh_linking ) : ?>
 	<div class="bsh-card bsh-empty">
-		<span class="dashicons dashicons-download" aria-hidden="true"></span>
+		<?php BSH_Icons::e( 'download' ); ?>
 		<p><?php esc_html_e( 'اول «دریافت فهرست غرفه» را بزن. محصولات غرفه در پس‌زمینه خوانده و با محصولات سایت مقایسه می‌شوند؛ هنوز چیزی ساخته نمی‌شود.', 'basalamhub' ); ?></p>
 	</div>
 <?php elseif ( $bsh_preview['ready'] && ! $bsh_running ) : ?>

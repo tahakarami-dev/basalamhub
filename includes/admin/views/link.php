@@ -53,7 +53,7 @@ $bsh_wc_cell = function ( $wc_id ) {
 		<p class="bsh-card__meta"><?php esc_html_e( 'محصولاتی که از قبل در غرفه‌ی باسلام داری را به محصولات سایت وصل کن تا دوباره ساخته نشوند. اول پیش‌نمایش می‌بینی؛ تا تأیید نکنی چیزی متصل نمی‌شود.', 'basalamhub' ); ?></p>
 	</div>
 	<button type="button" class="bsh-btn<?php echo $bsh_any ? '' : ' bsh-btn--primary'; ?>" data-bsh-link-start <?php disabled( $bsh_running || ! BSH_Settings::is_connected() ); ?>>
-		<span class="dashicons dashicons-update" aria-hidden="true"></span>
+		<?php BSH_Icons::e( 'refresh' ); ?>
 		<?php echo $bsh_any ? esc_html__( 'دریافت و تطبیق دوباره', 'basalamhub' ) : esc_html__( 'دریافت محصولات غرفه و تطبیق', 'basalamhub' ); ?>
 	</button>
 </header>
@@ -69,7 +69,7 @@ $bsh_wc_cell = function ( $wc_id ) {
 
 <?php if ( ! $bsh_any && ! $bsh_running ) : ?>
 	<div class="bsh-card bsh-empty">
-		<span class="dashicons dashicons-admin-links" aria-hidden="true"></span>
+		<?php BSH_Icons::e( 'link' ); ?>
 		<p>
 			<?php
 			if ( 'ready' === $bsh_state['status'] ) {
@@ -153,7 +153,7 @@ $bsh_wc_cell = function ( $wc_id ) {
 								<?php if ( $bsh_row->photo ) : ?>
 									<img src="<?php echo esc_url( $bsh_row->photo ); ?>" alt="" loading="lazy" width="40" height="40">
 								<?php else : ?>
-									<span class="dashicons dashicons-format-image" aria-hidden="true"></span>
+									<?php BSH_Icons::e( 'image' ); ?>
 								<?php endif; ?>
 							</span>
 							<span>
@@ -181,7 +181,7 @@ $bsh_wc_cell = function ( $wc_id ) {
 							</span>
 						</div>
 					</td>
-					<td class="bsh-link-table__arrow" aria-hidden="true"><span class="dashicons dashicons-leftright"></span></td>
+					<td class="bsh-link-table__arrow" aria-hidden="true"><?php BSH_Icons::e( 'swap' ); ?></td>
 					<td>
 						<?php if ( 'suspect' === $bsh_tab && count( $bsh_cands ) > 1 ) : ?>
 							<select class="bsh-field__select" data-bsh-link-target aria-label="<?php esc_attr_e( 'محصول سایت', 'basalamhub' ); ?>">

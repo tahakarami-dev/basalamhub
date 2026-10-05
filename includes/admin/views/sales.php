@@ -117,7 +117,7 @@ $bsh_periods = array(
 	</div>
 	<?php if ( $bsh_total <= 0 ) : ?>
 		<div class="bsh-empty">
-			<span class="dashicons dashicons-chart-bar" aria-hidden="true"></span>
+			<?php BSH_Icons::e( 'chart' ); ?>
 			<p><?php esc_html_e( 'در این بازه فروشی ثبت نشده. با اولین سفارش (سایت یا باسلام) نمودار پر می‌شود.', 'basalamhub' ); ?></p>
 		</div>
 	<?php else : ?>

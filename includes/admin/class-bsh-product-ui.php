@@ -52,7 +52,7 @@ class BSH_Product_UI {
 			<?php else : ?>
 				<p>
 					<button type="button" class="bsh-btn" data-bsh-send>
-						<span class="dashicons dashicons-update" aria-hidden="true"></span>
+						<?php BSH_Icons::e( 'refresh' ); ?>
 						<?php echo $link && $link->basalam_id ? esc_html__( 'به‌روزرسانی در باسلام', 'basalamhub' ) : esc_html__( 'ارسال به باسلام', 'basalamhub' ); ?>
 					</button>
 				</p>

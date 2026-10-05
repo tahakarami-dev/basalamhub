@@ -31,7 +31,7 @@ $bsh_base   = admin_url( 'admin.php?page=basalamhub-products' );
 		<h1 class="bsh-page-title"><?php esc_html_e( 'محصولات', 'basalamhub' ); ?></h1>
 		<p class="bsh-card__meta"><?php esc_html_e( 'وضعیت هر محصول ووکامرس در باسلام. برای ویرایش خود محصول، روی نامش بزن.', 'basalamhub' ); ?></p>
 	</div>
-	<a class="bsh-btn" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=product' ) ); ?>"><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span><?php esc_html_e( 'محصول جدید', 'basalamhub' ); ?></a>
+	<a class="bsh-btn" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=product' ) ); ?>"><?php BSH_Icons::e( 'plus' ); ?><?php esc_html_e( 'محصول جدید', 'basalamhub' ); ?></a>
 </header>
 
 <nav class="bsh-tabs" aria-label="<?php esc_attr_e( 'فیلتر وضعیت', 'basalamhub' ); ?>">
@@ -75,7 +75,7 @@ $bsh_base   = admin_url( 'admin.php?page=basalamhub-products' );
 
 <?php if ( ! $bsh_result['items'] ) : ?>
 	<div class="bsh-card bsh-empty">
-		<span class="dashicons dashicons-products" aria-hidden="true"></span>
+		<?php BSH_Icons::e( 'package' ); ?>
 		<p><?php esc_html_e( 'محصولی با این فیلتر نیست.', 'basalamhub' ); ?></p>
 	</div>
 <?php else : ?>
@@ -110,7 +110,7 @@ $bsh_base   = admin_url( 'admin.php?page=basalamhub-products' );
 				</td>
 				<td>
 					<div class="bsh-products__item">
-						<span class="bsh-products__thumb"><?php echo $bsh_p->get_image_id() ? wp_get_attachment_image( $bsh_p->get_image_id(), array( 40, 40 ) ) : '<span class="dashicons dashicons-format-image" aria-hidden="true"></span>'; ?></span>
+						<span class="bsh-products__thumb"><?php echo $bsh_p->get_image_id() ? wp_get_attachment_image( $bsh_p->get_image_id(), array( 40, 40 ) ) : BSH_Icons::svg( 'image', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG icon. ?></span>
 						<span>
 							<a href="<?php echo esc_url( get_edit_post_link( $bsh_row->ID ) ); ?>"><?php echo esc_html( $bsh_p->get_name() ); ?></a>
 							<span class="bsh-table__why">

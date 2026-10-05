@@ -32,7 +32,7 @@ class BSH_Admin {
 	 * Admin menu.
 	 */
 	public static function menu() {
-		$icon = 'data:image/svg+xml;base64,' . base64_encode( '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="black" d="M10 2a8 8 0 0 0-7.4 5h2.3A6 6 0 0 1 15.2 7H13l3 4 3-4h-1.6A8 8 0 0 0 10 2Zm-7 7-3 4h1.6A8 8 0 0 0 17.4 13h-2.3A6 6 0 0 1 4.8 13H7L4 9Z"/></svg>' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		$icon = 'data:image/svg+xml;base64,' . base64_encode( BSH_Icons::logo( 20, false ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 
 		add_menu_page( __( 'باسلام‌هاب', 'basalamhub' ), __( 'باسلام‌هاب', 'basalamhub' ), self::CAP, 'basalamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
 		add_submenu_page( 'basalamhub', __( 'داشبورد و سلامت', 'basalamhub' ), __( 'داشبورد', 'basalamhub' ), self::CAP, 'basalamhub', array( __CLASS__, 'page_dashboard' ) );
@@ -74,7 +74,7 @@ class BSH_Admin {
 		}
 		wp_enqueue_style( 'basalamhub-admin', BSH_URL . 'assets/css/admin.css', array(), BSH_VERSION );
 		if ( $ours ) {
-			wp_enqueue_style( 'basalamhub-app', BSH_URL . 'assets/css/app.css', array( 'basalamhub-admin', 'dashicons' ), BSH_VERSION );
+			wp_enqueue_style( 'basalamhub-app', BSH_URL . 'assets/css/app.css', array( 'basalamhub-admin' ), BSH_VERSION );
 		}
 		wp_enqueue_script( 'basalamhub-admin', BSH_URL . 'assets/js/admin.js', array(), BSH_VERSION, true );
 		wp_localize_script(

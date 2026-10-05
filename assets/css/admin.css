@@ -91,7 +91,8 @@
 .bsh-root .bsh-btn--ghost { border-color: transparent; background: none; color: var(--brand-ink); }
 .bsh-root .bsh-btn--ghost:hover { border-color: transparent; background: var(--brand-tint); color: var(--brand-ink); }
 .bsh-root .bsh-btn[disabled] { opacity: .45; cursor: not-allowed; }
-.bsh-root .bsh-btn .dashicons { font-size: 18px; width: 18px; height: 18px; }
+.bsh-root .bsh-icon { flex: none; display: inline-block; vertical-align: middle; }
+.bsh-root .bsh-btn .bsh-icon { width: 18px; height: 18px; }
 
 /* Status badge — Basalam chip shape (filled, small radius), one tint per state. */
 .bsh-root .bsh-badge {
@@ -139,10 +140,10 @@
 .bsh-root .bsh-checks { margin: 0; padding: 0; list-style: none; }
 .bsh-root .bsh-check { display: grid; grid-template-columns: 20px minmax(140px, 200px) 1fr; gap: var(--space-2); align-items: start; padding: var(--space-2) 0; border-bottom: 1px solid var(--line); margin: 0; }
 .bsh-root .bsh-check:last-child { border-bottom: 0; }
-.bsh-root .bsh-check .dashicons { font-size: 18px; width: 18px; height: 18px; margin-top: 3px; }
-.bsh-root .bsh-check--ok .dashicons { color: var(--success); }
-.bsh-root .bsh-check--warn .dashicons { color: var(--warning); }
-.bsh-root .bsh-check--bad .dashicons { color: var(--danger); }
+.bsh-root .bsh-check .bsh-icon { font-size: 18px; width: 18px; height: 18px; margin-top: 3px; }
+.bsh-root .bsh-check--ok .bsh-icon { color: var(--success); }
+.bsh-root .bsh-check--warn .bsh-icon { color: var(--warning); }
+.bsh-root .bsh-check--bad .bsh-icon { color: var(--danger); }
 .bsh-root .bsh-check__title { font-weight: 600; }
 .bsh-root .bsh-check__detail { color: var(--ink-muted); }
 
