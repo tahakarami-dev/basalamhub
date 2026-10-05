@@ -106,8 +106,38 @@ $bsh_help   = array(
 			<input type="checkbox" name="events[reconcile]" value="1" <?php checked( (int) $bsh_s['events']['reconcile'], 1 ); ?>>
 			<?php esc_html_e( 'تطبیق شبانه سفارش جاافتاده‌ای پیدا کرد', 'basalamhub' ); ?>
 		</label>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="events[low_stock]" value="1" <?php checked( (int) $bsh_s['events']['low_stock'], 1 ); ?>>
+			<?php esc_html_e( 'موجودی کالایی که در باسلام است کم شد یا تمام شد', 'basalamhub' ); ?>
+		</label>
+		<label class="bsh-checkbox">
+			<input type="checkbox" name="events[weekly]" value="1" <?php checked( (int) $bsh_s['events']['weekly'], 1 ); ?>>
+			<?php esc_html_e( 'گزارش هفتگی (شنبه‌ها ساعت ۹ صبح): فروش دو کانال، سفارش‌های جاافتاده، خطاها و کالاهای رو به اتمام', 'basalamhub' ); ?>
+		</label>
 		<div class="bsh-card__foot">
 			<button type="submit" class="bsh-btn bsh-btn--primary"><?php esc_html_e( 'ذخیره', 'basalamhub' ); ?></button>
 		</div>
 	</section>
 </form>
+
+<?php $bsh_report = get_option( 'bsh_report_last' ); ?>
+<section class="bsh-card bsh-section">
+	<div class="bsh-card__head">
+		<div>
+			<h2 class="bsh-card__title"><?php esc_html_e( 'گزارش هفتگی', 'basalamhub' ); ?></h2>
+			<p class="bsh-card__meta">
+				<?php
+				echo esc_html(
+					is_array( $bsh_report )
+						/* translators: %s: relative time */
+						? sprintf( __( 'آخرین گزارش: %s', 'basalamhub' ), bsh_time_ago( $bsh_report['at'] ) )
+						: __( 'هر شنبه ساعت ۹ صبح خودکار ساخته و فرستاده می‌شود.', 'basalamhub' )
+				);
+				?>
+			</p>
+		</div>
+		<button type="button" class="bsh-btn" data-bsh-report-now><?php esc_html_e( 'ساخت و ارسال الان', 'basalamhub' ); ?></button>
+	</div>
+	<pre class="bsh-report" data-bsh-report-text<?php echo is_array( $bsh_report ) ? '' : ' hidden'; ?>><?php echo is_array( $bsh_report ) ? esc_html( $bsh_report['text'] ) : ''; ?></pre>
+	<p class="bsh-field__hint" data-bsh-report-message aria-live="polite"></p>
+</section>

@@ -47,6 +47,7 @@ class BSH_App {
 	public static function pages() {
 		return array(
 			'basalamhub'            => array( __( 'داشبورد', 'basalamhub' ), 'dashicons-chart-area', 'store' ),
+			'basalamhub-sales'      => array( __( 'فروش', 'basalamhub' ), 'dashicons-chart-bar', 'store' ),
 			'basalamhub-products'   => array( __( 'محصولات', 'basalamhub' ), 'dashicons-products', 'store' ),
 			'basalamhub-orders'     => array( __( 'سفارش‌ها', 'basalamhub' ), 'dashicons-cart', 'store' ),
 			'basalamhub-bulk'       => array( __( 'ارسال گروهی', 'basalamhub' ), 'dashicons-upload', 'sync' ),
@@ -318,6 +319,12 @@ class BSH_App {
 				'',
 			)
 			: array( 'warn', __( 'اعلان‌ها', 'basalamhub' ), __( 'خاموش؛ سفارش جدید و خطاها را در بله یا تلگرام بگیر.', 'basalamhub' ), admin_url( 'admin.php?page=basalamhub-notify' ) );
+
+		$low = count( BSH_Stock_Alerts::low_items( 100 ) );
+		if ( $low ) {
+			/* translators: %s: count */
+			$checks[] = array( 'warn', __( 'موجودی باسلام', 'basalamhub' ), sprintf( __( '%s کالای متصل رو به اتمام است.', 'basalamhub' ), bsh_fa_number( $low ) ), admin_url( 'admin.php?page=basalamhub-sales#bsh-low-stock' ) );
+		}
 
 		$unmapped = count( BSH_Categories::unmapped_terms() );
 		$cats_url = admin_url( 'admin.php?page=basalamhub-categories' );

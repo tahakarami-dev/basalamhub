@@ -58,6 +58,8 @@ class BSH_Settings {
 			'orders_auto_confirm' => 0,
 			'stock_reference'     => 'site',
 			'safety_stock'        => 0,
+			'low_stock_alert'     => 1,
+			'low_stock_threshold' => 3,
 		);
 	}
 
@@ -98,6 +100,7 @@ class BSH_Settings {
 
 		$clean['orders_enabled']      = empty( $input['orders_enabled'] ) ? 0 : 1;
 		$clean['orders_auto_confirm'] = empty( $input['orders_auto_confirm'] ) ? 0 : 1;
+		$clean['low_stock_alert']     = empty( $input['low_stock_alert'] ) ? 0 : 1;
 		$reference                    = isset( $input['stock_reference'] ) ? sanitize_key( $input['stock_reference'] ) : 'site';
 		$clean['stock_reference']     = in_array( $reference, array( 'site', 'basalam' ), true ) ? $reference : 'site';
 
@@ -117,6 +120,7 @@ class BSH_Settings {
 			'orders_interval'    => array( 2, 60, __( 'فاصله‌ی دریافت سفارش باید بین ۲ تا ۶۰ دقیقه باشد.', 'basalamhub' ) ),
 			'orders_import_days' => array( 0, 30, __( 'سفارش‌های گذشته را بین ۰ تا ۳۰ روز می‌شود وارد کرد.', 'basalamhub' ) ),
 			'safety_stock'       => array( 0, 100000, __( 'موجودی اطمینان باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
+			'low_stock_threshold' => array( 0, 100000, __( 'حد هشدار موجودی باید صفر یا بیشتر باشد.', 'basalamhub' ) ),
 		) as $key => $rule ) {
 			$raw = isset( $input[ $key ] ) ? trim( (string) $input[ $key ] ) : '';
 			$raw = strtr(
@@ -152,6 +156,7 @@ class BSH_Settings {
 			BSH_Order_Sync::reschedule();
 			BSH_Inventory::schedule();
 			BSH_Reconcile::schedule();
+			BSH_Report::schedule();
 		}
 		return $errors;
 	}

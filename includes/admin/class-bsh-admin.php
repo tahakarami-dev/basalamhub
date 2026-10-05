@@ -36,6 +36,7 @@ class BSH_Admin {
 
 		add_menu_page( __( 'باسلام‌هاب', 'basalamhub' ), __( 'باسلام‌هاب', 'basalamhub' ), self::CAP, 'basalamhub', array( __CLASS__, 'page_dashboard' ), $icon, 56 );
 		add_submenu_page( 'basalamhub', __( 'داشبورد و سلامت', 'basalamhub' ), __( 'داشبورد', 'basalamhub' ), self::CAP, 'basalamhub', array( __CLASS__, 'page_dashboard' ) );
+		add_submenu_page( 'basalamhub', __( 'فروش دوکاناله', 'basalamhub' ), __( 'فروش', 'basalamhub' ), self::CAP, 'basalamhub-sales', array( __CLASS__, 'page_sales' ) );
 		add_submenu_page( 'basalamhub', __( 'محصولات', 'basalamhub' ), __( 'محصولات', 'basalamhub' ), self::CAP, 'basalamhub-products', array( __CLASS__, 'page_products' ) );
 		$missing = BSH_Order_Sync::missing_count();
 		$orders  = $missing ? ' <span class="awaiting-mod">' . esc_html( bsh_fa_digits( $missing ) ) . '</span>' : '';
@@ -144,6 +145,13 @@ class BSH_Admin {
 	 */
 	public static function page_products() {
 		self::render( 'products', 'basalamhub-products' );
+	}
+
+	/**
+	 * Sales by channel.
+	 */
+	public static function page_sales() {
+		self::render( 'sales', 'basalamhub-sales' );
 	}
 
 	/**

@@ -307,7 +307,7 @@ class BSH_Queue {
 		);
 		// Recurring jobs (maintenance, order poll, stock pull) are always pending; don't count them as work.
 		$recurring = 0;
-		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'bsh_poll_orders', array() ), array( 'bsh_stock_pull', array( 'page' => 1 ) ), array( 'bsh_reconcile_orders', array( 'manual' => 0 ) ) ) as $job ) {
+		foreach ( array( array( self::HOOK_MAINTENANCE, array() ), array( 'bsh_poll_orders', array() ), array( 'bsh_stock_pull', array( 'page' => 1 ) ), array( 'bsh_reconcile_orders', array( 'manual' => 0 ) ), array( 'bsh_weekly_report', array( 'manual' => 0 ) ) ) as $job ) {
 			$recurring += as_has_scheduled_action( $job[0], $job[1], self::GROUP ) ? 1 : 0;
 		}
 		$out['pending'] = max( 0, $out['pending'] - $recurring );

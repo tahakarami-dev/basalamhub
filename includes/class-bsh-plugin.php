@@ -38,6 +38,9 @@ class BSH_Plugin {
 		BSH_Reconcile::init();
 		BSH_Importer::init();
 		BSH_Notifier::init();
+		BSH_Sales::init();
+		BSH_Stock_Alerts::init();
+		BSH_Report::init();
 
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_update_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
