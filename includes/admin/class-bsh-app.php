@@ -125,16 +125,22 @@ class BSH_App {
 						<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'جستجوی محصول با نام یا SKU', 'basalamhub' ); ?>" aria-label="<?php esc_attr_e( 'جستجوی محصول', 'basalamhub' ); ?>">
 					</form>
 					<div class="bsh-app__actions">
-						<a class="bsh-app__pill bsh-app__pill--<?php echo $connected ? 'ok' : 'bad'; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav>
-							<span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : 'bad'; ?>" aria-hidden="true"></span>
-							<?php echo $connected ? esc_html__( 'متصل به باسلام', 'basalamhub' ) : esc_html__( 'وصل نیست', 'basalamhub' ); ?>
+						<a class="bsh-app__chip bsh-app__chip--status<?php echo $connected ? '' : ' is-bad'; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav title="<?php echo esc_attr( $connected ? $conn['vendor_title'] : __( 'اتصال در تنظیمات', 'basalamhub' ) ); ?>">
+							<span class="bsh-app__chip-icon" aria-hidden="true"><?php BSH_Icons::e( 'store', 18 ); ?><span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : 'bad'; ?>"></span></span>
+							<span class="bsh-app__chip-text"><?php echo $connected ? esc_html__( 'متصل به باسلام', 'basalamhub' ) : esc_html__( 'وصل نیست', 'basalamhub' ); ?></span>
 						</a>
-						<button type="button" class="bsh-app__icon-btn" data-bsh-theme aria-label="<?php esc_attr_e( 'تغییر پوسته: خودکار، روشن، تیره', 'basalamhub' ); ?>" title="<?php esc_attr_e( 'پوسته', 'basalamhub' ); ?>">
-							<?php BSH_Icons::e( 'theme' ); ?>
+						<button type="button" class="bsh-app__icon-btn bsh-app__theme" data-bsh-theme aria-label="<?php esc_attr_e( 'تغییر پوسته: خودکار، روشن، تیره', 'basalamhub' ); ?>" title="<?php esc_attr_e( 'پوسته', 'basalamhub' ); ?>">
+							<?php BSH_Icons::e( 'theme', 20, 'bsh-app__theme-auto' ); ?>
+							<?php BSH_Icons::e( 'sun', 20, 'bsh-app__theme-light' ); ?>
+							<?php BSH_Icons::e( 'moon', 20, 'bsh-app__theme-dark' ); ?>
 						</button>
-						<a class="bsh-app__user" href="<?php echo esc_url( get_edit_profile_url() ); ?>" title="<?php esc_attr_e( 'نمایه', 'basalamhub' ); ?>">
+						<span class="bsh-app__divider" aria-hidden="true"></span>
+						<a class="bsh-app__chip bsh-app__user" href="<?php echo esc_url( get_edit_profile_url() ); ?>" title="<?php esc_attr_e( 'نمایه', 'basalamhub' ); ?>">
 							<span class="bsh-app__avatar" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( trim( $user->display_name ) ? trim( $user->display_name ) : $user->user_login, 0, 1 ) ) ); ?></span>
-							<span><?php echo esc_html( $user->display_name ); ?></span>
+							<span class="bsh-app__chip-text bsh-app__user-text">
+								<strong><?php echo esc_html( $user->display_name ); ?></strong>
+								<small><?php echo esc_html( current_user_can( 'manage_options' ) ? __( 'مدیر فروشگاه', 'basalamhub' ) : __( 'مدیر فروش', 'basalamhub' ) ); ?></small>
+							</span>
 						</a>
 					</div>
 				</header>

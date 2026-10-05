@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       باسلام‌هاب – همگام‌سازی ووکامرس و باسلام
- * Plugin URI:        https://github.com/tahakarami-dev/salamhub
+ * Plugin URI:        https://github.com/tahakarami-dev/basalamhub
  * Description:       فروشگاه ووکامرس و غرفه‌ی باسلام را دوطرفه همگام نگه می‌دارد: محصول یک بار ثبت می‌شود، در دو جا فروخته می‌شود و هیچ سفارشی گم نمی‌شود.
  * Version:           0.8.1
  * Requires at least: 6.0

@@ -164,15 +164,30 @@ body.bsh-app-screen #wpbody-content > .update-nag { display: none; }
 }
 .bsh-root .bsh-app__search input[type="search"]::placeholder { color: var(--ink-muted); }
 .bsh-root .bsh-app__search input[type="search"]:focus { border-color: var(--brand); background: var(--surface-raised); outline: none; box-shadow: 0 0 0 3px var(--brand-tint); }
-.bsh-app__actions { display: flex; align-items: center; gap: var(--space-2); }
-.bsh-root .bsh-app__pill { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: var(--radius-md); color: var(--ink-secondary); text-decoration: none; font: 600 13px/20px var(--font-sans); white-space: nowrap; }
-.bsh-root .bsh-app__pill:hover { border-color: var(--line-strong); color: var(--ink); }
-.bsh-root .bsh-app__icon-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-raised); color: var(--ink-secondary); cursor: pointer; }
+.bsh-app__actions { display: flex; align-items: center; gap: 8px; }
+/* Header controls share the sidebar's language: 40px, 10px corners, hairline border, soft hover. */
+.bsh-root .bsh-app__chip { display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px 0 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-raised); color: var(--ink-secondary); text-decoration: none; font: 600 13px/20px var(--font-sans); white-space: nowrap; transition: border-color .12s ease, background-color .12s ease, color .12s ease; }
+.bsh-root .bsh-app__chip:hover { border-color: var(--line-strong); background: var(--surface-sunken); color: var(--ink); }
+.bsh-root .bsh-app__chip:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+.bsh-app__chip-icon { position: relative; flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--surface-sunken); color: var(--ink-secondary); }
+.bsh-app__chip-icon .bsh-app__dot { position: absolute; inset-block-end: -2px; inset-inline-end: -2px; width: 9px; height: 9px; box-shadow: 0 0 0 2px var(--surface-raised); }
+.bsh-root .bsh-app__chip--status.is-bad { border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); color: var(--danger); }
+.bsh-root .bsh-app__icon-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-raised); color: var(--ink-secondary); cursor: pointer; transition: border-color .12s ease, background-color .12s ease, color .12s ease; }
 .bsh-root .bsh-app__icon-btn:hover { border-color: var(--line-strong); background: var(--surface-sunken); color: var(--ink); }
 .bsh-root .bsh-app__icon-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
-.bsh-app__menu-btn { display: none !important; }
-.bsh-root .bsh-app__user { display: flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; font: 600 13px/20px var(--font-sans); white-space: nowrap; }
-.bsh-app__avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--surface-sunken); color: var(--ink-secondary); font: 700 14px/1 var(--font-sans); }
+/* The menu button is for small screens only. */
+.bsh-root .bsh-app__menu-btn { display: none; }
+/* The theme button shows the current mode. */
+.bsh-app__theme .bsh-icon { display: none; }
+.bsh-app[data-theme="auto"] .bsh-app__theme-auto, .bsh-app:not([data-theme]) .bsh-app__theme-auto,
+.bsh-app[data-theme="light"] .bsh-app__theme-light,
+.bsh-app[data-theme="dark"] .bsh-app__theme-dark { display: inline-block; }
+.bsh-app__divider { width: 1px; height: 24px; margin: 0 4px; background: var(--line); }
+.bsh-root .bsh-app__user { padding: 0 12px 0 4px; }
+.bsh-app__avatar { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, #ff7a4d, #f04b23); color: #fff; font: 700 14px/1 var(--font-sans); }
+.bsh-app__user-text { display: grid; line-height: 1.2; text-align: start; }
+.bsh-app__user-text strong { font: 700 13px/18px var(--font-sans); color: var(--ink); }
+.bsh-app__user-text small { font: 400 11px/14px var(--font-sans); color: var(--ink-muted); }
 .bsh-app__progress { height: 2px; background: linear-gradient(90deg, transparent, var(--brand), transparent); background-size: 200% 100%; animation: bsh-load 1s linear infinite; }
 @keyframes bsh-load { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .bsh-app__content.is-loading { opacity: .55; transition: opacity .15s; }
@@ -344,7 +359,8 @@ body.bsh-app-screen #wpbody-content > .update-nag { display: none; }
 	.bsh-app__menu-btn { display: grid !important; }
 	.bsh-app__topbar { padding: 0 16px; gap: var(--space-2); }
 	.bsh-app__content { padding: var(--space-3) 16px 40px; }
-	.bsh-app__crumbs > span, .bsh-app__user > span:not(.bsh-app__avatar), .bsh-app__pill { display: none !important; }
+	.bsh-app__crumbs > span, .bsh-app__user-text, .bsh-app__chip-text, .bsh-app__divider { display: none !important; }
+	.bsh-root .bsh-app__chip { padding: 0 5px; }
 	.bsh-grid { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
