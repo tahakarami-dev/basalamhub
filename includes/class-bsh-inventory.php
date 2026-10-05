@@ -308,7 +308,7 @@ class BSH_Inventory {
 	 * @param WC_Order $order Order.
 	 */
 	public static function on_site_sale( $order ) {
-		if ( ! self::basalam_is_reference() || ! $order instanceof WC_Order || in_array( $order->get_created_via(), array( 'basalamhub', 'salamhub' ), true ) ) {
+		if ( ! self::basalam_is_reference() || ! $order instanceof WC_Order || in_array( $order->get_created_via(), array( 'basalamhub', 'salamhub' ), true ) || BSH_Demo::is_demo( $order ) ) {
 			return; // Basalam orders were already subtracted on Basalam.
 		}
 		foreach ( $order->get_items() as $item ) {

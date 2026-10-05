@@ -10,7 +10,19 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 global $wpdb;
 
-foreach ( array( 'bsh_settings', 'bsh_token', 'bsh_connection', 'bsh_db_version', 'bsh_last_sync_at', 'bsh_lock_worker', 'bsh_batch', 'bsh_basalam_categories', 'bsh_category_map', 'bsh_category_attributes', 'bsh_price_rules', 'bsh_pause_until', 'bsh_link_state', 'bsh_orders_polled_at', 'bsh_orders_poll_error', 'bsh_webhook_secret', 'bsh_webhook_last', 'bsh_stock_pulled_at', 'bsh_stock_pull_changed', 'bsh_import_state', 'bsh_reconcile_last', 'bsh_notify', 'bsh_sales', 'bsh_sales_ver', 'bsh_report_last' ) as $bsh_option ) {
+// Demo products and orders (if «حالت نمایشی» was still on) are not real data: remove them.
+if ( get_option( 'bsh_demo' ) ) {
+	if ( function_exists( 'wc_get_orders' ) ) {
+		foreach ( wc_get_orders( array( 'limit' => 2000, 'status' => 'any', 'meta_key' => '_bsh_demo', 'meta_value' => '1' ) ) as $bsh_order ) { // phpcs:ignore WordPress.DB.SlowDBQuery
+			$bsh_order->delete( true );
+		}
+	}
+	foreach ( get_posts( array( 'post_type' => array( 'product', 'product_variation' ), 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => '_bsh_demo', 'meta_value' => '1' ) ) as $bsh_id ) { // phpcs:ignore WordPress.DB.SlowDBQuery
+		wp_delete_post( $bsh_id, true );
+	}
+}
+
+foreach ( array( 'bsh_demo', 'bsh_settings', 'bsh_token', 'bsh_connection', 'bsh_db_version', 'bsh_last_sync_at', 'bsh_lock_worker', 'bsh_batch', 'bsh_basalam_categories', 'bsh_category_map', 'bsh_category_attributes', 'bsh_price_rules', 'bsh_pause_until', 'bsh_link_state', 'bsh_orders_polled_at', 'bsh_orders_poll_error', 'bsh_webhook_secret', 'bsh_webhook_last', 'bsh_stock_pulled_at', 'bsh_stock_pull_changed', 'bsh_import_state', 'bsh_reconcile_last', 'bsh_notify', 'bsh_sales', 'bsh_sales_ver', 'bsh_report_last' ) as $bsh_option ) {
 	delete_option( $bsh_option );
 }
 

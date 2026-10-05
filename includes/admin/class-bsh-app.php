@@ -75,6 +75,7 @@ class BSH_App {
 		$title     = isset( $pages[ $slug ] ) ? $pages[ $slug ][0] : __( 'باسلام‌هاب', 'basalamhub' );
 		$connected = BSH_Settings::is_connected();
 		$conn      = BSH_Settings::connection();
+		$demo      = ! $connected && BSH_Demo::active();
 		$user      = wp_get_current_user();
 		$search    = isset( $_GET['s'] ) && 'basalamhub-products' === $slug ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		?>
@@ -95,9 +96,9 @@ class BSH_App {
 				</nav>
 				<div class="bsh-app__sidebar-foot">
 					<a class="bsh-app__booth" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav>
-						<span class="bsh-app__booth-icon" aria-hidden="true"><?php BSH_Icons::e( 'store' ); ?><span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : 'bad'; ?>"></span></span>
+						<span class="bsh-app__booth-icon" aria-hidden="true"><?php BSH_Icons::e( 'store' ); ?><span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : ( $demo ? 'demo' : 'bad' ); ?>"></span></span>
 						<span class="bsh-app__booth-text">
-							<strong><?php echo esc_html( $connected ? $conn['vendor_title'] : __( 'وصل نیست', 'basalamhub' ) ); ?></strong>
+							<strong><?php echo esc_html( $connected ? $conn['vendor_title'] : ( $demo ? __( 'غرفه‌ی نمایشی', 'basalamhub' ) : __( 'وصل نیست', 'basalamhub' ) ) ); ?></strong>
 							<small><?php echo esc_html( $connected ? __( 'غرفه‌ی متصل باسلام', 'basalamhub' ) : __( 'از تنظیمات وصل شو', 'basalamhub' ) ); ?></small>
 						</span>
 					</a>
@@ -125,9 +126,9 @@ class BSH_App {
 						<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'جستجوی محصول با نام یا SKU', 'basalamhub' ); ?>" aria-label="<?php esc_attr_e( 'جستجوی محصول', 'basalamhub' ); ?>">
 					</form>
 					<div class="bsh-app__actions">
-						<a class="bsh-app__chip bsh-app__chip--status<?php echo $connected ? '' : ' is-bad'; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav title="<?php echo esc_attr( $connected ? $conn['vendor_title'] : __( 'اتصال در تنظیمات', 'basalamhub' ) ); ?>">
-							<span class="bsh-app__chip-icon" aria-hidden="true"><?php BSH_Icons::e( 'store', 18 ); ?><span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : 'bad'; ?>"></span></span>
-							<span class="bsh-app__chip-text"><?php echo $connected ? esc_html__( 'متصل به باسلام', 'basalamhub' ) : esc_html__( 'وصل نیست', 'basalamhub' ); ?></span>
+						<a class="bsh-app__chip bsh-app__chip--status<?php echo $connected || $demo ? '' : ' is-bad'; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav title="<?php echo esc_attr( $connected ? $conn['vendor_title'] : __( 'اتصال در تنظیمات', 'basalamhub' ) ); ?>">
+							<span class="bsh-app__chip-icon" aria-hidden="true"><?php BSH_Icons::e( 'store', 18 ); ?><span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : ( $demo ? 'demo' : 'bad' ); ?>"></span></span>
+							<span class="bsh-app__chip-text"><?php echo $connected ? esc_html__( 'متصل به باسلام', 'basalamhub' ) : ( $demo ? esc_html__( 'حالت نمایشی', 'basalamhub' ) : esc_html__( 'وصل نیست', 'basalamhub' ) ); ?></span>
 						</a>
 						<button type="button" class="bsh-app__icon-btn bsh-app__theme" data-bsh-theme aria-label="<?php esc_attr_e( 'تغییر پوسته: خودکار، روشن، تیره', 'basalamhub' ); ?>" title="<?php esc_attr_e( 'پوسته', 'basalamhub' ); ?>">
 							<?php BSH_Icons::e( 'theme', 20, 'bsh-app__theme-auto' ); ?>
@@ -146,6 +147,15 @@ class BSH_App {
 				</header>
 				<div class="bsh-app__progress" data-bsh-loading hidden></div>
 				<main class="bsh-app__main" data-bsh-main tabindex="-1">
+					<?php if ( BSH_Demo::active() ) : ?>
+						<div class="bsh-demo-bar" role="status">
+							<span class="bsh-demo-bar__text"><?php BSH_Icons::e( 'info', 18 ); ?><strong><?php esc_html_e( 'حالت نمایشی', 'basalamhub' ); ?></strong><span><?php esc_html_e( 'داده‌ها نمونه‌اند و چیزی به باسلام فرستاده نمی‌شود.', 'basalamhub' ); ?></span></span>
+							<span class="bsh-demo-bar__actions">
+								<button type="button" class="bsh-btn bsh-btn--primary" data-bsh-demo="order"><?php BSH_Icons::e( 'bag', 18 ); ?><?php esc_html_e( 'شبیه‌سازی سفارش باسلام', 'basalamhub' ); ?></button>
+								<button type="button" class="bsh-btn bsh-btn--ghost" data-bsh-demo="clear"><?php esc_html_e( 'پاک کردن داده‌ی نمایشی', 'basalamhub' ); ?></button>
+							</span>
+						</div>
+					<?php endif; ?>
 					<div class="bsh-app__content" data-bsh-content data-page="<?php echo esc_attr( $slug ); ?>" data-title="<?php echo esc_attr( $title ); ?>">
 						<?php include BSH_DIR . 'includes/admin/views/' . $view . '.php'; ?>
 					</div>
@@ -266,7 +276,9 @@ class BSH_App {
 		$settings  = admin_url( 'admin.php?page=basalamhub-settings' );
 		$checks    = array();
 
-		if ( ! BSH_Settings::has_token() ) {
+		if ( BSH_Demo::active() && ! BSH_Settings::is_connected() ) {
+			$checks[] = array( 'ok', __( 'توکن باسلام', 'basalamhub' ), __( 'حالت نمایشی · بعداً از تنظیمات وصل شو.', 'basalamhub' ), '' );
+		} elseif ( ! BSH_Settings::has_token() ) {
 			$checks[] = array( 'bad', __( 'توکن باسلام', 'basalamhub' ), __( 'وارد نشده.', 'basalamhub' ), $settings );
 		} elseif ( $token_bad ) {
 			$checks[] = array( 'bad', __( 'توکن باسلام', 'basalamhub' ), __( 'قابل خواندن نیست؛ دوباره واردش کن.', 'basalamhub' ), $settings );

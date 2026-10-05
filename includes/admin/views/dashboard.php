@@ -18,6 +18,9 @@ $bsh_activity  = BSH_App::activity( 14 );
 $bsh_checks    = BSH_App::health_checks();
 $bsh_events    = BSH_Logger::query( array( 'per_page' => 7 ) )['items'];
 $bsh_user      = wp_get_current_user();
+$bsh_today     = BSH_Insights::today();
+$bsh_score     = BSH_Insights::score();
+$bsh_demo      = BSH_Demo::active();
 
 $bsh_sum_ok  = array_sum( wp_list_pluck( $bsh_activity, 'ok' ) );
 $bsh_sum_err = array_sum( wp_list_pluck( $bsh_activity, 'error' ) );
@@ -58,15 +61,17 @@ $bsh_level_icon = array(
 ?>
 <header class="bsh-page-head bsh-page-head--row">
 	<div>
-		<?php /* translators: %s: user name */ ?>
-		<h1 class="bsh-page-title"><?php echo esc_html( sprintf( __( 'سلام %s', 'basalamhub' ), $bsh_user->display_name ) ); ?></h1>
+		<?php /* translators: 1: greeting, 2: user name */ ?>
+		<h1 class="bsh-page-title"><?php echo esc_html( sprintf( __( '%1$s، %2$s', 'basalamhub' ), BSH_Insights::greeting(), $bsh_user->display_name ) ); ?></h1>
 		<p class="bsh-card__meta">
 			<?php
 			echo esc_html(
-				$bsh_connected
+				$bsh_demo && ! $bsh_connected
+					? __( 'داری با داده‌ی نمایشی کار می‌کنی؛ هیچ چیزی به باسلام فرستاده نمی‌شود.', 'basalamhub' )
+					: ( $bsh_connected
 					/* translators: 1: booth, 2: relative time */
 					? sprintf( __( 'غرفه‌ی «%1$s» · آخرین همگام‌سازی %2$s', 'basalamhub' ), BSH_Settings::connection()['vendor_title'], bsh_time_ago( $bsh_last_sync ) )
-					: __( 'هنوز به باسلام وصل نشده‌ای. چند دقیقه بیشتر طول نمی‌کشد.', 'basalamhub' )
+					: __( 'هنوز به باسلام وصل نشده‌ای. چند دقیقه بیشتر طول نمی‌کشد.', 'basalamhub' ) )
 			);
 			?>
 		</p>
@@ -80,7 +85,75 @@ $bsh_level_icon = array(
 	<?php endif; ?>
 </header>
 
-<?php if ( ! $bsh_connected ) : ?>
+<?php
+$bsh_ring_r    = 52;
+$bsh_ring_len  = 2 * M_PI * $bsh_ring_r;
+$bsh_basa_pct  = $bsh_today['revenue'] > 0 ? round( 100 * $bsh_today['basalam_revenue'] / $bsh_today['revenue'] ) : 0;
+?>
+<div class="bsh-hero bsh-section">
+	<section class="bsh-card bsh-today bsh-today--<?php echo esc_attr( $bsh_today['mood'] ); ?>" aria-labelledby="bsh-today-title">
+		<div class="bsh-card__head">
+			<h2 class="bsh-card__title" id="bsh-today-title"><?php BSH_Icons::e( 'sun', 20 ); ?><?php esc_html_e( 'امروز چی شد', 'basalamhub' ); ?></h2>
+			<time class="bsh-card__meta"><?php echo esc_html( wp_date( 'l j F' ) ); ?></time>
+		</div>
+		<p class="bsh-today__sentence"><?php echo esc_html( $bsh_today['sentence'] ); ?></p>
+		<dl class="bsh-today__stats">
+			<div><dt><?php esc_html_e( 'سفارش امروز', 'basalamhub' ); ?></dt><dd><?php echo esc_html( bsh_fa_number( $bsh_today['orders'] ) ); ?></dd></div>
+			<div><dt><?php esc_html_e( 'فروش امروز', 'basalamhub' ); ?></dt><dd><?php echo esc_html( BSH_Sales::compact( $bsh_today['revenue'] ) ); ?></dd></div>
+			<?php /* translators: %s: percent */ ?>
+			<div><dt><?php esc_html_e( 'سهم باسلام', 'basalamhub' ); ?></dt><dd><?php echo esc_html( sprintf( __( '%s٪', 'basalamhub' ), bsh_fa_number( $bsh_basa_pct ) ) ); ?></dd></div>
+		</dl>
+		<a class="bsh-btn bsh-btn--ghost" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-sales' ) ); ?>" data-bsh-nav><?php BSH_Icons::e( 'chart', 18 ); ?><?php esc_html_e( 'گزارش فروش', 'basalamhub' ); ?></a>
+	</section>
+
+	<section class="bsh-card bsh-hscore bsh-hscore--<?php echo esc_attr( $bsh_score['level'] ); ?>" aria-labelledby="bsh-hscore-title">
+		<div class="bsh-card__head">
+			<h2 class="bsh-card__title" id="bsh-hscore-title"><?php esc_html_e( 'امتیاز سلامت فروشگاه', 'basalamhub' ); ?></h2>
+		</div>
+		<div class="bsh-hscore__body">
+			<?php /* translators: %s: score */ ?>
+			<div class="bsh-hscore__ring" role="img" aria-label="<?php echo esc_attr( sprintf( __( 'امتیاز %s از ۱۰۰', 'basalamhub' ), bsh_fa_number( $bsh_score['score'] ) ) ); ?>">
+				<svg viewBox="0 0 120 120" width="132" height="132" aria-hidden="true" focusable="false">
+					<circle class="bsh-hscore__track" cx="60" cy="60" r="<?php echo esc_attr( $bsh_ring_r ); ?>"></circle>
+					<circle class="bsh-hscore__arc" cx="60" cy="60" r="<?php echo esc_attr( $bsh_ring_r ); ?>" stroke-dasharray="<?php echo esc_attr( round( $bsh_ring_len, 2 ) ); ?>" stroke-dashoffset="<?php echo esc_attr( round( $bsh_ring_len * ( 1 - $bsh_score['score'] / 100 ), 2 ) ); ?>"></circle>
+				</svg>
+				<span class="bsh-hscore__num"><strong><?php echo esc_html( bsh_fa_number( $bsh_score['score'] ) ); ?></strong><small><?php esc_html_e( 'از ۱۰۰', 'basalamhub' ); ?></small></span>
+			</div>
+			<div class="bsh-hscore__why">
+				<p class="bsh-hscore__label"><?php echo esc_html( $bsh_score['label'] ); ?></p>
+				<?php if ( $bsh_score['reasons'] ) : ?>
+					<ul class="bsh-hscore__reasons">
+						<?php foreach ( array_slice( $bsh_score['reasons'], 0, 4 ) as $bsh_reason ) : ?>
+							<li>
+								<?php /* translators: %s: points */ ?>
+								<span class="bsh-hscore__pts"><?php echo esc_html( sprintf( __( '−%s', 'basalamhub' ), bsh_fa_number( $bsh_reason['points'] ) ) ); ?></span>
+								<?php if ( $bsh_reason['url'] ) : ?>
+									<a href="<?php echo esc_url( $bsh_reason['url'] ); ?>" data-bsh-nav><?php echo esc_html( $bsh_reason['text'] ); ?></a>
+								<?php else : ?>
+									<span><?php echo esc_html( $bsh_reason['text'] ); ?></span>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php else : ?>
+					<p class="bsh-card__meta"><?php esc_html_e( 'اتصال، صف، سفارش‌ها و موجودی همه سالم‌اند. همین‌طور ادامه بده!', 'basalamhub' ); ?></p>
+				<?php endif; ?>
+			</div>
+		</div>
+	</section>
+</div>
+
+<?php if ( ! $bsh_connected && ! $bsh_demo ) : ?>
+	<section class="bsh-card bsh-section bsh-demo-card">
+		<div>
+			<h2 class="bsh-card__title"><?php BSH_Icons::e( 'image', 20 ); ?><?php esc_html_e( 'اول ببین، بعد وصل شو', 'basalamhub' ); ?></h2>
+			<p class="bsh-card__meta"><?php esc_html_e( 'حالت نمایشی چند محصول و یک ماه سفارش نمونه می‌سازد تا داشبورد فروش، هشدار موجودی و اعلان سفارش را همین حالا ببینی. چیزی به باسلام فرستاده نمی‌شود و با یک کلیک پاک می‌شود.', 'basalamhub' ); ?></p>
+		</div>
+		<button type="button" class="bsh-btn bsh-btn--primary" data-bsh-demo="fill"><?php esc_html_e( 'روشن کردن حالت نمایشی', 'basalamhub' ); ?></button>
+	</section>
+<?php endif; ?>
+
+<?php if ( ! $bsh_connected && ! $bsh_demo ) : ?>
 	<section class="bsh-card bsh-section bsh-onboard">
 		<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'راه‌اندازی در چهار قدم', 'basalamhub' ); ?></h2></div>
 		<ol class="bsh-onboard__steps">
