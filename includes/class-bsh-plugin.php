@@ -43,6 +43,7 @@ class BSH_Plugin {
 		BSH_Report::init();
 		BSH_Insights::init();
 		BSH_Demo::init();
+		BSH_Live_Test::init();
 
 		add_action( 'woocommerce_new_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );
 		add_action( 'woocommerce_update_product', array( __CLASS__, 'on_product_saved' ), 20, 1 );

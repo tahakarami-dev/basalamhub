@@ -48,6 +48,7 @@ class BSH_Admin {
 		$badge  = $errors ? ' <span class="awaiting-mod">' . esc_html( bsh_fa_digits( $errors ) ) . '</span>' : '';
 		add_submenu_page( 'basalamhub', __( 'لاگ همگام‌سازی', 'basalamhub' ), __( 'لاگ', 'basalamhub' ) . $badge, self::CAP, 'basalamhub-logs', array( __CLASS__, 'page_logs' ) );
 		BSH_Import_UI::add_notify_page();
+		BSH_Live_Test::add_page();
 		add_submenu_page( 'basalamhub', __( 'تنظیمات باسلام‌هاب', 'basalamhub' ), __( 'تنظیمات', 'basalamhub' ), self::CAP, 'basalamhub-settings', array( __CLASS__, 'page_settings' ) );
 	}
 
@@ -109,6 +110,12 @@ class BSH_Admin {
 					'confirmBulk'       => __( '%s محصول در صف ارسال به باسلام قرار می‌گیرد. ادامه می‌دهی؟', 'basalamhub' ),
 					'confirmCancel'     => __( 'ارسال گروهی متوقف شود؟ محصولاتی که تا الان ارسال شده‌اند در باسلام می‌مانند و بقیه از صف خارج می‌شوند.', 'basalamhub' ),
 					'saving'            => __( 'در حال ثبت در باسلام…', 'basalamhub' ),
+					'ltRunning'         => __( 'در حال اجرا…', 'basalamhub' ),
+					'ltPickProduct'     => __( 'اول یک محصول تست انتخاب کن.', 'basalamhub' ),
+					'ltCopied'          => __( 'کپی شد', 'basalamhub' ),
+					'ltDone'            => __( 'بدون خطا', 'basalamhub' ),
+					/* translators: %s: count */
+					'ltFailed'          => __( '%s خطا', 'basalamhub' ),
 					'demoFilling'       => __( 'در حال ساخت داده‌ی نمایشی…', 'basalamhub' ),
 					'demoClearing'      => __( 'در حال پاک کردن…', 'basalamhub' ),
 					'confirmDemoClear'  => __( 'همه‌ی محصولات و سفارش‌های نمایشی پاک شوند؟ داده‌ی واقعی دست نمی‌خورد.', 'basalamhub' ),

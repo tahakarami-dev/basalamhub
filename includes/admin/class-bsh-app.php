@@ -57,6 +57,7 @@ class BSH_App {
 			'basalamhub-pricing'    => array( __( 'قوانین قیمت', 'basalamhub' ), 'tag', 'sync' ),
 			'basalamhub-logs'       => array( __( 'لاگ', 'basalamhub' ), 'logs', 'system' ),
 			'basalamhub-notify'     => array( __( 'اعلان‌ها', 'basalamhub' ), 'bell', 'system' ),
+			'basalamhub-livetest'   => array( __( 'تست با باسلام واقعی', 'basalamhub' ), 'check', 'system' ),
 			'basalamhub-settings'   => array( __( 'تنظیمات', 'basalamhub' ), 'settings', 'system' ),
 		);
 	}

@@ -467,3 +467,27 @@ body.bsh-app-screen #wpbody-content > .update-nag { display: none; }
 	.bsh-toast, .bsh-toast.is-leaving { animation: none; }
 	.bsh-root .bsh-hscore__arc { transition: none; }
 }
+
+/* ---- Live test («تست با باسلام واقعی») ---- */
+.bsh-root .bsh-livetest__steps { margin: var(--space-3) 0 0; padding: 0; list-style: none; counter-reset: none; }
+.bsh-root .bsh-livetest__step { margin: 0; padding: var(--space-3) 0; border-top: 1px solid var(--line); }
+.bsh-root .bsh-livetest__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.bsh-root .bsh-livetest__head strong { font: 700 15px/26px var(--font-sans); color: var(--ink); }
+.bsh-root .bsh-livetest__head .bsh-card__meta { max-width: 720px; }
+.bsh-root .bsh-livetest__head .bsh-btn { flex: none; min-width: 96px; }
+.bsh-root .bsh-livetest__head .bsh-btn[data-state="ok"] { border-color: var(--success); color: var(--success); }
+.bsh-root .bsh-livetest__head .bsh-btn[data-state="fail"] { border-color: var(--danger); color: var(--danger); }
+.bsh-root .bsh-livetest__result { margin: var(--space-2) 0 0; padding: 10px 12px; border-radius: var(--radius-md); background: var(--surface-sunken); list-style: none; }
+.bsh-root .bsh-livetest__result li { position: relative; margin: 0; padding: 3px 22px 3px 0; font: 400 13px/22px var(--font-sans); color: var(--ink-secondary); overflow-wrap: anywhere; }
+.bsh-root .bsh-livetest__result li::before { position: absolute; inset-inline-start: 0; top: 3px; width: 16px; text-align: center; font-weight: 700; }
+.bsh-root .bsh-livetest__result li.is-ok::before { content: "✓"; color: var(--success); }
+.bsh-root .bsh-livetest__result li.is-warn::before { content: "!"; color: var(--warning); }
+.bsh-root .bsh-livetest__result li.is-fail::before { content: "✕"; color: var(--danger); }
+.bsh-root .bsh-livetest__result li.is-info::before { content: "·"; color: var(--ink-muted); }
+.bsh-root .bsh-livetest__result li.is-fail { color: var(--danger); }
+.bsh-root .bsh-livetest__result strong { color: var(--ink); font-weight: 600; }
+.bsh-root .bsh-livetest__result strong + span::before { content: " — "; color: var(--ink-muted); }
+.bsh-root .bsh-livetest__report { width: 100%; min-height: 220px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-sunken); color: var(--ink); font: 400 12px/22px ui-monospace, "Vazirmatn", monospace; resize: vertical; }
+@media (max-width: 560px) {
+	.bsh-root .bsh-livetest__head { flex-direction: column; align-items: stretch; }
+}
