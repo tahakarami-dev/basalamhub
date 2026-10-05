@@ -40,24 +40,24 @@ class BSH_App {
 	}
 
 	/**
-	 * Navigation: slug => [label, dashicon, group].
+	 * Navigation: slug => [label, icon, group].
 	 *
 	 * @return array<string,array>
 	 */
 	public static function pages() {
 		return array(
-			'basalamhub'            => array( __( 'داشبورد', 'basalamhub' ), 'dashicons-chart-area', 'store' ),
-			'basalamhub-sales'      => array( __( 'فروش', 'basalamhub' ), 'dashicons-chart-bar', 'store' ),
-			'basalamhub-products'   => array( __( 'محصولات', 'basalamhub' ), 'dashicons-products', 'store' ),
-			'basalamhub-orders'     => array( __( 'سفارش‌ها', 'basalamhub' ), 'dashicons-cart', 'store' ),
-			'basalamhub-bulk'       => array( __( 'ارسال گروهی', 'basalamhub' ), 'dashicons-upload', 'sync' ),
-			'basalamhub-link'       => array( __( 'اتصال محصولات غرفه', 'basalamhub' ), 'dashicons-admin-links', 'sync' ),
-			'basalamhub-import'     => array( __( 'ایمپورت غرفه', 'basalamhub' ), 'dashicons-download', 'sync' ),
-			'basalamhub-categories' => array( __( 'نگاشت دسته‌ها', 'basalamhub' ), 'dashicons-category', 'sync' ),
-			'basalamhub-pricing'    => array( __( 'قوانین قیمت', 'basalamhub' ), 'dashicons-tag', 'sync' ),
-			'basalamhub-logs'       => array( __( 'لاگ', 'basalamhub' ), 'dashicons-list-view', 'system' ),
-			'basalamhub-notify'     => array( __( 'اعلان‌ها', 'basalamhub' ), 'dashicons-bell', 'system' ),
-			'basalamhub-settings'   => array( __( 'تنظیمات', 'basalamhub' ), 'dashicons-admin-generic', 'system' ),
+			'basalamhub'            => array( __( 'داشبورد', 'basalamhub' ), 'dashboard', 'store' ),
+			'basalamhub-sales'      => array( __( 'فروش', 'basalamhub' ), 'chart', 'store' ),
+			'basalamhub-products'   => array( __( 'محصولات', 'basalamhub' ), 'package', 'store' ),
+			'basalamhub-orders'     => array( __( 'سفارش‌ها', 'basalamhub' ), 'bag', 'store' ),
+			'basalamhub-bulk'       => array( __( 'ارسال گروهی', 'basalamhub' ), 'upload', 'sync' ),
+			'basalamhub-link'       => array( __( 'اتصال محصولات غرفه', 'basalamhub' ), 'link', 'sync' ),
+			'basalamhub-import'     => array( __( 'ایمپورت غرفه', 'basalamhub' ), 'download', 'sync' ),
+			'basalamhub-categories' => array( __( 'نگاشت دسته‌ها', 'basalamhub' ), 'folder', 'sync' ),
+			'basalamhub-pricing'    => array( __( 'قوانین قیمت', 'basalamhub' ), 'tag', 'sync' ),
+			'basalamhub-logs'       => array( __( 'لاگ', 'basalamhub' ), 'logs', 'system' ),
+			'basalamhub-notify'     => array( __( 'اعلان‌ها', 'basalamhub' ), 'bell', 'system' ),
+			'basalamhub-settings'   => array( __( 'تنظیمات', 'basalamhub' ), 'settings', 'system' ),
 		);
 	}
 
@@ -84,22 +84,25 @@ class BSH_App {
 			</script>
 			<aside class="bsh-app__sidebar" data-bsh-sidebar aria-label="<?php esc_attr_e( 'منوی باسلام‌هاب', 'basalamhub' ); ?>">
 				<a class="bsh-app__brand" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub' ) ); ?>" data-bsh-nav>
-					<span class="bsh-app__logo" aria-hidden="true"><span class="dashicons dashicons-update"></span></span>
-					<span class="bsh-app__brand-name"><?php esc_html_e( 'باسلام‌هاب', 'basalamhub' ); ?></span>
+					<?php echo BSH_Icons::logo( 38 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?>
+					<span class="bsh-app__brand-text">
+						<span class="bsh-app__brand-name"><?php esc_html_e( 'باسلام‌هاب', 'basalamhub' ); ?></span>
+						<span class="bsh-app__brand-sub"><?php esc_html_e( 'همگام‌سازی ووکامرس و باسلام', 'basalamhub' ); ?></span>
+					</span>
 				</a>
 				<nav class="bsh-app__nav" data-bsh-sidebar-nav>
 					<?php self::nav( $slug ); ?>
 				</nav>
 				<div class="bsh-app__sidebar-foot">
-					<div class="bsh-app__booth">
-						<span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : 'bad'; ?>" aria-hidden="true"></span>
-						<span>
+					<a class="bsh-app__booth" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav>
+						<span class="bsh-app__booth-icon" aria-hidden="true"><?php BSH_Icons::e( 'store' ); ?><span class="bsh-app__dot bsh-app__dot--<?php echo $connected ? 'ok' : 'bad'; ?>"></span></span>
+						<span class="bsh-app__booth-text">
 							<strong><?php echo esc_html( $connected ? $conn['vendor_title'] : __( 'وصل نیست', 'basalamhub' ) ); ?></strong>
 							<small><?php echo esc_html( $connected ? __( 'غرفه‌ی متصل باسلام', 'basalamhub' ) : __( 'از تنظیمات وصل شو', 'basalamhub' ) ); ?></small>
 						</span>
-					</div>
+					</a>
 					<a class="bsh-app__exit" href="<?php echo esc_url( admin_url() ); ?>">
-						<span class="dashicons dashicons-wordpress" aria-hidden="true"></span>
+						<?php BSH_Icons::e( 'exit' ); ?>
 						<?php esc_html_e( 'بازگشت به پیشخوان وردپرس', 'basalamhub' ); ?>
 					</a>
 				</div>
@@ -109,7 +112,7 @@ class BSH_App {
 			<div class="bsh-app__body">
 				<header class="bsh-app__topbar">
 					<button type="button" class="bsh-app__icon-btn bsh-app__menu-btn" data-bsh-menu aria-label="<?php esc_attr_e( 'باز کردن منو', 'basalamhub' ); ?>">
-						<span class="dashicons dashicons-menu-alt3" aria-hidden="true"></span>
+						<?php BSH_Icons::e( 'menu' ); ?>
 					</button>
 					<div class="bsh-app__crumbs">
 						<span><?php esc_html_e( 'باسلام‌هاب', 'basalamhub' ); ?></span>
@@ -118,7 +121,7 @@ class BSH_App {
 					</div>
 					<form class="bsh-app__search" method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" role="search" data-bsh-nav-form>
 						<input type="hidden" name="page" value="basalamhub-products">
-						<span class="dashicons dashicons-search" aria-hidden="true"></span>
+						<?php BSH_Icons::e( 'search' ); ?>
 						<input type="search" name="s" value="<?php echo esc_attr( $search ); ?>" placeholder="<?php esc_attr_e( 'جستجوی محصول با نام یا SKU', 'basalamhub' ); ?>" aria-label="<?php esc_attr_e( 'جستجوی محصول', 'basalamhub' ); ?>">
 					</form>
 					<div class="bsh-app__actions">
@@ -127,7 +130,7 @@ class BSH_App {
 							<?php echo $connected ? esc_html__( 'متصل به باسلام', 'basalamhub' ) : esc_html__( 'وصل نیست', 'basalamhub' ); ?>
 						</a>
 						<button type="button" class="bsh-app__icon-btn" data-bsh-theme aria-label="<?php esc_attr_e( 'تغییر پوسته: خودکار، روشن، تیره', 'basalamhub' ); ?>" title="<?php esc_attr_e( 'پوسته', 'basalamhub' ); ?>">
-							<span class="dashicons dashicons-admin-appearance" aria-hidden="true"></span>
+							<?php BSH_Icons::e( 'theme' ); ?>
 						</button>
 						<a class="bsh-app__user" href="<?php echo esc_url( get_edit_profile_url() ); ?>" title="<?php esc_attr_e( 'نمایه', 'basalamhub' ); ?>">
 							<span class="bsh-app__avatar" aria-hidden="true"><?php echo esc_html( mb_strtoupper( mb_substr( trim( $user->display_name ) ? trim( $user->display_name ) : $user->user_login, 0, 1 ) ) ); ?></span>
@@ -178,11 +181,11 @@ class BSH_App {
 					$badge = '<span class="bsh-app__badge">' . esc_html( bsh_fa_digits( BSH_Bulk::progress( $batch )['percent'] ) ) . '٪</span>';
 				}
 				printf(
-					'<a class="bsh-app__nav-item%1$s" href="%2$s" data-bsh-nav %3$s><span class="dashicons %4$s" aria-hidden="true"></span><span>%5$s</span>%6$s</a>',
+					'<a class="bsh-app__nav-item%1$s" href="%2$s" data-bsh-nav %3$s>%4$s<span class="bsh-app__nav-text">%5$s</span>%6$s</a>',
 					$slug === $active ? ' is-active' : '',
 					esc_url( admin_url( 'admin.php?page=' . $slug ) ),
 					$slug === $active ? 'aria-current="page"' : '',
-					esc_attr( $page[1] ),
+					BSH_Icons::svg( $page[1] ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG.
 					esc_html( $page[0] ),
 					$badge // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built from escaped parts above.
 				);

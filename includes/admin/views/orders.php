@@ -32,7 +32,7 @@ $bsh_failed    = BSH_Logger::query(
 	</div>
 	<?php if ( $bsh_enabled ) : ?>
 		<button type="button" class="bsh-btn bsh-btn--primary" data-bsh-orders-poll>
-			<span class="dashicons dashicons-update" aria-hidden="true"></span>
+			<?php BSH_Icons::e( 'refresh' ); ?>
 			<?php esc_html_e( 'دریافت سفارش‌ها الان', 'basalamhub' ); ?>
 		</button>
 	<?php endif; ?>
@@ -109,7 +109,7 @@ $bsh_failed    = BSH_Logger::query(
 	<div class="bsh-card__head"><h2 class="bsh-card__title"><?php esc_html_e( 'آخرین سفارش‌ها', 'basalamhub' ); ?></h2></div>
 	<?php if ( ! $bsh_rows ) : ?>
 		<div class="bsh-empty">
-			<span class="dashicons dashicons-cart" aria-hidden="true"></span>
+			<?php BSH_Icons::e( 'bag' ); ?>
 			<p><?php echo $bsh_enabled ? esc_html__( 'هنوز سفارشی از باسلام نیامده. سفارش بعدی خودکار اینجا و در سفارش‌های ووکامرس ظاهر می‌شود.', 'basalamhub' ) : esc_html__( 'با روشن کردن دریافت سفارش‌ها، سفارش‌های باسلام اینجا می‌آیند.', 'basalamhub' ); ?></p>
 		</div>
 	<?php else : ?>

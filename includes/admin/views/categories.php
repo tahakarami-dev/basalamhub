@@ -69,7 +69,7 @@ $bsh_inherited = function ( $term_id ) use ( $bsh_map ) {
 	</p>
 	<div class="bsh-card__foot">
 		<button type="button" class="bsh-btn" data-bsh-cat-refresh <?php disabled( ! BSH_Settings::is_connected() ); ?>>
-			<span class="dashicons dashicons-update" aria-hidden="true"></span>
+			<?php BSH_Icons::e( 'refresh' ); ?>
 			<?php echo $bsh_items ? esc_html__( 'به‌روزرسانی فهرست', 'basalamhub' ) : esc_html__( 'دریافت فهرست از باسلام', 'basalamhub' ); ?>
 		</button>
 	</div>

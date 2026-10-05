@@ -50,10 +50,10 @@ $bsh_bad_checks = count(
 	)
 );
 $bsh_level_icon = array(
-	'success' => 'dashicons-yes-alt',
-	'warning' => 'dashicons-clock',
-	'error'   => 'dashicons-warning',
-	'info'    => 'dashicons-info-outline',
+	'success' => 'check',
+	'warning' => 'clock',
+	'error'   => 'alert',
+	'info'    => 'info',
 );
 ?>
 <header class="bsh-page-head bsh-page-head--row">
@@ -73,7 +73,7 @@ $bsh_level_icon = array(
 	</div>
 	<?php if ( $bsh_connected ) : ?>
 		<a class="bsh-btn bsh-btn--primary" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-bulk' ) ); ?>" data-bsh-nav>
-			<span class="dashicons dashicons-upload" aria-hidden="true"></span><?php esc_html_e( 'ارسال محصولات', 'basalamhub' ); ?>
+			<?php BSH_Icons::e( 'upload' ); ?><?php esc_html_e( 'ارسال محصولات', 'basalamhub' ); ?>
 		</a>
 	<?php else : ?>
 		<a class="bsh-btn bsh-btn--primary" href="<?php echo esc_url( admin_url( 'admin.php?page=basalamhub-settings' ) ); ?>" data-bsh-nav><?php esc_html_e( 'اتصال به باسلام', 'basalamhub' ); ?></a>
@@ -119,9 +119,9 @@ $bsh_level_icon = array(
 		<span class="bsh-tile__value"><?php echo esc_html( bsh_fa_number( $bsh_open_err ) ); ?></span>
 		<span class="bsh-tile__meta">
 			<?php if ( $bsh_open_err ) : ?>
-				<span class="dashicons dashicons-warning" aria-hidden="true"></span><?php esc_html_e( 'دلیل و راه‌حل در لاگ', 'basalamhub' ); ?>
+				<?php BSH_Icons::e( 'alert' ); ?><?php esc_html_e( 'دلیل و راه‌حل در لاگ', 'basalamhub' ); ?>
 			<?php else : ?>
-				<span class="dashicons dashicons-yes-alt" aria-hidden="true"></span><?php esc_html_e( 'همه‌چیز تحت کنترل است', 'basalamhub' ); ?>
+				<?php BSH_Icons::e( 'check' ); ?><?php esc_html_e( 'همه‌چیز تحت کنترل است', 'basalamhub' ); ?>
 			<?php endif; ?>
 		</span>
 	</a>
@@ -134,10 +134,10 @@ $bsh_level_icon = array(
 			if ( ! BSH_Order_Sync::enabled() ) {
 				esc_html_e( 'دریافت سفارش‌ها خاموش است', 'basalamhub' );
 			} elseif ( $bsh_missing ) {
-				echo '<span class="dashicons dashicons-warning" aria-hidden="true"></span>' . esc_html__( 'در ووکامرس ثبت نشده‌اند', 'basalamhub' );
+				echo BSH_Icons::svg( 'alert', 16 ) . esc_html__( 'در ووکامرس ثبت نشده‌اند', 'basalamhub' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG icon.
 			} else {
 				/* translators: %s: count */
-				echo '<span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>' . esc_html( sprintf( __( '%s سفارش باسلام در سایت', 'basalamhub' ), bsh_fa_number( BSH_Order_Sync::imported_count() ) ) );
+				echo BSH_Icons::svg( 'check', 16 ) . esc_html( sprintf( __( '%s سفارش باسلام در سایت', 'basalamhub' ), bsh_fa_number( BSH_Order_Sync::imported_count() ) ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG icon.
 			}
 			?>
 		</span>
@@ -159,7 +159,7 @@ $bsh_level_icon = array(
 		</div>
 		<?php if ( 0 === $bsh_sum_ok + $bsh_sum_err ) : ?>
 			<div class="bsh-empty">
-				<span class="dashicons dashicons-chart-bar" aria-hidden="true"></span>
+				<?php BSH_Icons::e( 'chart' ); ?>
 				<p><?php esc_html_e( 'هنوز فعالیتی ثبت نشده. بعد از اولین ارسال، نمودار اینجا پر می‌شود.', 'basalamhub' ); ?></p>
 			</div>
 		<?php else : ?>
@@ -224,7 +224,7 @@ $bsh_level_icon = array(
 		<ul class="bsh-health">
 			<?php foreach ( $bsh_checks as $bsh_check ) : ?>
 				<li class="bsh-health__item bsh-health__item--<?php echo esc_attr( $bsh_check[0] ); ?>">
-					<span class="dashicons <?php echo esc_attr( 'ok' === $bsh_check[0] ? 'dashicons-yes-alt' : ( 'warn' === $bsh_check[0] ? 'dashicons-warning' : 'dashicons-dismiss' ) ); ?>" aria-hidden="true"></span>
+					<?php BSH_Icons::e( 'ok' === $bsh_check[0] ? 'check' : ( 'warn' === $bsh_check[0] ? 'alert' : 'error' ), 20, 'bsh-health__icon' ); ?>
 					<span class="bsh-health__text">
 						<strong><?php echo esc_html( $bsh_check[1] ); ?></strong>
 						<?php if ( $bsh_check[3] ) : ?>
@@ -249,7 +249,7 @@ $bsh_level_icon = array(
 			<ul class="bsh-feed">
 				<?php foreach ( $bsh_events as $bsh_ev ) : ?>
 					<li class="bsh-feed__item bsh-feed__item--<?php echo esc_attr( $bsh_ev->level ); ?>">
-						<span class="bsh-feed__icon dashicons <?php echo esc_attr( $bsh_level_icon[ $bsh_ev->level ] ); ?>" aria-hidden="true"></span>
+						<span class="bsh-feed__icon"><?php BSH_Icons::e( $bsh_level_icon[ $bsh_ev->level ], 16 ); ?></span>
 						<span class="bsh-feed__text">
 							<strong><?php echo esc_html( $bsh_ev->title ); ?></strong>
 							<span><?php echo esc_html( $bsh_ev->message ); ?></span>

@@ -5,7 +5,7 @@ Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.8.0
+Stable tag: 0.8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,7 +91,14 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 = 0.7.0 =
 نام افزونه «باسلام‌هاب» شد. بعد از نصب، اطلاعات نسخه‌ی قبلی خودکار منتقل و افزونه‌ی قدیمی غیرفعال می‌شود.
 
+== Credits ==
+
+آیکون‌ها بر پایه‌ی Lucide (https://lucide.dev) با مجوز ISC.
+
 == Changelog ==
+
+= 0.8.1 =
+* ظاهر تازه: لوگوی اختصاصی (حرف «ب» به شکل پیکان همگام‌سازی)، منوی کناری بازطراحی‌شده و مجموعه آیکون خطی یکدست به‌جای آیکون‌های پیش‌فرض وردپرس
 
 = 0.8.0 =
 * داشبورد «فروش دوکاناله»: فروش روزانه‌ی سایت و باسلام (۷/۳۰/۹۰ روز)، مقایسه با دوره‌ی قبل، سهم باسلام، سود پس از کمیسیون، پرفروش‌ها
