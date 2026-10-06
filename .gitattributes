@@ -1,0 +1,2 @@
+includes/license/RTL_License_*.php -text -diff binary
+includes/license/bsh-license.php -text
