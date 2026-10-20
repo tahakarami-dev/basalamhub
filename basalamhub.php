@@ -83,6 +83,6 @@ add_action(
 );
 
 // Licensed edition (RTL Theme): the plugin boots only when the license is active.
-// BSH_Plugin::boot is hooked from includes/license/bsh-license.php (encoded on release).
+// BSH_Plugin::boot is hooked from bsh-license.php in this folder (encoded on release).
 require_once BSH_DIR . 'includes/license/class-bsh-license-guard.php';
 BSH_License_Guard::load();

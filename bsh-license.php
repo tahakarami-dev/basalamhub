@@ -19,7 +19,7 @@ $rtlLicenseClassName  = 'RTL_License_420efec66a1fed09';
 $rtlLicenseFilePath   = __DIR__ . DIRECTORY_SEPARATOR . $rtlLicenseClassName . '.php';
 $rtlLicenseFileHash   = @sha1_file($rtlLicenseFilePath);
 
-if ( $rtlLicenseFileHash === '00bb7bc3407cc988636cdb5ed0828bf9ffce0d37' && file_exists($rtlLicenseFilePath) ) {
+if ( $rtlLicenseFileHash === 'eba12f5015d2e31586fbad55678f469c056ae8a1' && file_exists($rtlLicenseFilePath) ) {
 	require_once $rtlLicenseFilePath;
 
 	if ( class_exists($rtlLicenseClassName) && method_exists($rtlLicenseClassName, 'isActive') ) {
