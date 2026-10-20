@@ -34,7 +34,6 @@ class BSH_License_Guard {
 		}
 		// The license file and its gate sit in the plugin's root folder, as RTL Theme requires.
 		require_once dirname( __DIR__, 2 ) . '/bsh-license.php';
-		add_action( 'admin_notices', array( __CLASS__, 'notice_inactive' ) );
 	}
 
 	/**
@@ -74,18 +73,6 @@ class BSH_License_Guard {
 		echo '<div class="notice notice-error"><p dir="rtl" style="text-align:right"><strong>' . esc_html__( 'باسلام‌هاب فعال نشد.', 'basalamhub' ) . '</strong> ';
 		/* translators: %s: PHP version */
 		echo esc_html( sprintf( __( 'این نسخه برای بررسی لایسنس به «ionCube Loader» روی هاست نیاز دارد که الان نصب نیست. از پشتیبانی هاست بخواه آن را برای PHP نسخه‌ی %s فعال کند؛ معمولاً چند دقیقه طول می‌کشد. تا آن موقع افزونه کاری انجام نمی‌دهد و به سایتت آسیبی نمی‌زند.', 'basalamhub' ), self::php_version() ) );
-		echo '</p></div>';
-	}
-
-	/**
-	 * Loader present, license not active (yet).
-	 */
-	public static function notice_inactive() {
-		if ( defined( 'BSH_LICENSED' ) || ! self::can_see() ) {
-			return;
-		}
-		echo '<div class="notice notice-warning"><p dir="rtl" style="text-align:right"><strong>' . esc_html__( 'باسلام‌هاب هنوز فعال نشده.', 'basalamhub' ) . '</strong> ';
-		echo esc_html__( 'لایسنس خریدت از راست‌چین را فعال کن تا همگام‌سازی با باسلام شروع شود. تا آن موقع هیچ چیزی به باسلام فرستاده نمی‌شود.', 'basalamhub' );
 		echo '</p></div>';
 	}
 }
